@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#F6F2EC">
+<title>Bahay Cafe</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<style>
+/* ── 브랜드 팔레트: 로고 받으면 여기 5개 값만 교체 (K-Food 크림 베이스 유지) ── */
+:root {
+  --accent:#8B4A25;      /* 메인 액센트 (흰 배경 대비 6.5:1) */
+  --accent-dark:#6B3519; /* 그라데이션 끝 */
+  --accent-2:#A65D33;    /* 막대 그래프 시작색 */
+  --accent-soft:#EBD3C2; /* 액센트 배경 위 보조 글자 */
+  --accent-bg:#F8EEE7;   /* 선택된 행/카드 배경 */
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, "Pretendard", "Segoe UI", sans-serif; background:#F6F2EC; color:#1E1A17; -webkit-text-size-adjust:100%; }
+input, select, button { font-family: inherit; }
+/* muted text darkened for AA contrast (was #807460) */
+:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+input:focus, select:focus, textarea:focus { border-color:var(--accent); }
+.peso-field:focus-within { border-color:var(--accent); }
+/* 정렬용 숫자 모노 (시스템 폰트, 외부 로딩 없음; 한글은 Pretendard로 폴백) */
+/* GCash = 중립 정보(파랑) KPI 변형 */
+.kpi.accent-blue { background:linear-gradient(135deg,#2563EB,#1E40AF); border:none; }
+.kpi.accent-blue .kpi-label,.kpi.accent-blue .delta,.kpi.accent-blue .delta.up,.kpi.accent-blue .delta.down,.kpi.accent-blue .delta.flat { color:#C7D9F3; }
+.kpi.accent-blue .kpi-value { color:#fff; }
+.login-wrap { min-height:100vh; display:grid; place-items:center; padding:20px; }
+.login-card { background:#fff; border-radius:20px; padding:34px 30px; width:100%; max-width:390px; box-shadow:0 14px 40px rgba(110,60,30,.12); }
+.login-logo-img { width:100%; max-width:260px; display:block; margin:6px auto 18px; }
+.login-card h1 { text-align:center; font-size:18px; margin-bottom:4px; letter-spacing:-.3px; }
+.login-card .sub { text-align:center; color:#807460; font-size:12px; margin-bottom:22px; letter-spacing:.5px; text-transform:uppercase; }
+.field { margin-bottom:14px; }
+.field label { display:block; font-size:13px; font-weight:600; margin-bottom:6px; }
+.field select, .field input { width:100%; border:1.5px solid #D8CDBD; border-radius:11px; padding:12px; font-size:15px; background:#fff; }
+.err { background:#FBE4E3; color:var(--accent); padding:10px; border-radius:9px; font-size:13px; margin-bottom:14px; text-align:center; }
+.setup-note { background:#FBF1DC; color:#9A6A1E; padding:14px; border-radius:11px; font-size:12.5px; line-height:1.6; margin-bottom:16px; }
+.topbar { display:flex; justify-content:space-between; align-items:center; padding:13px 20px; background:#fff; border-bottom:1px solid #E6DFD4; gap:12px; }
+.topbar-logo { height:30px; }
+.who { display:flex; align-items:center; gap:10px; }
+.who-name { font-size:13px; font-weight:600; text-align:right; }
+.who-name small { display:block; color:#807460; font-weight:500; }
+.logout { border:1px solid #D8CDBD; background:#fff; border-radius:9px; padding:7px 12px; font-size:12px; cursor:pointer; color:#5E4A36; }
+.tabs { display:flex; gap:2px; padding:10px 20px 0; background:#fff; border-bottom:1px solid #E6DFD4; overflow-x:auto; }
+.tab { border:none; background:none; padding:10px 14px; font-size:14px; font-weight:600; color:#807460; cursor:pointer; border-bottom:2.5px solid transparent; white-space:nowrap; }
+.tab.on { color:var(--accent); border-bottom-color:var(--accent); }
+.content { padding:20px; max-width:1080px; margin:0 auto; }
+.grid-2 { display:grid; grid-template-columns:1.4fr 1fr; gap:18px; }
+@media(max-width:820px){ .grid-2{ grid-template-columns:1fr; } }
+.card { background:#fff; border:1px solid #E6DFD4; border-radius:16px; padding:20px; margin-bottom:18px; }
+.card-head { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:14px; flex-wrap:wrap; gap:8px; }
+.card h2 { font-size:16px; font-weight:800; margin:0 0 14px; letter-spacing:-.3px; }
+.card-head h2 { margin:0; }
+.date-pill { background:#F3ECE0; color:#8E7A5E; font-size:12px; font-weight:600; padding:5px 10px; border-radius:20px; border:none; }
+.muted { color:#807460; font-size:12px; }
+.section-label { font-size:12px; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:.5px; margin:18px 0 8px; }
+.menu-row { display:grid; grid-template-columns:1fr auto auto auto; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid #F0E9DD; }
+.m-name { font-weight:600; font-size:14px; }
+.m-price { color:#807460; font-size:13px; }
+.m-sub { font-weight:700; font-variant-numeric:tabular-nums; min-width:62px; text-align:right; color:#5E4A36; }
+.stepper { display:flex; align-items:center; gap:4px; }
+.stepper button { width:38px; height:38px; border:1px solid #D8CDBD; background:#fff; border-radius:8px; font-size:18px; cursor:pointer; color:#5E4A36; }
+.stepper input { width:52px; text-align:center; border:1px solid #D8CDBD; border-radius:8px; padding:8px; font-size:15px; font-variant-numeric:tabular-nums; }
+.exp-row { display:grid; grid-template-columns:1.2fr 100px auto; gap:8px; margin-bottom:8px; }
+.exp-row select, .exp-row input { border:1px solid #D8CDBD; border-radius:8px; padding:9px 10px; font-size:13px; width:100%; }
+.exp-add { border:1px solid #D8CDBD; background:#F6F2EC; border-radius:8px; width:38px; cursor:pointer; font-size:17px; color:#5E4A36; }
+.sticky { align-self:start; }
+.pay-input { margin-bottom:12px; }
+.pay-input label { display:block; font-size:13px; font-weight:600; margin-bottom:5px; }
+.peso-field { display:flex; align-items:center; border:1.5px solid #D8CDBD; border-radius:10px; overflow:hidden; }
+.peso-field span { padding:0 12px; color:#807460; font-weight:700; background:#F6F2EC; align-self:stretch; display:flex; align-items:center; }
+.peso-field input { flex:1; border:none; padding:12px; font-size:16px; font-variant-numeric:tabular-nums; outline:none; width:100%; }
+.reconcile { background:#FAF6EF; border-radius:12px; padding:14px; margin:14px 0; }
+.rec-row { display:flex; justify-content:space-between; padding:5px 0; font-size:14px; }
+.rec-row.big { font-size:16px; padding:12px 0; border-top:1px solid #E6DFD4; margin-top:8px; }
+.rec-row b { font-variant-numeric:tabular-nums; }
+.rec-flag { margin-top:8px; padding:10px 12px; border-radius:9px; font-weight:700; font-size:14px; text-align:center; }
+.rec-flag.ok { background:#E3F3E8; color:#1F7A43; }
+.rec-flag.bad { background:#FBE4E3; color:var(--accent); }
+.rec-flag.idle { background:#F0E9DD; color:#807460; font-weight:500; }
+.btn-primary { width:100%; background:var(--accent); color:#fff; border:none; padding:14px; border-radius:11px; font-size:15px; font-weight:700; cursor:pointer; margin-top:6px; }
+.btn-primary:disabled { background:#D8CDBD; cursor:not-allowed; }
+.hint { font-size:12px; color:#807460; margin:10px 0 0; line-height:1.5; }
+.prev-row { display:flex; justify-content:space-between; padding:7px 0; font-size:13px; border-bottom:1px solid #F0E9DD; }
+.kpi-row { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:18px; }
+@media(max-width:820px){ .kpi-row{ grid-template-columns:1fr; } }
+.kpi { background:#fff; border:1px solid #E6DFD4; border-radius:14px; padding:18px; }
+.kpi.accent { background:linear-gradient(135deg,var(--accent),var(--accent-dark)); border:none; }
+.kpi-label { font-size:12px; color:#807460; margin-bottom:8px; }
+.kpi.accent .kpi-label { color:var(--accent-soft); }
+.kpi-value { font-size:23px; font-weight:800; font-variant-numeric:tabular-nums; letter-spacing:-.5px; }
+.kpi.accent .kpi-value { color:#fff; }
+.bar-row { display:grid; grid-template-columns:92px 1fr auto; align-items:center; gap:10px; margin-bottom:11px; }
+.bar-name { font-size:13px; font-weight:600; display:flex; align-items:center; gap:5px; }
+.bar-track { background:#F0E9DD; border-radius:6px; height:13px; overflow:hidden; }
+.bar-fill { background:linear-gradient(90deg,var(--accent-2),var(--accent)); height:100%; }
+.bar-val { font-size:13px; font-weight:700; font-variant-numeric:tabular-nums; min-width:66px; text-align:right; }
+.badge { font-size:10px; font-weight:700; padding:1px 6px; border-radius:5px; }
+.data-table { width:100%; border-collapse:collapse; font-size:13px; }
+.data-table th { text-align:left; color:#807460; font-size:11px; text-transform:uppercase; letter-spacing:.4px; padding:8px 6px; border-bottom:2px solid #E6DFD4; }
+.data-table th small { display:block; font-weight:500; text-transform:none; letter-spacing:0; color:#BDB2A0; }
+.data-table td { padding:9px 6px; border-bottom:1px solid #F0E9DD; }
+.tscroll { overflow:auto; max-height:76vh; -webkit-overflow-scrolling:touch; }
+.tscroll thead th { position:sticky; top:0; background:#fff; z-index:2; }
+.data-table .num { text-align:right; font-variant-numeric:tabular-nums; }
+.data-table .pos { color:#1F7A43; }
+.data-table .neg { color:var(--accent); }
+.empty { color:#807460; text-align:center; padding:18px; }
+.tag-due { background:#FBE4E3; color:var(--accent); padding:2px 8px; border-radius:6px; font-weight:700; }
+.formula { margin-top:14px; background:#FAF6EF; border-radius:10px; padding:12px 14px; font-size:13px; color:#5E4A36; line-height:1.6; }
+.order-card { border:1px solid #E6DFD4; border-radius:12px; padding:14px; margin-bottom:12px; }
+.order-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+.order-items { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+.chip { background:#F3ECE0; color:#5E4A36; font-size:12px; font-weight:600; padding:4px 10px; border-radius:20px; }
+.order-foot { display:flex; justify-content:space-between; align-items:center; font-size:13px; color:#5E4A36; gap:8px; flex-wrap:wrap; }
+.status { font-size:12px; font-weight:700; padding:3px 10px; border-radius:20px; }
+.s-CONFIRMED { background:#E8EEF6; color:#3A5A82; }
+.s-SHIPPING { background:#FBF1DC; color:#9A6A1E; }
+.s-DELIVERED { background:#E3F3E8; color:#1F7A43; }
+.btn-mini { border:1px solid var(--accent); color:var(--accent); background:#fff; border-radius:8px; padding:9px 12px; font-size:12px; font-weight:700; cursor:pointer; }
+.done-mark { color:#1F7A43; font-weight:700; font-size:13px; }
+.toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:#1E1A17; color:#fff; padding:13px 22px; border-radius:30px; font-size:14px; font-weight:600; box-shadow:0 8px 24px rgba(0,0,0,.25); z-index:99; }
+.loading { text-align:center; padding:40px; color:#807460; }
+.report-pl .pl-row { display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px solid #F0E9DD; font-size:14px; }
+.report-pl .pl-row.total { border-top:2px solid #E6DFD4; border-bottom:none; font-weight:800; font-size:17px; padding-top:13px; margin-top:4px; }
+.report-pl b { font-variant-numeric:tabular-nums; }
+.filter-bar { display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
+.filter-bar select, .filter-bar input { border:1px solid #D8CDBD; border-radius:9px; padding:8px 10px; font-size:13px; }
+.scroll-list { max-height:none; }
+.kpi-row.four { grid-template-columns:repeat(4,1fr); }
+@media(max-width:820px){ .kpi-row.four{ grid-template-columns:repeat(2,1fr); } }
+.kpi .delta { font-size:12px; font-weight:700; margin-top:5px; }
+.kpi.accent .delta { color:var(--accent-soft); }
+.delta.up{ color:#1F7A43; } .delta.down{ color:var(--accent); } .delta.flat{ color:#807460; }
+.kpi.accent .delta.up,.kpi.accent .delta.down,.kpi.accent .delta.flat{ color:var(--accent-soft); }
+.report-title { font-size:18px; font-weight:800; margin:2px 0 16px; letter-spacing:-.3px; }
+.report-title span { color:#807460; font-weight:600; font-size:14px; }
+.ebar-row { display:grid; grid-template-columns:110px 1fr auto; align-items:center; gap:10px; margin-bottom:10px; }
+.ebar-name { font-size:13px; font-weight:600; }
+.ebar-track { background:#F0E9DD; border-radius:6px; height:12px; overflow:hidden; }
+.ebar-fill { background:linear-gradient(90deg,#E0A93F,#C9842A); height:100%; }
+.ebar-val { font-size:13px; font-weight:700; font-variant-numeric:tabular-nums; min-width:66px; text-align:right; }
+.pl-sub { padding-left:14px; color:#807460; font-size:13px; }
+.legend { display:flex; gap:18px; margin-bottom:6px; }
+.legend span { display:flex; align-items:center; gap:6px; font-size:12px; font-weight:600; color:#5E4A36; }
+.legend i { width:11px; height:11px; border-radius:3px; display:inline-block; }
+.minibar { display:inline-block; height:8px; border-radius:4px; background:linear-gradient(90deg,var(--accent-2),var(--accent)); vertical-align:middle; margin-right:6px; }
+.m-en { display:block; font-size:11px; color:#807460; font-weight:500; font-style:normal; }
+.add-form { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px; align-items:center; }
+.add-form input, .add-form select { border:1px solid #D8CDBD; border-radius:8px; padding:9px 10px; font-size:13px; }
+.add-form input { flex:1; min-width:80px; }
+.mng-row { display:grid; grid-template-columns:1fr auto auto; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid #F0E9DD; font-size:14px; }
+.mng-price { font-weight:700; font-variant-numeric:tabular-nums; color:#5E4A36; }
+.mng-del { border:1px solid #E0C0BE; color:var(--accent); background:#fff; border-radius:7px; padding:5px 10px; font-size:12px; font-weight:600; cursor:pointer; }
+.lang-toggle { display:flex; gap:4px; }
+.lang-toggle button { border:1px solid #D8CDBD; background:#fff; border-radius:8px; padding:6px 10px; font-size:12px; font-weight:700; color:#807460; cursor:pointer; white-space:nowrap; }
+.lang-toggle button.on { background:var(--accent); color:#fff; border-color:var(--accent); }
+.lang-sub { display:block; font-size:11px; color:#807460; font-weight:500; font-style:italic; margin-top:1px; }
+.btn-primary .lang-sub { color:var(--accent-soft); font-weight:600; }
+.update-stamp { font-size:12.5px; color:#807460; font-weight:600; margin:0 0 16px; }
+.update-stamp b { color:#5E4A36; }
+.mng-row.editable { grid-template-columns:1fr 96px auto; }
+.mng-price-input { width:96px; text-align:right; border:1px solid #D8CDBD; border-radius:7px; padding:6px 8px; font-size:13px; font-variant-numeric:tabular-nums; }
+.legend.multi { flex-wrap:wrap; gap:8px 16px; }
+/* ── Bahay Cafe 추가 ── */
+.wordmark { text-align:center; margin:6px 0 18px; }
+.wordmark b { display:block; font-size:28px; font-weight:800; letter-spacing:-.6px; color:var(--accent); }
+.wordmark small { display:block; font-size:11px; color:#807460; letter-spacing:2px; text-transform:uppercase; margin-top:2px; }
+.topbar-mark { font-size:17px; font-weight:800; color:var(--accent); letter-spacing:-.4px; white-space:nowrap; }
+.tab { min-height:44px; }
+.logout, .lang-toggle button, .btn-mini, .mng-del { min-height:36px; }
+.kpi.alert { border-color:#E0A9A6; background:#FDF3F2; }
+.kpi.alert .kpi-value { color:#B5322E; }
+.kpi .kpi-sub { font-size:12px; color:#5E4A36; margin-top:6px; line-height:1.5; }
+.dot-red { display:inline-block; min-width:18px; height:18px; padding:0 5px; border-radius:9px; background:#B5322E; color:#fff; font-size:11px; font-weight:700; line-height:18px; text-align:center; margin-left:5px; vertical-align:1px; }
+.feed-row { display:flex; gap:10px; align-items:flex-start; padding:10px 0; border-bottom:1px solid #F0E9DD; font-size:14px; }
+.feed-row:last-child { border-bottom:none; }
+.feed-row .muted { white-space:nowrap; }
+.soon { border:1.5px dashed #D8CDBD; border-radius:14px; padding:22px; text-align:center; color:#5E4A36; line-height:1.7; }
+.soon b { color:var(--accent); }
+.emp-row { display:grid; grid-template-columns:1fr 96px 84px auto; align-items:center; gap:8px; padding:9px 0; border-bottom:1px solid #F0E9DD; font-size:13px; }
+.emp-row select, .emp-row input { border:1px solid #D8CDBD; border-radius:7px; padding:7px 8px; font-size:13px; width:100%; }
+.emp-row.off { opacity:.55; }
+@media(max-width:560px){ .emp-row{ grid-template-columns:1fr 1fr; } }
+.badge.admin { background:var(--accent-bg); color:var(--accent); }
+.badge.staff { background:#E8EEF6; color:#3A5A82; }
+.s-PENDING { background:#F0E9DD; color:#8E7A5E; }
+.s-APPROVED { background:var(--accent-bg); color:var(--accent); }
+.s-REJECTED { background:#FBE4E3; color:#B5322E; }
+@media(max-width:560px){ .topbar{ flex-wrap:wrap; padding:10px 16px; } .who{ width:100%; justify-content:space-between; } .content{ padding:16px; } }
+.kv { display:flex; justify-content:space-between; gap:10px; padding:8px 0; border-bottom:1px solid #F0E9DD; font-size:14px; }
+.kv b { font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-variant-numeric:tabular-nums; }
+</style>
+</head>
+<body>
+<div id="root"><div class="loading">불러오는 중… / Loading…</div></div>
+<script>
+// ════════════════════════════════════════════════════════
+//  ① Supabase 연결 정보 (K-Food 와 같은 프로젝트)
+// ════════════════════════════════════════════════════════
+const SUPABASE_URL = "https://lnrugwschlcesaaertgc.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucnVnd3NjaGxjZXNhYWVydGdjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0ODczNzgsImV4cCI6MjA5NjA2MzM3OH0.JTpEUF2TO2NcuS1ak04hqd2IYfZ2bYn40L3EaLIwVGw";
+//  · 카페 데이터는 cafe 스키마 (기본 클라이언트 sb)
+//  · K-Food 와 공유하는 공급요청은 kfr 스키마 (sbk = sb.schema("kfr"))
+//  두 스키마 모두 Settings → API → Exposed schemas 에 있어야 합니다.
+const SUPABASE_SCHEMA = "cafe";
+const SHARED_SCHEMA = "kfr";
+const STORAGE_BUCKET = "cafe";
+// 영업일 기준 시간대: 사장님이 한국에서 보더라도 '오늘'은 필리핀 매장 기준
+const STORE_TZ = "Asia/Manila";
+// 로고: 받으면 파일을 저장소에 올리고 경로를 넣으세요 (예: "logo.png"). 비우면 글자 로고.
+const LOGO = "";
+// ════════════════════════════════════════════════════════
+
+const PESO = "₱";
+const fmt = (n) => PESO + (Number(n) || 0).toLocaleString("en-PH");
+const today = () => new Date().toLocaleDateString("en-CA", { timeZone: STORE_TZ });
+const thisMonth = () => today().slice(0, 7);
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+const timeHM = (ts) => ts ? new Date(ts).toLocaleTimeString("en-GB", { timeZone: STORE_TZ, hour:"2-digit", minute:"2-digit" }) : "—";
+
+let sb = null, sbk = null;
+const state = { user:null, employees:[], settings:{}, tab:null, lang:(localStorage.getItem("cafe_lang")||"en") };
+
+// ── 다국어: ko / en(+tl 병기) ──
+const I18N = {
+  system_name:{ko:"카페 관리 시스템",en:"Cafe Management",tl:"Pamamahala ng Cafe"},
+  employee:{ko:"직원",en:"Employee",tl:"Empleyado"},
+  pin:{ko:"PIN 번호",en:"PIN",tl:"PIN number"},
+  login:{ko:"로그인",en:"Login",tl:"Mag-login"},
+  logout:{ko:"로그아웃",en:"Logout"},
+  loading:{ko:"불러오는 중…",en:"Loading…"},
+  err_no_account:{ko:"계정을 찾을 수 없습니다.",en:"Account not found / Hindi mahanap ang account."},
+  err_bad_pin:{ko:"PIN이 올바르지 않습니다.",en:"Incorrect PIN / Maling PIN."},
+  role_ADMIN:{ko:"사장",en:"Owner"},
+  role_STAFF:{ko:"직원",en:"Staff"},
+  tab_dashboard:{ko:"대시보드",en:"Dashboard"},
+  tab_clock:{ko:"출퇴근",en:"Time Clock"},
+  tab_inventory:{ko:"재고",en:"Inventory"},
+  tab_board:{ko:"게시판",en:"Board"},
+  tab_closing:{ko:"마감",en:"Closing"},
+  tab_daily:{ko:"일별 매출",en:"Daily Sales"},
+  tab_menurank:{ko:"메뉴 순위",en:"Menu Ranking"},
+  tab_report:{ko:"월별 보고서",en:"Monthly Report"},
+  tab_attendance:{ko:"근태",en:"Attendance"},
+  tab_supply:{ko:"공급요청",en:"Supply Requests"},
+  tab_manage:{ko:"관리",en:"Settings"},
+  coming_soon:{ko:"준비 중인 화면입니다",en:"Coming soon",tl:"Malapit na"},
+  save:{ko:"저장",en:"Save",tl:"I-save"},
+  saved:{ko:"저장되었습니다",en:"Saved / Na-save"},
+  save_fail:{ko:"저장 실패: ",en:"Save failed: "},
+};
+function tt(k){ const e=I18N[k]; if(!e) return k; return state.lang==="ko" ? (e.ko??k) : (e.en??k); }
+function tl(k){ const e=I18N[k]; if(!e) return k; if(state.lang==="ko") return e.ko??k; return (e.en??k)+(e.tl?`<span class="lang-sub">${e.tl}</span>`:""); }
+function langButtons(){ return [["ko","한국어"],["en","English · Tagalog"]].map(([k,l])=>`<button class="${state.lang===k?'on':''}" onclick="setLang('${k}')">${l}</button>`).join(""); }
+function setLang(l){ state.lang=l; localStorage.setItem("cafe_lang",l); if(state.user) renderApp(); else renderLogin(); }
+const empName = (e) => !e ? "" : (state.lang==="ko" ? e.name : (e.name_en || e.name));
+const empById = (id) => state.employees.find((e) => String(e.id) === String(id));
+const isAdmin = () => state.user?.role === "ADMIN";
+
+function logoHTML(big){
+  if (LOGO) return big ? `<img class="login-logo-img" src="${LOGO}" alt="Bahay Cafe">` : `<img class="topbar-logo" src="${LOGO}" alt="Bahay Cafe">`;
+  return big ? `<div class="wordmark"><b>☕ Bahay Cafe</b><small>${tl("system_name")}</small></div>` : `<span class="topbar-mark">☕ Bahay Cafe</span>`;
+}
+function setupError(msg, e){
+  const hint = /schema/i.test(e?.message||"") ? `<br><br>👉 Supabase → Settings → API → <b>Exposed schemas</b> 에 <b>cafe</b>, <b>kfr</b> 가 모두 있는지 확인하세요.` : "";
+  $("root").innerHTML = `<div class="login-wrap"><div class="login-card">${logoHTML(true)}<div class="setup-note">${msg}${hint}<br><br>오류: ${esc(e?.message||e)}</div></div></div>`;
+}
+
+async function init() {
+  sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { db: { schema: SUPABASE_SCHEMA } });
+  sbk = sb.schema(SHARED_SCHEMA);
+  try {
+    await loadEmployees();
+    await loadSettings();
+  } catch (e) {
+    setupError("DB 연결은 됐지만 cafe 테이블을 읽지 못했어요. Supabase SQL Editor 에서 <b>supabase/cafe_schema.sql</b> 을 실행했는지 확인해주세요.", e);
+    return;
+  }
+  // 새로고침해도 로그인 유지 (직원 폰 편의). 비활성/삭제된 계정이면 다시 로그인.
+  const saved = empById(localStorage.getItem("cafe_user"));
+  if (saved && saved.active !== false) { setUser(saved); renderApp(); }
+  else renderLogin();
+}
+async function loadEmployees(){
+  // PIN 은 로그인 순간에만 조회 (목록에는 싣지 않음)
+  const { data, error } = await sb.from("employees").select("id,name,name_en,role,active").order("id");
+  if (error) throw error;
+  state.employees = data || [];
+}
+async function loadSettings(){
+  const { data, error } = await sb.from("app_settings").select("key,value");
+  if (error) throw error;
+  state.settings = Object.fromEntries((data||[]).map((r) => [r.key, r.value]));
+}
+async function setSetting(key, value){
+  state.settings[key] = value;
+  return sb.from("app_settings").upsert({ key, value: String(value) });
+}
+function toast(msg) { const t=document.createElement("div"); t.className="toast"; t.setAttribute("role","status"); t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),2200); }
+
+// ── 로그인 ──────────────────────────────────────
+function renderLogin() {
+  const last = localStorage.getItem("cafe_last_emp");
+  const opts = state.employees.filter((e) => e.active !== false)
+    .map((e) => `<option value="${e.id}" ${String(e.id)===last?"selected":""}>${esc(empName(e))} · ${tt("role_"+e.role)}</option>`).join("");
+  $("root").innerHTML = `<div class="login-wrap"><div class="login-card">
+    ${logoHTML(true)}
+    <div class="lang-toggle" style="justify-content:center;margin-bottom:18px">${langButtons()}</div>
+    <div id="loginErr"></div>
+    <div class="field"><label for="loginEmp">${tl("employee")}</label><select id="loginEmp">${opts}</select></div>
+    <div class="field"><label for="loginPin">${tl("pin")}</label><input id="loginPin" type="password" inputmode="numeric" autocomplete="current-password" placeholder="••••"></div>
+    <button class="btn-primary" onclick="doLogin()">${tl("login")}</button>
+  </div></div>`;
+  $("loginPin").addEventListener("keydown", (e) => { if (e.key === "Enter") doLogin(); });
+}
+async function doLogin() {
+  const id = Number($("loginEmp").value), pin = $("loginPin").value.trim();
+  const { data, error } = await sb.from("employees").select("id,name,name_en,role,active,pin").eq("id", id).single();
+  if (error || !data || data.active === false) { $("loginErr").innerHTML = `<div class="err">${tt("err_no_account")}</div>`; return; }
+  if (String(data.pin) !== pin) { $("loginErr").innerHTML = `<div class="err">${tt("err_bad_pin")}</div>`; return; }
+  localStorage.setItem("cafe_last_emp", String(id));
+  localStorage.setItem("cafe_user", String(id));
+  setUser(data);
+  renderApp();
+}
+function setUser(e){
+  state.user = { id: e.id, name: e.name, name_en: e.name_en, role: e.role };
+  state.tab = tabsFor().some(([k]) => k === state.tab) ? state.tab : tabsFor()[0][0];
+}
+function logout() { state.user = null; state.tab = null; localStorage.removeItem("cafe_user"); renderLogin(); }
+
+// ── 탭 라우팅 (role 로 분기) ─────────────────────
+function tabsFor(){
+  if (isAdmin()) return ["dashboard","daily","menurank","report","attendance","inventory","supply","board","manage"].map((k)=>[k,tt("tab_"+k)]);
+  const t = ["clock","inventory","board"];
+  if (state.settings.staff_closing === "1") t.push("closing");
+  return t.map((k)=>[k,tt("tab_"+k)]);
+}
+function renderApp() {
+  const u = state.user;
+  $("root").innerHTML = `
+    <div class="topbar">
+      ${logoHTML(false)}
+      <div class="who"><div class="lang-toggle">${langButtons()}</div>
+        <div class="who-name">${esc(empName(u))}<small>${tt("role_"+u.role)}</small></div>
+        <button class="logout" onclick="logout()">${tt("logout")}</button></div>
+    </div>
+    <nav class="tabs" role="tablist">${tabsFor().map(([k,l])=>`<button class="tab ${state.tab===k?'on':''}" role="tab" aria-selected="${state.tab===k}" onclick="go('${k}')">${l}</button>`).join("")}</nav>
+    <main class="content" id="screen"><div class="loading">${tt("loading")}</div></main>`;
+  renderScreen();
+}
+function go(t) { state.tab = t; renderApp(); }
+const SCREENS = {
+  dashboard: () => screenDashboard(),
+  manage:    () => screenManage(),
+  clock:      () => screenSoon("tab_clock", 2, { ko:"사진(실시간 촬영) + GPS + 서버시각으로 출근/퇴근", en:"Clock in/out with live photo + GPS + server time" }),
+  attendance: () => screenSoon("tab_attendance", 2, { ko:"직원×날짜 근태표 · 사진 확대 · 매장 거리 · 월 근무시간", en:"Staff × date attendance with photo, distance and monthly hours" }),
+  board:      () => screenSoon("tab_board", 3, { ko:"요청/특이사항/수정 글 + 사진 첨부 + 댓글", en:"Requests / issues / fixes with photos and comments" }),
+  inventory:  () => screenSoon("tab_inventory", 4, { ko:"현재고 · 입출고 장부 · 저재고 경고 · 주문요청", en:"Stock, in/out ledger, low-stock alerts, order requests" }),
+  supply:     () => screenSoon("tab_supply", 5, { ko:"주문요청 승인/반려 → K-Food 주문함(☕카페)으로 연결", en:"Approve / reject requests → sent to K-Food orders" }),
+  closing:    () => screenSoon("tab_closing", 6, { ko:"일일 마감(메뉴 수량 · 현금 · GCash)", en:"Daily closing (menu qty, cash, GCash)" }),
+  daily:      () => screenSoon("tab_daily", 6, { ko:"일별 매출표", en:"Daily sales table" }),
+  menurank:   () => screenSoon("tab_menurank", 6, { ko:"메뉴 판매 순위", en:"Menu sales ranking" }),
+  report:     () => screenSoon("tab_report", 6, { ko:"월별 손익 보고서", en:"Monthly P&L report" }),
+};
+async function renderScreen() {
+  try { await (SCREENS[state.tab] || SCREENS[tabsFor()[0][0]])(); }
+  catch (e) { $("screen").innerHTML = `<div class="err">${esc(e.message||e)}</div>`; }
+}
+function screenSoon(tabKey, step, desc){
+  $("screen").innerHTML = `<div class="report-title">${tt(tabKey)}</div>
+    <div class="card"><div class="soon">🛠 ${tl("coming_soon")}<br><b>${esc(desc[state.lang==="ko"?"ko":"en"])}</b><br><span class="muted">Build step ${step}</span></div></div>`;
+}
+
+// ── 대시보드 (사장 첫 화면) ──────────────────────
+async function screenDashboard(){
+  const d = today();
+  const [att, inv, notes, close, sup] = await Promise.all([
+    sb.from("attendance").select("employee_id,clock_in,clock_out,verified,distance_m").eq("date", d),
+    sb.from("inventory_items").select("id,name,name_en,unit,stock,reorder_level").eq("active", true),
+    sb.from("notes").select("id,title,category,author_employee_id,created_at", { count:"exact" }).eq("resolved", false).order("id", { ascending:false }).limit(5),
+    sb.from("closings").select("cash,gcash").eq("date", d).maybeSingle(),
+    sbk.from("supply_requests").select("id", { count:"exact", head:true }).eq("source","CAFE").eq("status","PENDING"),
+  ]);
+  const working = (att.data||[]).filter((a) => a.clock_in && !a.clock_out);
+  const low = (inv.data||[]).filter((i) => Number(i.stock) < Number(i.reorder_level));
+  const sales = close.data ? Number(close.data.cash||0) + Number(close.data.gcash||0) : null;
+  const ko = state.lang === "ko";
+  const workingTxt = working.map((a) => `${esc(empName(empById(a.employee_id)))} ${timeHM(a.clock_in)}${a.verified?" ✅":" ⚠️"}`).join("<br>");
+  const lowTxt = low.slice(0,4).map((i) => `${esc(ko?i.name:(i.name_en||i.name))} ${Number(i.stock)}/${Number(i.reorder_level)}${esc(i.unit||"")}`).join("<br>");
+  const supErr = sup.error ? `<div class="setup-note">⚠️ K-Food 공용 테이블(kfr.supply_requests)을 읽지 못했어요: ${esc(sup.error.message)}</div>` : "";
+  const feed = (notes.data||[]).map((n) => `<div class="feed-row"><span class="muted">${new Date(n.created_at).toLocaleDateString("en-CA",{timeZone:STORE_TZ}).slice(5)}</span><div><b>${esc(n.title||"(제목 없음)")}</b><div class="muted">${esc(empName(empById(n.author_employee_id)))}</div></div></div>`).join("");
+  $("screen").innerHTML = `<div class="report-title">${ko?"오늘의 매장":"Today at the cafe"} <span>· ${d}</span></div>
+    ${supErr}
+    <div class="kpi-row four">
+      <div class="kpi accent"><div class="kpi-label">${ko?"오늘 매출":"Today's sales"}</div><div class="kpi-value">${sales===null?"—":fmt(sales)}</div><div class="delta flat">${sales===null?(ko?"마감 전":"Not closed yet"):(ko?"마감 완료":"Closed")}</div></div>
+      <div class="kpi"><div class="kpi-label">${ko?"근무 중":"Working now"}</div><div class="kpi-value">${working.length}</div><div class="kpi-sub">${workingTxt}</div></div>
+      <div class="kpi ${low.length?"alert":""}"><div class="kpi-label">${ko?"저재고":"Low stock"}</div><div class="kpi-value">${low.length}</div><div class="kpi-sub">${lowTxt}</div></div>
+      <div class="kpi ${sup.count?"alert":""}"><div class="kpi-label">${ko?"승인 대기":"Pending approval"}</div><div class="kpi-value">${sup.error?"—":(sup.count||0)}</div><div class="kpi-sub">${ko?"☕ 공급요청":"☕ Supply requests"}</div></div>
+    </div>
+    <div class="card"><div class="card-head"><h2>${ko?"게시판 · 미해결":"Board · Open"}${notes.count?`<span class="dot-red">${notes.count}</span>`:""}</h2><button class="btn-mini" onclick="go('board')">${ko?"전체 보기":"View all"} →</button></div>
+      ${feed || `<p class="empty">${ko?"미해결 글이 없습니다.":"No open posts."}</p>`}</div>`;
+}
+
+// ── 관리: 직원 · 매장 좌표 ───────────────────────
+async function screenManage(){
+  await loadEmployees();
+  const ko = state.lang === "ko";
+  const rows = state.employees.map((e) => `<div class="emp-row ${e.active===false?"off":""}">
+      <div><b>${esc(e.name)}</b>${e.name_en?`<span class="m-en">${esc(e.name_en)}</span>`:""}</div>
+      <select aria-label="role" onchange="updateEmployee(${e.id},'role',this.value)">
+        ${["STAFF","ADMIN"].map((r)=>`<option value="${r}" ${e.role===r?"selected":""}>${tt("role_"+r)}</option>`).join("")}</select>
+      <input type="password" inputmode="numeric" placeholder="${ko?"새 PIN":"New PIN"}" aria-label="PIN" onchange="updateEmployee(${e.id},'pin',this.value)">
+      <button class="mng-del" onclick="updateEmployee(${e.id},'active',${e.active===false})">${e.active===false?(ko?"복구":"Restore"):(ko?"비활성":"Disable")}</button>
+    </div>`).join("");
+  const s = state.settings;
+  const hasStore = s.store_lat && s.store_lng;
+  $("screen").innerHTML = `<div class="report-title">${tt("tab_manage")}</div>
+    <div class="grid-2">
+      <div class="card"><h2>${ko?"직원":"Employees"}</h2>
+        <div class="add-form">
+          <input id="empName" placeholder="${ko?"이름":"Name"}">
+          <input id="empNameEn" placeholder="${ko?"영문 이름":"English name"}">
+          <input id="empPin" type="password" inputmode="numeric" placeholder="PIN" style="max-width:90px">
+          <select id="empRole"><option value="STAFF">${tt("role_STAFF")}</option><option value="ADMIN">${tt("role_ADMIN")}</option></select>
+          <button class="btn-mini" onclick="addEmployee()">${ko?"추가":"Add"}</button>
+        </div>
+        ${rows || `<p class="empty">—</p>`}
+        <p class="hint">${ko?"PIN 칸에 새 번호를 입력하고 칸을 벗어나면 저장됩니다. 퇴사자는 삭제 대신 '비활성'(근태 기록 보존).":"Type a new PIN and leave the box to save. Disable instead of deleting to keep attendance history."}</p>
+      </div>
+      <div class="card sticky"><h2>${ko?"매장 위치 (출근 지오펜스)":"Store location (geofence)"}</h2>
+        <div class="kv"><span>${ko?"매장 좌표":"Store coordinates"}</span><b>${hasStore?`${Number(s.store_lat).toFixed(5)}, ${Number(s.store_lng).toFixed(5)}`:(ko?"미등록":"Not set")}</b></div>
+        <div class="kv"><span>${ko?"허용 반경":"Allowed radius"}</span><span><input id="geofence" type="number" min="10" step="10" value="${esc(s.geofence_m||100)}" style="width:80px;border:1px solid #D8CDBD;border-radius:7px;padding:6px 8px;text-align:right"> m</span></div>
+        <button class="btn-primary" onclick="registerStoreLocation()">📍 ${ko?"지금 위치를 매장 좌표로 등록":"Use my current location as the store"}</button>
+        <p class="hint">${ko?"매장 안에서 한 번 눌러 주세요. 출근 시 이 좌표와의 거리로 '매장 출근'을 확인합니다.":"Press this once while inside the cafe. Clock-ins are checked against this point."}</p>
+        <div class="kv" style="margin-top:14px"><span>${ko?"직원 마감 입력 허용":"Staff can enter closing"}</span>
+          <input type="checkbox" ${s.staff_closing==="1"?"checked":""} onchange="setSetting('staff_closing', this.checked?'1':'0').then(()=>toast(tt('saved')))" style="width:22px;height:22px"></div>
+      </div>
+    </div>`;
+  $("geofence").addEventListener("change", async (e) => {
+    const v = Math.max(10, Number(e.target.value) || 100);
+    const { error } = await setSetting("geofence_m", v);
+    toast(error ? tt("save_fail") + error.message : tt("saved"));
+  });
+}
+async function addEmployee(){
+  const name = $("empName").value.trim(), name_en = $("empNameEn").value.trim() || null, pin = $("empPin").value.trim(), role = $("empRole").value;
+  if (!name || !/^\d{4,8}$/.test(pin)) { toast(state.lang==="ko" ? "이름과 4~8자리 숫자 PIN을 입력하세요" : "Enter a name and a 4–8 digit PIN"); return; }
+  const { error } = await sb.from("employees").insert({ name, name_en, pin, role });
+  if (error) { toast(tt("save_fail") + error.message); return; }
+  toast(tt("saved")); screenManage();
+}
+async function updateEmployee(id, field, value){
+  if (field === "pin") { value = String(value).trim(); if (!/^\d{4,8}$/.test(value)) { toast(state.lang==="ko" ? "PIN은 4~8자리 숫자" : "PIN must be 4–8 digits"); return; } }
+  if (field === "role" || field === "active") {
+    // 마지막 활성 사장 계정은 강등/비활성 불가 (잠김 방지)
+    const admins = state.employees.filter((e) => e.role === "ADMIN" && e.active !== false);
+    const target = empById(id);
+    const losesAdmin = target?.role === "ADMIN" && target.active !== false && ((field === "role" && value !== "ADMIN") || (field === "active" && value === false));
+    if (losesAdmin && admins.length <= 1) { toast(state.lang==="ko" ? "마지막 사장 계정은 바꿀 수 없습니다" : "Can't remove the last owner account"); screenManage(); return; }
+  }
+  const { error } = await sb.from("employees").update({ [field]: value }).eq("id", id);
+  if (error) { toast(tt("save_fail") + error.message); return; }
+  toast(tt("saved"));
+  if (String(id) === String(state.user.id) && field === "role") { state.user.role = value; await loadEmployees(); setUser(state.user); renderApp(); return; }
+  screenManage();
+}
+function getPosition(){
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) return reject(new Error("GPS not supported"));
+    navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy:true, timeout:15000, maximumAge:0 });
+  });
+}
+async function registerStoreLocation(){
+  const ko = state.lang === "ko";
+  try {
+    const p = await getPosition();
+    const { latitude:lat, longitude:lng, accuracy } = p.coords;
+    if (!confirm(`${ko?"이 위치를 매장 좌표로 등록할까요?":"Save this as the store location?"}\n${lat.toFixed(5)}, ${lng.toFixed(5)} (±${Math.round(accuracy)}m)`)) return;
+    const r = await Promise.all([setSetting("store_lat", lat), setSetting("store_lng", lng)]);
+    const err = r.find((x) => x.error)?.error;
+    toast(err ? tt("save_fail") + err.message : tt("saved"));
+    screenManage();
+  } catch (e) { toast((ko?"위치를 가져오지 못했어요: ":"Couldn't get location: ") + (e.message||e)); }
+}
+
+init();
+</script>
+</body>
+</html>
