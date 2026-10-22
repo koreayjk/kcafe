@@ -10,6 +10,7 @@
    - [`supabase/04_inventory.sql`](supabase/04_inventory.sql) — 입출고 장부로 현재고 자동 계산
    - [`supabase/05_kfood_link.sql`](supabase/05_kfood_link.sql) — K-Food 공급요청 상태 흐름·입고 처리 잠금
    - [`supabase/06_sales.sql`](supabase/06_sales.sql) — 마감(카드/기타 결제, 마감자·수정시각)·지출 기록자
+   - [`supabase/07_photo_cleanup.sql`](supabase/07_photo_cleanup.sql) — 출근 사진 보관기간(기본 90일) 지난 것만 정리 허용
 2. **Integrations → Data API → Settings → Exposed schemas** 에 `cafe` 추가 (`kfr` 도 유지)
 3. 앱 접속 → `사장` / PIN `0000` 로그인 → **관리** 탭에서 PIN 변경, 직원 추가
 4. 매장 안에서 **관리 → 📍 지금 위치를 매장 좌표로 등록** (출근 지오펜스 기준점, 기본 반경 100m)
@@ -29,5 +30,6 @@
 | 4 | 재고(입출고·저재고) + 주문요청 + 공급요청 승인 | ✅ |
 | 5 | K-Food 연동 (`kfr.supply_requests` + K-Food 앱 ☕카페 UI + 배송완료 → 입고 처리) | ✅ |
 | 6 | 마감/매출 · 일별 매출 · 메뉴 순위 · 월별 보고서 · 메뉴/지출 관리 | ✅ |
+| + | 출근 사진 자동 정리(기본 90일, 관리 탭에서 변경·즉시 정리) | ✅ |
 
 기획 전체는 인수인계 문서(Bahay Cafe 관리 프로그램 — 기획 & 인수인계 MD v2) 참고.

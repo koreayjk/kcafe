@@ -512,6 +512,7 @@ function renderApp() {
     <main class="content" id="screen"><div class="loading">${tt("loading")}</div></main>`;
   renderScreen();
   refreshBoardBadge();
+  if (isAdmin()) purgeOldPhotos(false);
 }
 function go(t) { resetCam(); if (t === "board") { board.mode = "list"; board.id = null; } state.tab = t; renderApp(); }
 const SCREENS = {
@@ -626,7 +627,17 @@ async function screenManage(){
           <input type="checkbox" ${s.staff_closing==="1"?"checked":""} onchange="setSetting('staff_closing', this.checked?'1':'0').then(()=>toast(tt('saved')))" style="width:22px;height:22px"></div>
       </div>
     </div>
-    <div class="grid-2">${salesHTML}</div>`;
+    <div class="grid-2">${salesHTML}</div>
+    <div class="card"><h2>📷 ${ko?"출근 사진 보관":"Clock-in photo retention"}</h2>
+      <div class="kv"><span>${ko?"보관 기간":"Keep photos for"}</span><span><input id="keepDays" type="number" min="30" max="730" step="1" value="${esc(s.photo_retention_days||90)}" style="width:80px;border:1px solid #D8CDBD;border-radius:7px;padding:6px 8px;text-align:right"> ${ko?"일":"days"}</span></div>
+      <div class="kv"><span>${ko?"마지막 자동 정리":"Last cleanup"}</span><b>${esc(s.photo_cleanup_on || "—")}</b></div>
+      <button class="btn-ghost" id="purgeBtn" onclick="purgeOldPhotos(true)">🗑 ${ko?"지금 정리하기":"Clean up now"}</button>
+      <p class="hint">${ko?"사장님이 앱을 열 때 하루 한 번, 보관 기간이 지난 출근 사진만 저장소에서 지웁니다. 출퇴근 시각·위치·✅ 기록은 그대로 남습니다. 최소 30일.":"Once a day when the owner opens the app, clock-in photos older than this are deleted from storage. Times, location and ✅ stay. Minimum 30 days."}</p></div>`;
+  $("keepDays").addEventListener("change", async (e) => {
+    const v = Math.min(730, Math.max(30, Math.round(Number(e.target.value) || 90))); e.target.value = v;
+    const { error } = await setSetting("photo_retention_days", v);
+    toast(error ? tt("save_fail") + error.message : tt("saved"));
+  });
   $("geofence").addEventListener("change", async (e) => {
     const v = Math.max(10, Number(e.target.value) || 100);
     const { error } = await setSetting("geofence_m", v);
@@ -814,7 +825,7 @@ async function screenAttendance(){
   const end = `${month}-${String(new Date(y, m, 0).getDate()).padStart(2,"0")}`;
   await loadEmployees();
   const { data, error } = await sb.from("attendance")
-    .select("id,employee_id,date,clock_in,clock_out,photo_path,distance_m,out_distance_m,accuracy_m,verified,manual_edit")
+    .select("id,employee_id,date,clock_in,clock_out,photo_path,photo_purged_at,distance_m,out_distance_m,accuracy_m,verified,manual_edit")
     .gte("date", `${month}-01`).lte("date", end).order("clock_in");
   if (error) throw error;
   const rows = attState.rows = data || [];
@@ -827,7 +838,7 @@ async function screenAttendance(){
     const fix = open && r.date < d0 ? ` <button class="photo-btn" onclick="fixClockOut(${r.id})">${ko?"퇴근 입력":"Set out"}</button>` : "";
     return `<div class="shift ${r.verified?"":"warn"} ${open?"open":""}">
       <b>${timeHM(r.clock_in)}–${open ? (r.date === d0 ? (ko?"근무 중":"on duty") : "?") : timeHM(r.clock_out)}</b>${r.manual_edit ? ` <span class="muted">${ko?"수정됨":"edited"}</span>` : ""}<br>
-      ${distTxt(r.distance_m)} ${r.verified?"✅":"⚠️"}${r.photo_path ? ` <button class="photo-btn" aria-label="photo" onclick="showPhoto(${r.id})">📷</button>` : ""}${fix}
+      ${distTxt(r.distance_m)} ${r.verified?"✅":"⚠️"}${r.photo_path ? ` <button class="photo-btn" aria-label="photo" onclick="showPhoto(${r.id})">📷</button>` : r.photo_purged_at ? ` <span class="muted" title="${ko?"보관기간이 지나 사진 정리됨":"Photo removed after retention period"}">📷✕</span>` : ""}${fix}
       ${r.clock_out ? `<br><span class="muted">${fmtDur(durMin(r.clock_in, r.clock_out))}${r.out_distance_m != null ? ` · ${ko?"퇴근":"out"} ${r.out_distance_m}m` : ""}</span>` : ""}
     </div>`;
   }).join("");
@@ -1671,6 +1682,40 @@ async function updateMenu(id, field, value){
   const { error } = await sb.from("menus").update({ [field]: value }).eq("id", id);
   if (error) { toast(tt("save_fail") + error.message); return; }
   toast(tt("saved")); renderScreen();
+}
+
+
+// ── 출근 사진 자동 정리: 보관기간 지난 사진만 Storage 에서 삭제 (DB 가 기간을 다시 확인) ──
+let purgeRunning = false;
+async function purgeOldPhotos(manual){
+  if (!isAdmin() || purgeRunning) return;
+  const ko = state.lang === "ko";
+  if (!manual && state.settings.photo_cleanup_on === today()) return;
+  purgeRunning = true;
+  const btn = manual ? $("purgeBtn") : null; if (btn) btn.disabled = true;
+  try {
+    const keep = Math.max(30, Number(state.settings.photo_retention_days) || 90);
+    const c = new Date(today() + "T00:00:00"); c.setDate(c.getDate() - keep);
+    const cutoff = c.toLocaleDateString("en-CA");
+    let total = 0;
+    for (let round = 0; round < 20; round++) {
+      // photo_purged_at 를 함께 조회: 07_photo_cleanup.sql 미실행이면 여기서 멈춤 (사진 삭제 전)
+      const { data, error } = await sb.from("attendance").select("id,photo_path,photo_purged_at").not("photo_path", "is", null).lt("date", cutoff).order("id").limit(100);
+      if (error) throw error;
+      if (!data?.length) break;
+      const rm = await sb.storage.from(STORAGE_BUCKET).remove(data.map((r) => r.photo_path));
+      if (rm.error) throw rm.error;
+      const up = await sb.from("attendance").update({ photo_path: null }).in("id", data.map((r) => r.id)).select("id,photo_path");
+      if (up.error) throw up.error;
+      const cleared = (up.data||[]).filter((r) => !r.photo_path).length;
+      total += cleared;
+      if (data.length < 100 || !cleared) break;
+    }
+    await setSetting("photo_cleanup_on", today());
+    if (manual) { toast(ko ? `사진 ${total}장 정리했습니다` : `Removed ${total} photo(s)`); renderScreen(); }
+  } catch (e) {
+    if (manual) toast((ko ? "정리 실패: " : "Cleanup failed: ") + (e.message || e));
+  } finally { purgeRunning = false; if (btn) btn.disabled = false; }
 }
 
 init();
