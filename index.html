@@ -264,6 +264,9 @@ textarea { width:100%; border:1.5px solid #D8CDBD; border-radius:11px; padding:1
 .item-row.off { opacity:.55; }
 .btn-mini.on { background:var(--accent); color:#fff; }
 .s-CONFIRMED { background:#E8EEF6; color:#3A5A82; }
+.sup-steps { display:flex; gap:4px; margin:2px 0 10px; }
+.sup-steps span { flex:1; height:5px; border-radius:3px; background:#F0E9DD; }
+.sup-steps span.on { background:#1F7A43; }
 .kv { display:flex; justify-content:space-between; gap:10px; padding:8px 0; border-bottom:1px solid #F0E9DD; font-size:14px; }
 .kv b { font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-variant-numeric:tabular-nums; }
 </style>
@@ -366,6 +369,7 @@ const I18N = {
   send_request:{ko:"사장님께 주문요청 보내기",en:"Send request to owner",tl:"Ipadala sa may-ari"},
   my_requests:{ko:"주문요청 현황",en:"Request status",tl:"Estado ng hiling"},
   ledger:{ko:"입출고 장부",en:"Stock ledger",tl:"Talaan ng stock"},
+  receive_stock:{ko:"입고 처리 (재고에 더하기)",en:"Receive into stock",tl:"Idagdag sa stock"},
   store_not_set:{ko:"매장 위치가 아직 등록되지 않았어요. 사장님께 '관리 → 매장 좌표 등록'을 요청하세요.",en:"Store location isn't set yet. Ask the owner to set it in Settings."},
 };
 function tt(k){ const e=I18N[k]; if(!e) return k; return state.lang==="ko" ? (e.ko??k) : (e.en??k); }
@@ -505,7 +509,7 @@ async function screenDashboard(){
     sbk.from("supply_requests").select("id", { count:"exact", head:true }).eq("source","CAFE").eq("status","PENDING"),
     unreadNoteIds(),
   ]);
-  const reqs = await sbk.from("supply_requests").select("id,items,status,requested_by,created_at,decided_at").eq("source","CAFE").gte("created_at", since).order("id", { ascending:false }).limit(10);
+  const reqs = await sbk.from("supply_requests").select("id,items,status,requested_by,created_at,status_at,received_at").eq("source","CAFE").gte("status_at", since).order("id", { ascending:false }).limit(10);
   const attRows = att.data || []; attRows.forEach((r) => photoRows.set(r.id, r));
   const working = attRows.filter((a) => a.clock_in && !a.clock_out);
   const low = (inv.data||[]).filter((i) => Number(i.stock) < Number(i.reorder_level));
@@ -532,9 +536,10 @@ async function screenDashboard(){
     if (a.clock_out) events.push({ t: a.clock_out, html: `<div class="feed-row"><span class="feed-ico">⚪</span>
       <div class="feed-main"><b>${who}</b> ${ko?"퇴근":"clocked out"} ${timeHM(a.clock_out)} · ${fmtDur(durMin(a.clock_in, a.clock_out))}</div><span class="muted">${ago(a.clock_out)}</span></div>` });
   });
-  (reqs.data||[]).forEach((r) => events.push({ t: r.created_at, html: `<button class="feed-row feed-btn" onclick="go('supply')"><span class="feed-ico">📦</span>
-    <div class="feed-main"><div><b>${esc(personName(r.requested_by))}</b> ${ko?"주문요청":"requested"} ${supBadge(r.status)}</div><div class="muted">${reqItemsTxt(r.items)}</div></div>
-    <span class="muted">${ago(r.created_at)}</span></button>` }));
+  (reqs.data||[]).forEach((r) => { const t = r.status_at || r.created_at, toRecv = r.status === "DELIVERED" && !r.received_at;
+    events.push({ t, html: `<button class="feed-row feed-btn" onclick="go('${toRecv ? "inventory" : "supply"}')"><span class="feed-ico">${r.status==="DELIVERED" ? "🚚" : "📦"}</span>
+    <div class="feed-main"><div><b>${esc(personName(r.requested_by))}</b> ${ko?"주문요청":"request"} ${supBadge(r.status)}${toRecv ? ` <span class="dot-red">${ko?"입고 대기":"to receive"}</span>` : ""}</div><div class="muted">${reqItemsTxt(r.items)}</div></div>
+    <span class="muted">${ago(t)}</span></button>` }); });
   events.sort((a, b) => new Date(b.t) - new Date(a.t));
   $("screen").innerHTML = `<div class="report-title">${ko?"오늘의 매장":"Today at the cafe"} <span>· ${d}</span></div>
     ${supErr}
@@ -1039,7 +1044,7 @@ async function screenInventory(){
   const ko = state.lang === "ko", items = inv.items.filter((i) => i.active !== false);
   const [moves, reqs] = await Promise.all([
     sb.from("inventory_moves").select("id,item_id,type,qty,delta,stock_after,date,note,employee_id,created_at").order("id", { ascending:false }).limit(30),
-    sbk.from("supply_requests").select("id,date,items,status,note,requested_by,created_at").eq("source","CAFE").order("id", { ascending:false }).limit(10),
+    sbk.from("supply_requests").select("id,date,items,status,note,requested_by,created_at,status_at,received_at").eq("source","CAFE").order("id", { ascending:false }).limit(10),
   ]);
   if (moves.error) throw moves.error;
   const low = items.filter(isLow);
@@ -1070,9 +1075,11 @@ async function screenInventory(){
   }).join("");
   const reqList = reqs.error ? `<div class="setup-note">⚠️ ${esc(reqs.error.message)}</div>` : (reqs.data||[]).map((r) => `<div class="order-card">
       <div class="order-top"><span class="muted">${r.date} · ${esc(personName(r.requested_by))}</span>${supBadge(r.status)}</div>
+      ${supSteps(r)}
       <div class="order-items">${(r.items||[]).map((it) => `<span class="chip">${esc(reqItemName(it))} ×${qtyFmt(it.qty)}${esc(it.unit||"")}</span>`).join("")}</div>
       ${r.note ? `<div class="pre muted">${esc(r.note)}</div>` : ""}
       ${r.status==="PENDING" && (isAdmin() || r.requested_by===state.user.name) ? `<div class="order-foot"><span></span><button class="mng-del" onclick="cancelRequest(${r.id})">${ko?"요청 취소":"Cancel request"}</button></div>` : ""}
+      ${receiveHTML(r)}
     </div>`).join("");
   $("screen").innerHTML = `<div class="report-title">${tt("tab_inventory")}</div>
     ${lowBox}
@@ -1188,17 +1195,18 @@ async function updateItem(id, field, value){
 // ── 공급요청 승인 (사장) ─────────────────────────
 async function screenSupply(){
   const ko = state.lang === "ko";
-  const { data, error } = await sbk.from("supply_requests").select("id,date,items,status,note,requested_by,approved_by,decided_at,created_at")
+  const { data, error } = await sbk.from("supply_requests").select("id,date,items,status,note,requested_by,approved_by,decided_at,created_at,status_at,received_at")
     .eq("source","CAFE").order("id", { ascending:false }).limit(60);
   if (error) throw error;
   const pending = (data||[]).filter((r) => r.status === "PENDING"), rest = (data||[]).filter((r) => r.status !== "PENDING");
   const card = (r) => `<div class="order-card">
       <div class="order-top"><span><b>${esc(personName(r.requested_by))}</b> <span class="muted">${r.date} · ${ago(r.created_at)}</span></span>${supBadge(r.status)}</div>
+      ${supSteps(r)}
       <div class="order-items">${(r.items||[]).map((it) => `<span class="chip">${esc(reqItemName(it))} ×${qtyFmt(it.qty)}${esc(it.unit||"")}</span>`).join("")}</div>
       ${r.note ? `<div class="pre" style="font-size:13px;margin-bottom:8px">${esc(r.note)}</div>` : ""}
       ${r.status === "PENDING" ? `<div class="order-foot"><button class="mng-del" onclick="decideRequest(${r.id},'REJECTED')">${ko?"반려":"Reject"}</button>
         <button class="btn-mini on" onclick="decideRequest(${r.id},'APPROVED')">✓ ${ko?"승인 → K-Food로":"Approve → K-Food"}</button></div>`
-        : `<div class="muted">${r.approved_by ? `${ko?"결정":"By"}: ${esc(personName(r.approved_by))}` : ""}${r.decided_at ? ` · ${ago(r.decided_at)}` : ""}</div>`}
+        : `<div class="muted">${r.approved_by ? `${ko?"결정":"By"}: ${esc(personName(r.approved_by))}` : ""}${r.status_at ? ` · ${ago(r.status_at)}` : ""}</div>${receiveHTML(r)}`}
     </div>`;
   $("screen").innerHTML = `<div class="report-title">${tt("tab_supply")} <span>· ☕ Bahay Cafe → K-Food</span></div>
     <div class="card"><h2>${ko?"승인 대기":"Pending"} ${pending.length ? `<span class="dot-red">${pending.length}</span>` : ""}</h2>
@@ -1222,6 +1230,44 @@ async function decideRequest(id, status){
   if (!data?.length) toast(ko ? "이미 처리된 요청입니다" : "Already handled");
   else toast(status === "APPROVED" ? (ko ? "승인 — K-Food 주문함으로 보냈습니다" : "Approved — sent to K-Food") : (ko ? "반려했습니다" : "Rejected"));
   screenSupply();
+}
+
+
+// 진행 단계 막대 + 배송완료 건 '입고 처리' (K-Food → 카페 재고 IN)
+const SUP_FLOW = ["PENDING","APPROVED","CONFIRMED","SHIPPING","DELIVERED"];
+function supSteps(r){
+  if (r.status === "REJECTED") return "";
+  const i = SUP_FLOW.indexOf(r.status);
+  return `<div class="sup-steps" aria-label="${esc(supLabel(r.status))}">${SUP_FLOW.map((s, k) => `<span class="${k<=i?"on":""}" title="${esc(supLabel(s))}"></span>`).join("")}</div>`;
+}
+function receiveHTML(r){
+  const ko = state.lang === "ko";
+  if (r.status !== "DELIVERED") return "";
+  if (r.received_at) return `<div class="done-mark" style="margin-top:6px">✅ ${ko?"입고 완료":"Received"} · ${ago(r.received_at)}</div>`;
+  return `<button class="btn-primary" style="margin-top:8px" onclick="receiveRequest(${r.id})">📥 ${tl("receive_stock")}</button>`;
+}
+async function receiveRequest(id){
+  const ko = state.lang === "ko";
+  const { data: r, error } = await sbk.from("supply_requests").select("id,items,status,received_at").eq("id", id).single();
+  if (error) { toast(error.message); return; }
+  if (r.status !== "DELIVERED" || r.received_at) { toast(ko ? "이미 처리된 요청입니다" : "Already received"); return renderScreen(); }
+  const items = (r.items||[]).filter((it) => it.item_id && Number(it.qty) > 0);
+  if (!confirm(`${ko?"아래 수량을 재고에 입고할까요?":"Add these to stock?"}\n\n${(r.items||[]).map((it) => `· ${reqItemName(it)} +${qtyFmt(it.qty)}${it.unit||""}`).join("\n")}\n\n${ko?"실제 받은 수량이 다르면 입고 후 '실사'로 맞춰 주세요.":"If the delivered amount differs, fix it with a Count afterwards."}`)) return;
+  // 1) 재고 입고 기록 → 2) 요청에 입고완료 표시 (2가 실패하면 1을 되돌림)
+  let moveIds = [];
+  if (items.length) {
+    const ins = await sb.from("inventory_moves").insert(items.map((it) => ({ item_id: it.item_id, type:"IN", qty: Number(it.qty),
+      note: `${ko?"공급요청":"Supply request"} #${id}`, employee_id: state.user.id }))).select("id");
+    if (ins.error) { toast(tt("save_fail") + ins.error.message); return; }
+    moveIds = (ins.data||[]).map((m) => m.id);
+  }
+  const claim = await sbk.from("supply_requests").update({ received_at: new Date().toISOString() }).eq("id", id).eq("status","DELIVERED").is("received_at", null).select("id");
+  if (claim.error || !claim.data?.length) {
+    if (moveIds.length) await sb.from("inventory_moves").delete().in("id", moveIds);
+    toast(claim.error ? tt("save_fail") + claim.error.message : (ko ? "이미 처리된 요청입니다" : "Already received"));
+    return renderScreen();
+  }
+  toast(ko ? "입고 처리했습니다" : "Received into stock"); renderScreen();
 }
 
 init();
