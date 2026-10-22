@@ -190,6 +190,28 @@ input:focus, select:focus, textarea:focus { border-color:var(--accent); }
 .s-APPROVED { background:var(--accent-bg); color:var(--accent); }
 .s-REJECTED { background:#FBE4E3; color:#B5322E; }
 @media(max-width:560px){ .topbar{ flex-wrap:wrap; padding:10px 16px; } .who{ width:100%; justify-content:space-between; } .content{ padding:16px; } }
+.cam-wrap { background:#1E1A17; border-radius:14px; overflow:hidden; margin-bottom:12px; aspect-ratio:4/3; }
+.cam-wrap video, .cam-wrap img { width:100%; height:100%; object-fit:cover; display:block; }
+.cam-wrap video { transform:scaleX(-1); }
+.btn-ghost { width:100%; background:#fff; color:#5E4A36; border:1.5px solid #D8CDBD; padding:13px; border-radius:11px; font-size:14px; font-weight:700; cursor:pointer; margin-top:8px; }
+.clock-state { font-size:22px; font-weight:800; letter-spacing:-.4px; margin-bottom:4px; }
+.clock-state.on { color:#1F7A43; }
+.clock-sub { color:#5E4A36; font-size:14px; margin-bottom:14px; line-height:1.6; }
+.gps-line { padding:10px 12px; border-radius:10px; font-size:14px; font-weight:600; margin-bottom:6px; background:#F0E9DD; color:#5E4A36; }
+.gps-line.ok { background:#E3F3E8; color:#1F7A43; }
+.gps-line.warn { background:#FBF1DC; color:#9A6A1E; }
+.att-table td { vertical-align:top; min-width:118px; }
+.att-table td:first-child, .att-table th:first-child { min-width:64px; position:sticky; left:0; background:#fff; z-index:1; }
+.att-table thead th:first-child { z-index:3; }
+.shift { font-size:12px; line-height:1.5; padding:4px 6px; border-radius:7px; margin-bottom:4px; background:#E3F3E8; }
+.shift.warn { background:#FBF1DC; }
+.shift.open { outline:1.5px dashed #9A6A1E; }
+.shift b { font-size:13px; }
+.photo-btn { border:1px solid #D8CDBD; background:#fff; border-radius:6px; padding:2px 6px; font-size:12px; cursor:pointer; min-height:26px; }
+.att-total td { font-weight:700; border-top:2px solid #E6DFD4; background:#FAF6EF; }
+.modal { position:fixed; inset:0; background:rgba(20,15,10,.82); display:grid; place-items:center; z-index:100; padding:16px; }
+.modal img { max-width:100%; max-height:80vh; border-radius:12px; display:block; }
+.modal .modal-cap { color:#fff; text-align:center; margin-top:10px; font-size:14px; }
 .kv { display:flex; justify-content:space-between; gap:10px; padding:8px 0; border-bottom:1px solid #F0E9DD; font-size:14px; }
 .kv b { font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-variant-numeric:tabular-nums; }
 </style>
@@ -252,6 +274,29 @@ const I18N = {
   save:{ko:"저장",en:"Save",tl:"I-save"},
   saved:{ko:"저장되었습니다",en:"Saved / Na-save"},
   save_fail:{ko:"저장 실패: ",en:"Save failed: "},
+  cancel:{ko:"취소",en:"Cancel"},
+  off_duty:{ko:"출근 전",en:"Not clocked in",tl:"Hindi pa naka-clock in"},
+  on_duty:{ko:"근무 중",en:"On duty",tl:"Nasa trabaho"},
+  start_clock_in:{ko:"사진 찍고 출근",en:"Take photo & clock in",tl:"Kumuha ng litrato at mag-clock in"},
+  take_photo:{ko:"촬영",en:"Take photo",tl:"Kumuha ng litrato"},
+  retake:{ko:"다시 찍기",en:"Retake"},
+  clock_in:{ko:"출근",en:"Clock in",tl:"Mag-clock in"},
+  clock_out:{ko:"퇴근하기",en:"Clock out",tl:"Mag-clock out"},
+  clocked_in:{ko:"출근 완료",en:"Clocked in"},
+  clocked_out:{ko:"퇴근 완료",en:"Clocked out"},
+  clock_out_confirm:{ko:"지금 퇴근할까요?",en:"Clock out now? / Mag-clock out na?"},
+  already_in:{ko:"이미 출근 상태입니다",en:"Already clocked in"},
+  saving:{ko:"저장 중…",en:"Saving…"},
+  gps_checking:{ko:"📍 위치 확인 중…",en:"📍 Checking location…"},
+  gps_fail:{ko:"⚠️ 위치를 가져오지 못했어요 (위치 권한 확인)",en:"⚠️ Couldn't get location — allow location access"},
+  gps_no_store:{ko:"📍 위치 기록됨 (매장 좌표 미등록)",en:"📍 Location recorded (store not set)"},
+  no_gps_confirm:{ko:"위치 없이 출근할까요? 사장님 화면에 ⚠️로 표시됩니다.",en:"Clock in without location? The owner will see ⚠️. / Mag-clock in nang walang lokasyon?"},
+  cam_denied:{ko:"카메라를 열 수 없어요. 브라우저 설정에서 카메라 권한을 허용해 주세요.",en:"Can't open the camera. Allow camera access in your browser settings. / Payagan ang camera."},
+  cam_unsupported:{ko:"이 브라우저는 카메라를 지원하지 않아요 (Chrome/Safari 사용)",en:"This browser can't use the camera (use Chrome/Safari)"},
+  photo_note:{ko:"사진은 지금 이 자리에서만 찍을 수 있어요. 시각은 서버가 기록합니다.",en:"The photo must be taken live. Time is recorded by the server. / Ang oras ay itinatala ng server."},
+  my_records:{ko:"최근 근무 기록",en:"Recent shifts",tl:"Mga huling shift"},
+  h_date:{ko:"날짜",en:"Date"}, h_in:{ko:"출근",en:"In"}, h_out:{ko:"퇴근",en:"Out"}, h_hours:{ko:"근무",en:"Hours"},
+  store_not_set:{ko:"매장 위치가 아직 등록되지 않았어요. 사장님께 '관리 → 매장 좌표 등록'을 요청하세요.",en:"Store location isn't set yet. Ask the owner to set it in Settings."},
 };
 function tt(k){ const e=I18N[k]; if(!e) return k; return state.lang==="ko" ? (e.ko??k) : (e.en??k); }
 function tl(k){ const e=I18N[k]; if(!e) return k; if(state.lang==="ko") return e.ko??k; return (e.en??k)+(e.tl?`<span class="lang-sub">${e.tl}</span>`:""); }
@@ -353,12 +398,12 @@ function renderApp() {
     <main class="content" id="screen"><div class="loading">${tt("loading")}</div></main>`;
   renderScreen();
 }
-function go(t) { state.tab = t; renderApp(); }
+function go(t) { resetCam(); state.tab = t; renderApp(); }
 const SCREENS = {
   dashboard: () => screenDashboard(),
   manage:    () => screenManage(),
-  clock:      () => screenSoon("tab_clock", 2, { ko:"사진(실시간 촬영) + GPS + 서버시각으로 출근/퇴근", en:"Clock in/out with live photo + GPS + server time" }),
-  attendance: () => screenSoon("tab_attendance", 2, { ko:"직원×날짜 근태표 · 사진 확대 · 매장 거리 · 월 근무시간", en:"Staff × date attendance with photo, distance and monthly hours" }),
+  clock:      () => screenClock(),
+  attendance: () => screenAttendance(),
   board:      () => screenSoon("tab_board", 3, { ko:"요청/특이사항/수정 글 + 사진 첨부 + 댓글", en:"Requests / issues / fixes with photos and comments" }),
   inventory:  () => screenSoon("tab_inventory", 4, { ko:"현재고 · 입출고 장부 · 저재고 경고 · 주문요청", en:"Stock, in/out ledger, low-stock alerts, order requests" }),
   supply:     () => screenSoon("tab_supply", 5, { ko:"주문요청 승인/반려 → K-Food 주문함(☕카페)으로 연결", en:"Approve / reject requests → sent to K-Food orders" }),
@@ -486,6 +531,204 @@ async function registerStoreLocation(){
     toast(err ? tt("save_fail") + err.message : tt("saved"));
     screenManage();
   } catch (e) { toast((ko?"위치를 가져오지 못했어요: ":"Couldn't get location: ") + (e.message||e)); }
+}
+
+// ── 출퇴근 (직원): 실시간 사진 + GPS, 시각·거리·인증은 DB 트리거가 결정 ──
+const cam = { stream:null, blob:null, url:null, pos:null, posErr:null, posPromise:null };
+function stopCamera(){ if (cam.stream) { cam.stream.getTracks().forEach((t) => t.stop()); cam.stream = null; } }
+function resetCam(){ stopCamera(); if (cam.url) URL.revokeObjectURL(cam.url); Object.assign(cam, { blob:null, url:null, pos:null, posErr:null, posPromise:null }); }
+const durMin = (a, b) => Math.max(0, Math.round((new Date(b) - new Date(a)) / 60000));
+const fmtDur = (m) => `${Math.floor(m/60)}h ${String(m%60).padStart(2,"0")}m`;
+function storeDistance(lat, lng){
+  const s = state.settings; if (!s.store_lat || !s.store_lng) return null;
+  const R = 6371000, rad = (x) => x * Math.PI / 180, la1 = rad(lat), la2 = rad(Number(s.store_lat));
+  const h = Math.sin((la2-la1)/2)**2 + Math.cos(la1)*Math.cos(la2)*Math.sin(rad(Number(s.store_lng)-lng)/2)**2;
+  return Math.round(2 * R * Math.asin(Math.sqrt(h)));
+}
+const distTxt = (d) => d == null ? "📍 —" : `📍 ${d}m`;
+async function openShift(empId){
+  const { data, error } = await sb.from("attendance").select("id,clock_in,verified,distance_m")
+    .eq("employee_id", empId).is("clock_out", null).order("id", { ascending:false }).limit(1);
+  if (error) throw error;
+  return data?.[0] || null;
+}
+async function screenClock(){
+  resetCam();
+  await loadSettings();
+  const uid = state.user.id;
+  const [open, recent] = await Promise.all([
+    openShift(uid),
+    sb.from("attendance").select("id,date,clock_in,clock_out,verified,distance_m").eq("employee_id", uid).order("id", { ascending:false }).limit(10),
+  ]);
+  if (recent.error) throw recent.error;
+  const storeSet = state.settings.store_lat && state.settings.store_lng;
+  const status = open
+    ? `<div class="clock-state on">● ${tt("on_duty")}</div>
+       <div class="clock-sub">${state.lang==="ko" ? `${timeHM(open.clock_in)}부터` : `since ${timeHM(open.clock_in)}`} · ${fmtDur(durMin(open.clock_in, new Date()))} · ${distTxt(open.distance_m)} ${open.verified?"✅":"⚠️"}</div>
+       <button class="btn-primary" id="clockOutBtn" onclick="clockOut(${open.id})">${tl("clock_out")}</button>`
+    : `<div class="clock-state">${tl("off_duty")}</div>
+       <div class="clock-sub">${esc(empName(state.user))} · ${today()}</div>
+       <div id="camBox"><button class="btn-primary" onclick="startClockIn()">📷 ${tl("start_clock_in")}</button>
+       <p class="hint">${tt("photo_note")}</p></div>`;
+  const rows = (recent.data||[]).map((r) => `<tr><td>${r.date.slice(5)}</td><td class="num">${timeHM(r.clock_in)}</td>
+      <td class="num">${r.clock_out ? timeHM(r.clock_out) : "…"}</td><td class="num">${r.clock_out ? fmtDur(durMin(r.clock_in, r.clock_out)) : "—"}</td>
+      <td>${r.verified ? "✅" : "⚠️"}</td></tr>`).join("");
+  $("screen").innerHTML = `<div class="report-title">${tt("tab_clock")}</div>
+    ${storeSet ? "" : `<div class="setup-note">${tt("store_not_set")}</div>`}
+    <div class="grid-2">
+      <div class="card">${status}</div>
+      <div class="card"><h2>${tl("my_records")}</h2>
+        ${rows ? `<table class="data-table"><thead><tr><th>${tt("h_date")}</th><th class="num">${tt("h_in")}</th><th class="num">${tt("h_out")}</th><th class="num">${tt("h_hours")}</th><th></th></tr></thead><tbody>${rows}</tbody></table>` : `<p class="empty">—</p>`}
+      </div>
+    </div>`;
+}
+async function startClockIn(){
+  const box = $("camBox");
+  if (!navigator.mediaDevices?.getUserMedia) { box.innerHTML = `<div class="err">${tt("cam_unsupported")}</div>`; return; }
+  stopCamera();
+  // GPS 는 카메라와 동시에 요청 (촬영하는 동안 위치 확보)
+  cam.pos = null; cam.posErr = null;
+  cam.posPromise = getPosition().then((p) => { cam.pos = p.coords; }).catch((e) => { cam.posErr = e; }).finally(updateGpsLine);
+  try {
+    cam.stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:"user", width:{ ideal:960 }, height:{ ideal:720 } }, audio:false });
+  } catch (e) {
+    box.innerHTML = `<div class="err">${tt("cam_denied")}</div><button class="btn-ghost" onclick="screenClock()">${tt("cancel")}</button>`; return;
+  }
+  box.innerHTML = `<div class="cam-wrap"><video id="camVideo" playsinline muted autoplay></video></div>
+    <div id="gpsLine" class="gps-line"></div>
+    <button class="btn-primary" onclick="capturePhoto()">📸 ${tl("take_photo")}</button>
+    <button class="btn-ghost" onclick="screenClock()">${tt("cancel")}</button>`;
+  updateGpsLine();
+  const v = $("camVideo"); v.srcObject = cam.stream; v.play().catch(() => {});
+}
+function capturePhoto(){
+  const v = $("camVideo"); if (!v || !v.videoWidth) return;
+  // 640px · JPEG 60% 로 압축 (용량·egress 절약)
+  const scale = Math.min(1, 640 / v.videoWidth), c = document.createElement("canvas");
+  c.width = Math.round(v.videoWidth * scale); c.height = Math.round(v.videoHeight * scale);
+  c.getContext("2d").drawImage(v, 0, 0, c.width, c.height);
+  c.toBlob((b) => {
+    if (!b) return;
+    stopCamera();
+    if (cam.url) URL.revokeObjectURL(cam.url);
+    cam.blob = b; cam.url = URL.createObjectURL(b);
+    $("camBox").innerHTML = `<div class="cam-wrap"><img src="${cam.url}" alt=""></div>
+      <div id="gpsLine" class="gps-line"></div>
+      <button class="btn-primary" id="confirmIn" onclick="confirmClockIn()">✅ ${tl("clock_in")}</button>
+      <button class="btn-ghost" onclick="startClockIn()">↺ ${tt("retake")}</button>`;
+    updateGpsLine();
+  }, "image/jpeg", 0.6);
+}
+function updateGpsLine(){
+  const el = $("gpsLine"); if (!el) return;
+  if (cam.pos) {
+    const d = storeDistance(cam.pos.latitude, cam.pos.longitude), fence = Number(state.settings.geofence_m || 100);
+    if (d == null) { el.className = "gps-line"; el.textContent = tt("gps_no_store"); return; }
+    const ok = d <= fence;
+    el.className = "gps-line " + (ok ? "ok" : "warn");
+    el.textContent = `📍 ${state.lang==="ko" ? "매장까지" : "Store"} ${d}m (±${Math.round(cam.pos.accuracy)}m) ${ok ? "✅" : "⚠️"}`;
+  } else if (cam.posErr) { el.className = "gps-line warn"; el.textContent = tt("gps_fail"); }
+  else { el.className = "gps-line"; el.textContent = tt("gps_checking"); }
+}
+async function confirmClockIn(){
+  const btn = $("confirmIn"); btn.disabled = true; btn.textContent = tt("saving");
+  const restore = () => { btn.disabled = false; btn.innerHTML = `✅ ${tl("clock_in")}`; };
+  try {
+    if (!cam.pos && !cam.posErr) await Promise.race([cam.posPromise, new Promise((r) => setTimeout(r, 10000))]);
+    if (!cam.pos && !confirm(tt("no_gps_confirm"))) { restore(); return; }
+    const uid = state.user.id;
+    if (await openShift(uid)) { toast(tt("already_in")); return screenClock(); }
+    const path = `attendance/${today()}/${uid}_${Date.now()}.jpg`;
+    const up = await sb.storage.from(STORAGE_BUCKET).upload(path, cam.blob, { contentType:"image/jpeg", upsert:false });
+    if (up.error) throw up.error;
+    // clock_in/date/verified/distance_m 은 DB 트리거가 서버 기준으로 덮어씀
+    const { data, error } = await sb.from("attendance").insert({
+      employee_id: uid, date: today(), clock_in: new Date().toISOString(), photo_path: path,
+      lat: cam.pos?.latitude ?? null, lng: cam.pos?.longitude ?? null, accuracy_m: cam.pos ? Math.round(cam.pos.accuracy) : null,
+    }).select("clock_in,verified,distance_m").single();
+    if (error) throw error;
+    resetCam();
+    toast(`${tt("clocked_in")} ${timeHM(data.clock_in)} ${data.verified ? "✅" : "⚠️"}`);
+    screenClock();
+  } catch (e) { toast(tt("save_fail") + (e.message || e)); restore(); }
+}
+async function clockOut(id){
+  if (!confirm(tt("clock_out_confirm"))) return;
+  const btn = $("clockOutBtn"); if (btn) { btn.disabled = true; btn.textContent = tt("gps_checking"); }
+  let pos = null; try { pos = (await getPosition()).coords; } catch (_) {}
+  const { data, error } = await sb.from("attendance")
+    .update({ clock_out: new Date().toISOString(), out_lat: pos?.latitude ?? null, out_lng: pos?.longitude ?? null })
+    .eq("id", id).select("clock_in,clock_out").single();
+  if (error) { toast(tt("save_fail") + error.message); return screenClock(); }
+  toast(`${tt("clocked_out")} ${timeHM(data.clock_out)} · ${fmtDur(durMin(data.clock_in, data.clock_out))}`);
+  screenClock();
+}
+
+// ── 근태 (사장): 날짜 × 직원 표, 사진은 누를 때만 불러옴 ──
+const attState = { month:null, rows:[] };
+async function screenAttendance(){
+  const month = attState.month || thisMonth(); attState.month = month;
+  const [y, m] = month.split("-").map(Number);
+  const end = `${month}-${String(new Date(y, m, 0).getDate()).padStart(2,"0")}`;
+  await loadEmployees();
+  const { data, error } = await sb.from("attendance")
+    .select("id,employee_id,date,clock_in,clock_out,photo_path,distance_m,out_distance_m,accuracy_m,verified,manual_edit")
+    .gte("date", `${month}-01`).lte("date", end).order("clock_in");
+  if (error) throw error;
+  const rows = attState.rows = data || [];
+  const ko = state.lang === "ko", d0 = today();
+  const emps = state.employees.filter((e) => rows.some((r) => r.employee_id === e.id) || (e.active !== false && e.role === "STAFF"));
+  const dates = [...new Set(rows.map((r) => r.date))].sort().reverse();
+  const cell = (list) => list.map((r) => {
+    const open = !r.clock_out;
+    const fix = open && r.date < d0 ? ` <button class="photo-btn" onclick="fixClockOut(${r.id})">${ko?"퇴근 입력":"Set out"}</button>` : "";
+    return `<div class="shift ${r.verified?"":"warn"} ${open?"open":""}">
+      <b>${timeHM(r.clock_in)}–${open ? (r.date === d0 ? (ko?"근무 중":"on duty") : "?") : timeHM(r.clock_out)}</b>${r.manual_edit ? ` <span class="muted">${ko?"수정됨":"edited"}</span>` : ""}<br>
+      ${distTxt(r.distance_m)} ${r.verified?"✅":"⚠️"}${r.photo_path ? ` <button class="photo-btn" aria-label="photo" onclick="showPhoto(${r.id})">📷</button>` : ""}${fix}
+      ${r.clock_out ? `<br><span class="muted">${fmtDur(durMin(r.clock_in, r.clock_out))}${r.out_distance_m != null ? ` · ${ko?"퇴근":"out"} ${r.out_distance_m}m` : ""}</span>` : ""}
+    </div>`;
+  }).join("");
+  const body = dates.map((d) => `<tr><td><b>${d.slice(8)}</b> <span class="muted">${new Date(d+"T00:00:00").toLocaleDateString(ko?"ko-KR":"en-US",{weekday:"short"})}</span></td>
+    ${emps.map((e) => `<td>${cell(rows.filter((r) => r.date === d && r.employee_id === e.id))}</td>`).join("")}</tr>`).join("");
+  const totals = emps.map((e) => {
+    const mine = rows.filter((r) => r.employee_id === e.id);
+    const mins = mine.filter((r) => r.clock_out).reduce((s, r) => s + durMin(r.clock_in, r.clock_out), 0);
+    const days = new Set(mine.map((r) => r.date)).size, warn = mine.filter((r) => !r.verified).length;
+    return `<td>${fmtDur(mins)}<br><span class="muted">${days}${ko?"일":" days"}${warn ? ` · ⚠️${warn}` : ""}</span></td>`;
+  }).join("");
+  $("screen").innerHTML = `<div class="report-title">${tt("tab_attendance")} <span>· ${month}</span></div>
+    <div class="filter-bar"><input type="month" value="${month}" aria-label="month" onchange="attState.month=this.value;screenAttendance()"></div>
+    <div class="card">
+      ${dates.length ? `<div class="tscroll"><table class="data-table att-table">
+        <thead><tr><th>${ko?"날짜":"Date"}</th>${emps.map((e) => `<th>${esc(empName(e))}</th>`).join("")}</tr></thead>
+        <tbody>${body}<tr class="att-total"><td>${ko?"월 합계":"Total"}</td>${totals}</tr></tbody></table></div>`
+        : `<p class="empty">${ko?"이 달의 출근 기록이 없습니다.":"No attendance this month."}</p>`}
+      <p class="hint">✅ ${ko?"매장 반경 안에서 출근":"Clocked in inside the store radius"} · ⚠️ ${ko?"반경 밖이거나 위치 없음":"Outside the radius or no location"} · ${ko?"시각은 모두 서버 기록(필리핀 시간)":"All times are server-recorded (PH time)"}</p>
+    </div>`;
+}
+async function showPhoto(id){
+  const r = attState.rows.find((x) => x.id === id); if (!r?.photo_path) return;
+  const { data, error } = await sb.storage.from(STORAGE_BUCKET).createSignedUrl(r.photo_path, 300);
+  if (error) { toast(error.message); return; }
+  const e = empById(r.employee_id), m = document.createElement("div");
+  m.className = "modal"; m.setAttribute("role", "dialog");
+  m.innerHTML = `<div><img src="${data.signedUrl}" alt=""><div class="modal-cap">${esc(empName(e))} · ${r.date} ${timeHM(r.clock_in)} · ${distTxt(r.distance_m)}${r.accuracy_m != null ? ` (±${r.accuracy_m}m)` : ""} ${r.verified?"✅":"⚠️"}</div></div>`;
+  const close = () => { m.remove(); document.removeEventListener("keydown", onKey); };
+  const onKey = (ev) => { if (ev.key === "Escape") close(); };
+  m.onclick = close; document.addEventListener("keydown", onKey);
+  document.body.appendChild(m);
+}
+async function fixClockOut(id){
+  const r = attState.rows.find((x) => x.id === id); if (!r) return;
+  const ko = state.lang === "ko";
+  const hm = prompt(ko ? `${r.date} 퇴근 시각 (필리핀 시간, 예: 18:00)` : `Clock-out time for ${r.date} (PH time, e.g. 18:00)`, "18:00");
+  if (!hm) return;
+  if (!/^([01]?\d|2[0-3]):[0-5]\d$/.test(hm.trim())) { toast(ko ? "HH:MM 형식으로 입력하세요" : "Use HH:MM"); return; }
+  let out = new Date(`${r.date}T${hm.trim().padStart(5,"0")}:00+08:00`);
+  if (out < new Date(r.clock_in)) out = new Date(out.getTime() + 86400000); // 자정 넘긴 근무
+  const { error } = await sb.from("attendance").update({ clock_out: out.toISOString(), manual_edit: true }).eq("id", id);
+  if (error) { toast(tt("save_fail") + error.message); return; }
+  toast(tt("saved")); screenAttendance();
 }
 
 init();
