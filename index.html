@@ -239,6 +239,31 @@ textarea { width:100%; border:1.5px solid #D8CDBD; border-radius:11px; padding:1
 .feed-btn { width:100%; text-align:left; background:none; border:none; border-bottom:1px solid #F0E9DD; font:inherit; color:inherit; cursor:pointer; }
 .feed-ico { width:22px; text-align:center; flex:none; }
 .feed-main { flex:1; min-width:0; }
+.low-box { background:#FBE4E3; border:1px solid #E0A9A6; color:#7A1F1C; border-radius:14px; padding:14px 16px; margin-bottom:18px; font-size:14px; line-height:1.7; }
+.low-box .btn-mini { margin-top:8px; }
+.inv-row { display:grid; grid-template-columns:1fr auto 70px; gap:10px; align-items:center; width:100%; text-align:left; background:none; border:none; border-bottom:1px solid #F0E9DD; padding:11px 4px; font:inherit; color:inherit; cursor:pointer; min-height:48px; }
+.inv-row.sel { background:var(--accent-bg); border-radius:8px; }
+.inv-row.low .inv-stock { color:#B5322E; }
+.inv-row.low .inv-name::before { content:"🔴 "; }
+.inv-name { font-weight:600; font-size:14px; }
+.inv-stock { font-size:17px; font-weight:800; text-align:right; }
+.inv-stock small { font-size:11px; font-weight:600; color:#807460; }
+.inv-min { font-size:12px; text-align:right; }
+.seg { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-bottom:14px; }
+.seg button { border:1.5px solid #D8CDBD; background:#fff; border-radius:10px; padding:10px 4px; font-size:14px; font-weight:700; color:#5E4A36; cursor:pointer; min-height:48px; }
+.seg button.on.mv-IN { background:#1F7A43; border-color:#1F7A43; color:#fff; }
+.seg button.on.mv-OUT { background:#B5322E; border-color:#B5322E; color:#fff; }
+.seg button.on.mv-ADJUST { background:#3A5A82; border-color:#3A5A82; color:#fff; }
+.seg button.on .lang-sub { color:#fff; opacity:.85; }
+.mv-tag { font-size:11px; font-weight:700; padding:2px 7px; border-radius:6px; white-space:nowrap; }
+.mv-tag.mv-IN { background:#E3F3E8; color:#1F7A43; } .mv-tag.mv-OUT { background:#FBE4E3; color:#B5322E; } .mv-tag.mv-ADJUST { background:#E8EEF6; color:#3A5A82; }
+.chip-x { border:none; background:none; color:#807460; cursor:pointer; margin-left:2px; font-size:12px; min-width:22px; min-height:22px; }
+.item-row { display:grid; grid-template-columns:1fr 80px 90px auto; gap:8px; align-items:center; padding:8px 0; border-bottom:1px solid #F0E9DD; font-size:13px; }
+.item-row.head { font-size:11px; font-weight:700; text-transform:uppercase; padding-top:0; }
+.item-row input { border:1px solid #D8CDBD; border-radius:7px; padding:7px 8px; font-size:13px; width:100%; }
+.item-row.off { opacity:.55; }
+.btn-mini.on { background:var(--accent); color:#fff; }
+.s-CONFIRMED { background:#E8EEF6; color:#3A5A82; }
 .kv { display:flex; justify-content:space-between; gap:10px; padding:8px 0; border-bottom:1px solid #F0E9DD; font-size:14px; }
 .kv b { font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-variant-numeric:tabular-nums; }
 </style>
@@ -331,6 +356,16 @@ const I18N = {
   post:{ko:"올리기",en:"Post",tl:"I-post"},
   comments:{ko:"댓글",en:"Comments",tl:"Mga komento"},
   add_comment:{ko:"댓글 달기",en:"Add comment",tl:"Magkomento"},
+  record_move:{ko:"입출고 기록",en:"Record stock in/out",tl:"Itala ang pasok/labas"},
+  item:{ko:"품목",en:"Item",tl:"Item"},
+  qty:{ko:"수량",en:"Qty",tl:"Dami"},
+  counted_qty:{ko:"실제 센 수량",en:"Counted qty",tl:"Aktwal na bilang"},
+  memo:{ko:"메모",en:"Note",tl:"Tala"},
+  current_stock:{ko:"현재고",en:"Current stock",tl:"Kasalukuyang stock"},
+  order_request:{ko:"주문 요청",en:"Order request",tl:"Hiling na order"},
+  send_request:{ko:"사장님께 주문요청 보내기",en:"Send request to owner",tl:"Ipadala sa may-ari"},
+  my_requests:{ko:"주문요청 현황",en:"Request status",tl:"Estado ng hiling"},
+  ledger:{ko:"입출고 장부",en:"Stock ledger",tl:"Talaan ng stock"},
   store_not_set:{ko:"매장 위치가 아직 등록되지 않았어요. 사장님께 '관리 → 매장 좌표 등록'을 요청하세요.",en:"Store location isn't set yet. Ask the owner to set it in Settings."},
 };
 function tt(k){ const e=I18N[k]; if(!e) return k; return state.lang==="ko" ? (e.ko??k) : (e.en??k); }
@@ -441,8 +476,8 @@ const SCREENS = {
   clock:      () => screenClock(),
   attendance: () => screenAttendance(),
   board:      () => screenBoard(),
-  inventory:  () => screenSoon("tab_inventory", 4, { ko:"현재고 · 입출고 장부 · 저재고 경고 · 주문요청", en:"Stock, in/out ledger, low-stock alerts, order requests" }),
-  supply:     () => screenSoon("tab_supply", 5, { ko:"주문요청 승인/반려 → K-Food 주문함(☕카페)으로 연결", en:"Approve / reject requests → sent to K-Food orders" }),
+  inventory:  () => screenInventory(),
+  supply:     () => screenSupply(),
   closing:    () => screenSoon("tab_closing", 6, { ko:"일일 마감(메뉴 수량 · 현금 · GCash)", en:"Daily closing (menu qty, cash, GCash)" }),
   daily:      () => screenSoon("tab_daily", 6, { ko:"일별 매출표", en:"Daily sales table" }),
   menurank:   () => screenSoon("tab_menurank", 6, { ko:"메뉴 판매 순위", en:"Menu sales ranking" }),
@@ -470,6 +505,7 @@ async function screenDashboard(){
     sbk.from("supply_requests").select("id", { count:"exact", head:true }).eq("source","CAFE").eq("status","PENDING"),
     unreadNoteIds(),
   ]);
+  const reqs = await sbk.from("supply_requests").select("id,items,status,requested_by,created_at,decided_at").eq("source","CAFE").gte("created_at", since).order("id", { ascending:false }).limit(10);
   const attRows = att.data || []; attRows.forEach((r) => photoRows.set(r.id, r));
   const working = attRows.filter((a) => a.clock_in && !a.clock_out);
   const low = (inv.data||[]).filter((i) => Number(i.stock) < Number(i.reorder_level));
@@ -496,6 +532,9 @@ async function screenDashboard(){
     if (a.clock_out) events.push({ t: a.clock_out, html: `<div class="feed-row"><span class="feed-ico">⚪</span>
       <div class="feed-main"><b>${who}</b> ${ko?"퇴근":"clocked out"} ${timeHM(a.clock_out)} · ${fmtDur(durMin(a.clock_in, a.clock_out))}</div><span class="muted">${ago(a.clock_out)}</span></div>` });
   });
+  (reqs.data||[]).forEach((r) => events.push({ t: r.created_at, html: `<button class="feed-row feed-btn" onclick="go('supply')"><span class="feed-ico">📦</span>
+    <div class="feed-main"><div><b>${esc(personName(r.requested_by))}</b> ${ko?"주문요청":"requested"} ${supBadge(r.status)}</div><div class="muted">${reqItemsTxt(r.items)}</div></div>
+    <span class="muted">${ago(r.created_at)}</span></button>` }));
   events.sort((a, b) => new Date(b.t) - new Date(a.t));
   $("screen").innerHTML = `<div class="report-title">${ko?"오늘의 매장":"Today at the cafe"} <span>· ${d}</span></div>
     ${supErr}
@@ -966,6 +1005,223 @@ async function delNote(id){
   if (error) { toast(error.message); return; }
   if (data?.photo_path) sb.storage.from(STORAGE_BUCKET).remove([data.photo_path]);
   toast(state.lang==="ko" ? "삭제했습니다" : "Deleted"); boardList();
+}
+
+// ── 재고: 현재고 · 입출고 장부 · 저재고 · 주문요청 ──────
+const SUP_STATUS = {
+  PENDING:{ko:"승인 대기",en:"Pending",tl:"Naghihintay"},
+  APPROVED:{ko:"승인됨",en:"Approved",tl:"Aprubado"},
+  REJECTED:{ko:"반려",en:"Rejected",tl:"Tinanggihan"},
+  CONFIRMED:{ko:"주문 확인",en:"Confirmed",tl:"Nakumpirma"},
+  SHIPPING:{ko:"배송중",en:"Shipping",tl:"Pinapadala"},
+  DELIVERED:{ko:"배송완료",en:"Delivered",tl:"Naihatid"},
+};
+const supLabel = (s) => { const e = SUP_STATUS[s]; return !e ? s : (state.lang==="ko" ? e.ko : e.en); };
+const supBadge = (s) => `<span class="status s-${esc(s)}">${supLabel(s)}</span>`;
+const MOVE_TYPES = { IN:{ko:"입고",en:"In",tl:"Pumasok"}, OUT:{ko:"출고",en:"Out",tl:"Lumabas"}, ADJUST:{ko:"실사",en:"Count",tl:"Bilang"} };
+const moveLabel = (t) => state.lang==="ko" ? MOVE_TYPES[t]?.ko : MOVE_TYPES[t]?.en;
+const qtyFmt = (n) => { const v = Number(n) || 0; return Number.isInteger(v) ? String(v) : v.toFixed(2).replace(/0+$/, "").replace(/\.$/, ""); };
+const itemName = (i) => !i ? "" : (state.lang==="ko" ? i.name : (i.name_en || i.name));
+const isLow = (i) => Number(i.stock) < Number(i.reorder_level);
+const reqItemName = (it) => state.lang==="ko" ? it.name : (it.name_en || it.name);
+const reqItemsTxt = (items) => (items||[]).map((it) => `${esc(reqItemName(it))} ${qtyFmt(it.qty)}${esc(it.unit||"")}`).join(", ");
+// 공급요청에는 이름(text)이 저장됨 → 직원이면 현재 언어 이름으로 표시
+const personName = (n) => { const e = state.employees.find((x) => x.name === n); return e ? empName(e) : (n || ""); };
+const inv = { items:[], move:{ itemId:"", type:"OUT" }, req:{} };
+
+async function loadInventoryItems(){
+  const { data, error } = await sb.from("inventory_items").select("id,name,name_en,unit,stock,reorder_level,active,sort").order("sort").order("id");
+  if (error) throw error;
+  inv.items = data || [];
+}
+async function screenInventory(){
+  await loadInventoryItems();
+  const ko = state.lang === "ko", items = inv.items.filter((i) => i.active !== false);
+  const [moves, reqs] = await Promise.all([
+    sb.from("inventory_moves").select("id,item_id,type,qty,delta,stock_after,date,note,employee_id,created_at").order("id", { ascending:false }).limit(30),
+    sbk.from("supply_requests").select("id,date,items,status,note,requested_by,created_at").eq("source","CAFE").order("id", { ascending:false }).limit(10),
+  ]);
+  if (moves.error) throw moves.error;
+  const low = items.filter(isLow);
+  if (!inv.move.itemId && items[0]) inv.move.itemId = String(items[0].id);
+  const lowBox = low.length ? `<div class="low-box"><b>🔴 ${ko?`주문 필요 ${low.length}품목`:`Low stock: ${low.length}`}</b>
+      <div>${low.map((i) => `${esc(itemName(i))} <b>${qtyFmt(i.stock)}</b>/${qtyFmt(i.reorder_level)}${esc(i.unit||"")}`).join(" · ")}</div>
+      <button class="btn-mini" onclick="requestLowItems()">📦 ${ko?"부족 품목 주문요청 담기":"Add low items to request"}</button></div>` : "";
+  const rows = items.map((i) => `<button class="inv-row ${isLow(i)?"low":""} ${String(i.id)===inv.move.itemId?"sel":""}" onclick="pickMoveItem(${i.id})">
+      <span class="inv-name">${esc(itemName(i))}${state.lang==="ko" && i.name_en ? `<span class="m-en">${esc(i.name_en)}</span>` : ""}</span>
+      <span class="inv-stock num">${qtyFmt(i.stock)}<small> ${esc(i.unit||"")}</small></span>
+      <span class="inv-min muted num">${ko?"최소":"min"} ${qtyFmt(i.reorder_level)}</span></button>`).join("");
+  const sel = items.find((i) => String(i.id) === inv.move.itemId);
+  const moveCard = items.length ? `<div class="card sticky"><h2>${tl("record_move")}</h2>
+      <div class="field"><label for="mvItem">${tl("item")}</label><select id="mvItem" onchange="inv.move.itemId=this.value;screenInventory()">
+        ${items.map((i) => `<option value="${i.id}" ${String(i.id)===inv.move.itemId?"selected":""}>${esc(itemName(i))} (${qtyFmt(i.stock)}${esc(i.unit||"")})</option>`).join("")}</select></div>
+      <div class="seg" role="radiogroup">${Object.keys(MOVE_TYPES).map((t) => `<button role="radio" aria-checked="${inv.move.type===t}" class="${inv.move.type===t?"on":""} mv-${t}" onclick="setMoveType('${t}')">${moveLabel(t)}${state.lang==="ko"?"":`<span class="lang-sub">${MOVE_TYPES[t].tl}</span>`}</button>`).join("")}</div>
+      <div class="field"><label for="mvQty">${inv.move.type==="ADJUST" ? tl("counted_qty") : tl("qty")} ${sel ? `(${esc(sel.unit||"")})` : ""}</label>
+        <input id="mvQty" type="number" inputmode="decimal" min="0" step="any" placeholder="0" value="${esc(inv.move.qty||"")}" oninput="inv.move.qty=this.value"></div>
+      <div class="field"><label for="mvNote">${tl("memo")}</label><input id="mvNote" value="${esc(inv.move.note||"")}" oninput="inv.move.note=this.value" placeholder="${ko?"예: 시장 구매, 폐기, 실사":"e.g. market purchase, waste"}"></div>
+      <button class="btn-primary" id="mvSave" onclick="saveMove()">${tl("save")}</button>
+      <p class="hint">${inv.move.type==="ADJUST" ? (ko?"실사: 실제로 세어 본 수량을 입력하면 현재고가 그 수량으로 맞춰집니다.":"Count: enter the actual counted amount; stock is set to it.") : (ko?"입고는 더하고, 출고는 뺍니다.":"In adds, Out subtracts.")}</p></div>` : "";
+  const ledger = (moves.data||[]).map((m) => {
+    const it = inv.items.find((i) => i.id === m.item_id), d = Number(m.delta ?? 0);
+    return `<tr><td>${m.date.slice(5)}</td><td>${esc(itemName(it))}</td><td><span class="mv-tag mv-${m.type}">${moveLabel(m.type)}</span></td>
+      <td class="num ${d>=0?"pos":"neg"}">${d>0?"+":""}${qtyFmt(d)}</td><td class="num">${qtyFmt(m.stock_after)}</td>
+      <td>${esc(empName(empById(m.employee_id)))}${m.note ? `<div class="muted">${esc(m.note)}</div>` : ""}</td>
+      ${isAdmin() ? `<td><button class="link-del" aria-label="delete" onclick="delMove(${m.id})">✕</button></td>` : ""}</tr>`;
+  }).join("");
+  const reqList = reqs.error ? `<div class="setup-note">⚠️ ${esc(reqs.error.message)}</div>` : (reqs.data||[]).map((r) => `<div class="order-card">
+      <div class="order-top"><span class="muted">${r.date} · ${esc(personName(r.requested_by))}</span>${supBadge(r.status)}</div>
+      <div class="order-items">${(r.items||[]).map((it) => `<span class="chip">${esc(reqItemName(it))} ×${qtyFmt(it.qty)}${esc(it.unit||"")}</span>`).join("")}</div>
+      ${r.note ? `<div class="pre muted">${esc(r.note)}</div>` : ""}
+      ${r.status==="PENDING" && (isAdmin() || r.requested_by===state.user.name) ? `<div class="order-foot"><span></span><button class="mng-del" onclick="cancelRequest(${r.id})">${ko?"요청 취소":"Cancel request"}</button></div>` : ""}
+    </div>`).join("");
+  $("screen").innerHTML = `<div class="report-title">${tt("tab_inventory")}</div>
+    ${lowBox}
+    <div class="grid-2">
+      <div class="card"><h2>${tl("current_stock")}</h2>${rows || `<p class="empty">${ko?"등록된 품목이 없습니다.":"No items yet."}${isAdmin()?"":(ko?" 사장님께 품목 등록을 요청하세요.":" Ask the owner to add items.")}</p>`}</div>
+      ${moveCard}
+    </div>
+    <div class="card" id="reqCard"><h2>📦 ${tl("order_request")}</h2>${requestFormHTML(items)}</div>
+    <div class="card"><h2>${tl("my_requests")}</h2>${reqList || `<p class="empty">—</p>`}</div>
+    <div class="card"><h2>${tl("ledger")}</h2>${ledger ? `<div class="tscroll"><table class="data-table">
+      <thead><tr><th>${ko?"날짜":"Date"}</th><th>${tt("item")}</th><th></th><th class="num">±</th><th class="num">${ko?"재고":"Stock"}</th><th>${ko?"담당":"By"}</th>${isAdmin()?"<th></th>":""}</tr></thead>
+      <tbody>${ledger}</tbody></table></div>` : `<p class="empty">—</p>`}</div>
+    ${isAdmin() ? itemAdminHTML() : ""}`;
+}
+function setMoveType(t){ inv.move.type = t; screenInventory(); }
+function pickMoveItem(id){ inv.move.itemId = String(id); screenInventory().then(() => $("mvQty")?.focus()); }
+async function saveMove(){
+  const qty = Number($("mvQty").value), note = $("mvNote").value.trim();
+  if (!(qty > 0) && !(inv.move.type === "ADJUST" && $("mvQty").value !== "" && qty === 0)) { toast(state.lang==="ko" ? "수량을 입력하세요" : "Enter a quantity"); return; }
+  const btn = $("mvSave"); btn.disabled = true;
+  const { data, error } = await sb.from("inventory_moves").insert({ item_id: Number(inv.move.itemId), type: inv.move.type, qty, note: note || null, employee_id: state.user.id }).select("stock_after").single();
+  if (error) { toast(tt("save_fail") + error.message); btn.disabled = false; return; }
+  const it = inv.items.find((i) => String(i.id) === inv.move.itemId);
+  inv.move.qty = ""; inv.move.note = "";
+  toast(`${tt("saved")} · ${itemName(it)} ${qtyFmt(data.stock_after)}${it?.unit||""}`);
+  screenInventory();
+}
+async function delMove(id){
+  if (!confirm(state.lang==="ko" ? "이 기록을 삭제할까요? 재고가 그만큼 되돌아갑니다." : "Delete this entry? Stock will be reverted.")) return;
+  const { error } = await sb.from("inventory_moves").delete().eq("id", id);
+  if (error) { toast(error.message); return; }
+  screenInventory();
+}
+
+// 주문요청 (→ kfr.supply_requests, source=CAFE, PENDING)
+function requestFormHTML(items){
+  const ko = state.lang === "ko";
+  const picked = Object.entries(inv.req).filter(([, q]) => Number(q) > 0);
+  return `<div class="add-form">
+      <select id="rqItem" aria-label="item"><option value="">${ko?"품목 선택":"Choose item"}</option>
+        ${items.map((i) => `<option value="${i.id}">${esc(itemName(i))}${isLow(i)?" 🔴":""}</option>`).join("")}</select>
+      <input id="rqQty" type="number" inputmode="decimal" min="0" step="any" placeholder="${ko?"수량":"Qty"}" style="max-width:90px">
+      <button class="btn-mini" onclick="addReqItem()">${ko?"담기":"Add"}</button></div>
+    <div class="order-items">${picked.map(([id, q]) => { const i = inv.items.find((x) => String(x.id) === id);
+      return `<span class="chip">${esc(itemName(i))} ×${qtyFmt(q)}${esc(i?.unit||"")} <button class="chip-x" aria-label="remove" onclick="delete inv.req['${id}'];screenInventory()">✕</button></span>`; }).join("")}</div>
+    <div class="field"><label for="rqNote">${tl("memo")}</label><textarea id="rqNote" rows="2" oninput="inv.reqNote=this.value" placeholder="${ko?"예: 금요일까지 필요":"e.g. needed by Friday"}">${esc(inv.reqNote||"")}</textarea></div>
+    <button class="btn-primary" id="rqSave" onclick="submitRequest()" ${picked.length?"":"disabled"}>${tl("send_request")}</button>
+    <p class="hint">${ko?"사장님이 승인하면 K-Food 주문함으로 넘어갑니다.":"After the owner approves, it goes to the K-Food order list."}</p>`;
+}
+function addReqItem(){
+  const id = $("rqItem").value, q = Number($("rqQty").value);
+  if (!id || !(q > 0)) { toast(state.lang==="ko" ? "품목과 수량을 입력하세요" : "Choose an item and quantity"); return; }
+  inv.req[id] = (Number(inv.req[id]) || 0) + q; screenInventory().then(() => $("reqCard")?.scrollIntoView({ block:"center" }));
+}
+function requestLowItems(){
+  inv.items.filter((i) => i.active !== false && isLow(i)).forEach((i) => {
+    if (!(Number(inv.req[i.id]) > 0)) inv.req[i.id] = Math.max(1, Number(i.reorder_level) * 2 - Number(i.stock));
+  });
+  screenInventory().then(() => $("reqCard")?.scrollIntoView({ block:"center" }));
+}
+async function submitRequest(){
+  const items = Object.entries(inv.req).filter(([, q]) => Number(q) > 0).map(([id, q]) => {
+    const i = inv.items.find((x) => String(x.id) === id); return { item_id: Number(id), name: i?.name || id, name_en: i?.name_en || null, qty: Number(q), unit: i?.unit || "" };
+  });
+  if (!items.length) return;
+  const btn = $("rqSave"); btn.disabled = true;
+  const { error } = await sbk.from("supply_requests").insert({ source:"CAFE", requested_by: state.user.name, date: today(), items, status:"PENDING", note: $("rqNote").value.trim() || null });
+  if (error) { toast(tt("save_fail") + error.message); btn.disabled = false; return; }
+  inv.req = {}; inv.reqNote = ""; toast(state.lang==="ko" ? "주문요청을 보냈습니다" : "Request sent / Naipadala"); screenInventory();
+}
+async function cancelRequest(id){
+  if (!confirm(state.lang==="ko" ? "이 요청을 취소할까요?" : "Cancel this request?")) return;
+  const { error } = await sbk.from("supply_requests").delete().eq("id", id).eq("status", "PENDING");
+  if (error) { toast(error.message); return; }
+  screenRefresh();
+}
+function screenRefresh(){ renderScreen(); }
+
+// 품목 관리 (사장)
+function itemAdminHTML(){
+  const ko = state.lang === "ko";
+  const rows = inv.items.map((i) => `<div class="item-row ${i.active===false?"off":""}">
+      <div><b>${esc(i.name)}</b>${i.name_en ? `<span class="m-en">${esc(i.name_en)}</span>` : ""}</div>
+      <input aria-label="unit" value="${esc(i.unit||"")}" onchange="updateItem(${i.id},'unit',this.value.trim())">
+      <input aria-label="reorder level" type="number" min="0" step="any" value="${qtyFmt(i.reorder_level)}" onchange="updateItem(${i.id},'reorder_level',Number(this.value)||0)">
+      <button class="mng-del" onclick="updateItem(${i.id},'active',${i.active===false})">${i.active===false?(ko?"복구":"Restore"):(ko?"숨김":"Hide")}</button></div>`).join("");
+  return `<div class="card"><h2>${ko?"품목 관리":"Items"}</h2>
+    <div class="add-form">
+      <input id="itName" placeholder="${ko?"품목명":"Name"}"><input id="itNameEn" placeholder="${ko?"영문명":"English name"}">
+      <input id="itUnit" placeholder="${ko?"단위 (kg, 팩)":"Unit"}" style="max-width:90px">
+      <input id="itMin" type="number" min="0" step="any" placeholder="${ko?"최소재고":"Min"}" style="max-width:90px">
+      <input id="itStock" type="number" min="0" step="any" placeholder="${ko?"현재고":"Stock"}" style="max-width:90px">
+      <button class="btn-mini" onclick="addItem()">${ko?"추가":"Add"}</button></div>
+    <div class="item-row head muted"><span>${ko?"품목":"Item"}</span><span>${ko?"단위":"Unit"}</span><span>${ko?"최소재고":"Min stock"}</span><span></span></div>
+    ${rows || `<p class="empty">—</p>`}
+    <p class="hint">${ko?"최소재고보다 적으면 대시보드와 재고 화면에 빨간 경고가 뜹니다. 현재고는 입출고/실사 기록으로만 바뀝니다.":"Below min stock shows a red alert. Stock only changes through in/out/count entries."}</p></div>`;
+}
+async function addItem(){
+  const name = $("itName").value.trim(); if (!name) { toast(state.lang==="ko" ? "품목명을 입력하세요" : "Enter a name"); return; }
+  const stock = $("itStock").value === "" ? null : Number($("itStock").value);
+  const { data, error } = await sb.from("inventory_items").insert({ name, name_en: $("itNameEn").value.trim() || null, unit: $("itUnit").value.trim() || "개",
+    reorder_level: Number($("itMin").value) || 0, stock: 0, sort: inv.items.length + 1 }).select("id").single();
+  if (error) { toast(tt("save_fail") + error.message); return; }
+  if (stock > 0) await sb.from("inventory_moves").insert({ item_id: data.id, type:"ADJUST", qty: stock, note: state.lang==="ko" ? "최초 재고" : "Opening stock", employee_id: state.user.id });
+  toast(tt("saved")); screenInventory();
+}
+async function updateItem(id, field, value){
+  const { error } = await sb.from("inventory_items").update({ [field]: value }).eq("id", id);
+  if (error) { toast(tt("save_fail") + error.message); return; }
+  toast(tt("saved")); screenInventory();
+}
+
+// ── 공급요청 승인 (사장) ─────────────────────────
+async function screenSupply(){
+  const ko = state.lang === "ko";
+  const { data, error } = await sbk.from("supply_requests").select("id,date,items,status,note,requested_by,approved_by,decided_at,created_at")
+    .eq("source","CAFE").order("id", { ascending:false }).limit(60);
+  if (error) throw error;
+  const pending = (data||[]).filter((r) => r.status === "PENDING"), rest = (data||[]).filter((r) => r.status !== "PENDING");
+  const card = (r) => `<div class="order-card">
+      <div class="order-top"><span><b>${esc(personName(r.requested_by))}</b> <span class="muted">${r.date} · ${ago(r.created_at)}</span></span>${supBadge(r.status)}</div>
+      <div class="order-items">${(r.items||[]).map((it) => `<span class="chip">${esc(reqItemName(it))} ×${qtyFmt(it.qty)}${esc(it.unit||"")}</span>`).join("")}</div>
+      ${r.note ? `<div class="pre" style="font-size:13px;margin-bottom:8px">${esc(r.note)}</div>` : ""}
+      ${r.status === "PENDING" ? `<div class="order-foot"><button class="mng-del" onclick="decideRequest(${r.id},'REJECTED')">${ko?"반려":"Reject"}</button>
+        <button class="btn-mini on" onclick="decideRequest(${r.id},'APPROVED')">✓ ${ko?"승인 → K-Food로":"Approve → K-Food"}</button></div>`
+        : `<div class="muted">${r.approved_by ? `${ko?"결정":"By"}: ${esc(personName(r.approved_by))}` : ""}${r.decided_at ? ` · ${ago(r.decided_at)}` : ""}</div>`}
+    </div>`;
+  $("screen").innerHTML = `<div class="report-title">${tt("tab_supply")} <span>· ☕ Bahay Cafe → K-Food</span></div>
+    <div class="card"><h2>${ko?"승인 대기":"Pending"} ${pending.length ? `<span class="dot-red">${pending.length}</span>` : ""}</h2>
+      ${pending.map(card).join("") || `<p class="empty">${ko?"대기 중인 요청이 없습니다.":"Nothing to approve."}</p>`}</div>
+    <div class="card"><h2>${ko?"처리 내역":"History"}</h2>${rest.map(card).join("") || `<p class="empty">—</p>`}
+      <p class="hint">${ko?"승인된 요청은 K-Food 주문함에 ☕카페로 표시되고, 담당자가 확인→배송→완료로 진행합니다.":"Approved requests appear in K-Food as ☕Cafe and move through Confirmed → Shipping → Delivered."}</p></div>`;
+}
+async function decideRequest(id, status){
+  const ko = state.lang === "ko";
+  const patch = { status, approved_by: state.user.name, decided_at: new Date().toISOString() };
+  if (status === "REJECTED") {
+    const reason = prompt(ko ? "반려 사유 (선택)" : "Reason (optional)", "");
+    if (reason === null) return;
+    if (reason.trim()) {
+      const { data } = await sbk.from("supply_requests").select("note").eq("id", id).single();
+      patch.note = [data?.note, `[${ko?"반려":"Rejected"}] ${reason.trim()}`].filter(Boolean).join("\n");
+    }
+  }
+  const { data, error } = await sbk.from("supply_requests").update(patch).eq("id", id).eq("status", "PENDING").select("id");
+  if (error) { toast(tt("save_fail") + error.message); return; }
+  if (!data?.length) toast(ko ? "이미 처리된 요청입니다" : "Already handled");
+  else toast(status === "APPROVED" ? (ko ? "승인 — K-Food 주문함으로 보냈습니다" : "Approved — sent to K-Food") : (ko ? "반려했습니다" : "Rejected"));
+  screenSupply();
 }
 
 init();
