@@ -267,6 +267,28 @@ textarea { width:100%; border:1.5px solid #D8CDBD; border-radius:11px; padding:1
 .sup-steps { display:flex; gap:4px; margin:2px 0 10px; }
 .sup-steps span { flex:1; height:5px; border-radius:3px; background:#F0E9DD; }
 .sup-steps span.on { background:#1F7A43; }
+.cl-row { display:grid; grid-template-columns:1fr auto 64px 76px; grid-template-areas:"name step promo sub"; gap:8px 10px; align-items:center; padding:8px 0; border-bottom:1px solid #F0E9DD; }
+.cl-row > :nth-child(1) { grid-area:name; } .cl-row > :nth-child(2) { grid-area:step; } .cl-row > :nth-child(3) { grid-area:promo; } .cl-row > :nth-child(4) { grid-area:sub; }
+.cl-head { font-size:11px; color:#807460; font-weight:700; text-transform:uppercase; letter-spacing:.4px; border-bottom:2px solid #E6DFD4; padding-top:0; }
+.cl-head span:not(:first-child) { text-align:center; }
+.cl-name { display:flex; flex-direction:column; min-width:0; }
+.cl-row .m-sub { min-width:0; }
+@media(max-width:560px){ .cl-row { grid-template-columns:1fr auto; grid-template-areas:"name sub" "step promo"; } .cl-head { display:none; } }
+.promo-box { width:64px; text-align:center; border:1px dashed #C9842A; border-radius:7px; padding:8px 4px; font-size:13px; font-family:ui-monospace, SFMono-Regular, Menlo, monospace; background:#FFFDF8; min-height:38px; }
+.promo-box::placeholder { color:#BDB2A0; }
+.prev-btn { width:100%; background:none; border:none; border-bottom:1px solid #F0E9DD; font:inherit; color:inherit; cursor:pointer; text-align:left; }
+.prev-btn.sel { background:var(--accent-bg); border-radius:8px; }
+.prev-btn:disabled { cursor:default; opacity:.6; }
+.prev-row { align-items:center; gap:8px; }
+.rank-no { display:inline-block; min-width:20px; color:var(--accent); margin-right:4px; }
+.rank-row { grid-template-columns:minmax(0,1.3fr) 1fr auto; }
+.rank-row .bar-name { overflow:hidden; white-space:nowrap; text-overflow:ellipsis; display:block; }
+.data-table tr.we td:first-child { color:#B5322E; }
+.menu-mng { display:grid; grid-template-columns:1fr 110px 110px auto; gap:8px; align-items:center; padding:8px 0; border-bottom:1px solid #F0E9DD; font-size:13px; }
+.menu-mng select { border:1px solid #D8CDBD; border-radius:7px; padding:7px; font-size:13px; width:100%; }
+.menu-mng .peso-field input { padding:7px; font-size:13px; }
+.menu-mng.off { opacity:.55; }
+@media(max-width:560px){ .menu-mng { grid-template-columns:1fr 1fr; } }
 .kv { display:flex; justify-content:space-between; gap:10px; padding:8px 0; border-bottom:1px solid #F0E9DD; font-size:14px; }
 .kv b { font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-variant-numeric:tabular-nums; }
 </style>
@@ -370,6 +392,24 @@ const I18N = {
   my_requests:{ko:"주문요청 현황",en:"Request status",tl:"Estado ng hiling"},
   ledger:{ko:"입출고 장부",en:"Stock ledger",tl:"Talaan ng stock"},
   receive_stock:{ko:"입고 처리 (재고에 더하기)",en:"Receive into stock",tl:"Idagdag sa stock"},
+  closing_title:{ko:"일일 마감",en:"Daily Closing",tl:"Araw-araw na Closing"},
+  h_menu:{ko:"메뉴",en:"Menu"}, h_qty:{ko:"수량",en:"Qty"}, h_promo:{ko:"할인가",en:"Promo"}, h_sub:{ko:"소계",en:"Subtotal"},
+  free_label:{ko:"쿠폰 / 무료 제공",en:"Coupon / Free item",tl:"Kupon / Libreng item"},
+  free_add:{ko:"추가",en:"Add"},
+  free_hint:{ko:"무료로 준 음료·메뉴. 매출은 0, 수량만 순위에 집계됩니다.",en:"Items given free: ₱0 sales, counted in the ranking only. / Libreng item: ₱0."},
+  income_verify:{ko:"수입 입력 & 검증",en:"Income & Verification",tl:"Kita at Beripikasyon"},
+  cash:{ko:"현금",en:"Cash",tl:"Pera"},
+  gcash:{ko:"지캐시 (GCash)",en:"GCash",tl:"GCash"},
+  card_other:{ko:"카드 / 기타",en:"Card / other",tl:"Card / iba pa"},
+  menu_total:{ko:"메뉴 판매 합계",en:"Menu sales total"},
+  recv_total:{ko:"실제 수입 합계",en:"Actual income total"},
+  flag_idle:{ko:"메뉴 수량을 입력하세요",en:"Enter menu quantities / Ilagay ang dami"},
+  flag_ok:{ko:"✓ 일치합니다",en:"✓ Matches / Tugma"},
+  save_closing:{ko:"마감 저장",en:"Save closing",tl:"I-save ang closing"},
+  closing_hint:{ko:"할인가 칸에 가격을 넣으면 그 가격으로 계산됩니다(비우면 기본가). 메뉴 합계와 현금+GCash+카드가 맞아야 정상 마감이에요. 지출은 매출과 따로 아래에 기록하세요.",en:"Type a promo price to override the base price. Menu total must match Cash + GCash + Card. Record expenses separately below. / Dapat tumugma ang kabuuan."},
+  prev_closing:{ko:"최근 마감",en:"Recent closings",tl:"Mga huling closing"},
+  saved_closing:{ko:"마감이 저장되었습니다",en:"Closing saved / Na-save ang closing"},
+  today_expenses:{ko:"이 날 지출",en:"Expenses this day",tl:"Gastos ngayong araw"},
   store_not_set:{ko:"매장 위치가 아직 등록되지 않았어요. 사장님께 '관리 → 매장 좌표 등록'을 요청하세요.",en:"Store location isn't set yet. Ask the owner to set it in Settings."},
 };
 function tt(k){ const e=I18N[k]; if(!e) return k; return state.lang==="ko" ? (e.ko??k) : (e.en??k); }
@@ -454,7 +494,7 @@ function logout() { state.user = null; state.tab = null; localStorage.removeItem
 
 // ── 탭 라우팅 (role 로 분기) ─────────────────────
 function tabsFor(){
-  if (isAdmin()) return ["dashboard","daily","menurank","report","attendance","inventory","supply","board","manage"].map((k)=>[k,tt("tab_"+k)]);
+  if (isAdmin()) return ["dashboard","closing","daily","menurank","report","attendance","inventory","supply","board","manage"].map((k)=>[k,tt("tab_"+k)]);
   const t = ["clock","inventory","board"];
   if (state.settings.staff_closing === "1") t.push("closing");
   return t.map((k)=>[k,tt("tab_"+k)]);
@@ -482,18 +522,14 @@ const SCREENS = {
   board:      () => screenBoard(),
   inventory:  () => screenInventory(),
   supply:     () => screenSupply(),
-  closing:    () => screenSoon("tab_closing", 6, { ko:"일일 마감(메뉴 수량 · 현금 · GCash)", en:"Daily closing (menu qty, cash, GCash)" }),
-  daily:      () => screenSoon("tab_daily", 6, { ko:"일별 매출표", en:"Daily sales table" }),
-  menurank:   () => screenSoon("tab_menurank", 6, { ko:"메뉴 판매 순위", en:"Menu sales ranking" }),
-  report:     () => screenSoon("tab_report", 6, { ko:"월별 손익 보고서", en:"Monthly P&L report" }),
+  closing:    () => screenClosing(),
+  daily:      () => screenDaily(),
+  menurank:   () => screenMenuRank(),
+  report:     () => screenReport(),
 };
 async function renderScreen() {
   try { await (SCREENS[state.tab] || SCREENS[tabsFor()[0][0]])(); }
   catch (e) { $("screen").innerHTML = `<div class="err">${esc(e.message||e)}</div>`; }
-}
-function screenSoon(tabKey, step, desc){
-  $("screen").innerHTML = `<div class="report-title">${tt(tabKey)}</div>
-    <div class="card"><div class="soon">🛠 ${tl("coming_soon")}<br><b>${esc(desc[state.lang==="ko"?"ko":"en"])}</b><br><span class="muted">Build step ${step}</span></div></div>`;
 }
 
 // ── 대시보드 (사장 첫 화면) ──────────────────────
@@ -505,7 +541,7 @@ async function screenDashboard(){
     sb.from("notes").select("id,title,category,author_employee_id,last_activity_at,last_activity_by,resolved,photo_path,note_comments(count)")
       .gte("last_activity_at", since).order("last_activity_at", { ascending:false }).limit(15),
     sb.from("notes").select("id", { count:"exact", head:true }).eq("resolved", false),
-    sb.from("closings").select("cash,gcash").eq("date", d).maybeSingle(),
+    sb.from("closings").select("cash,gcash,card").eq("date", d).maybeSingle(),
     sbk.from("supply_requests").select("id", { count:"exact", head:true }).eq("source","CAFE").eq("status","PENDING"),
     unreadNoteIds(),
   ]);
@@ -513,7 +549,7 @@ async function screenDashboard(){
   const attRows = att.data || []; attRows.forEach((r) => photoRows.set(r.id, r));
   const working = attRows.filter((a) => a.clock_in && !a.clock_out);
   const low = (inv.data||[]).filter((i) => Number(i.stock) < Number(i.reorder_level));
-  const sales = close.data ? Number(close.data.cash||0) + Number(close.data.gcash||0) : null;
+  const sales = close.data ? closingTotal(close.data) : null;
   const ko = state.lang === "ko";
   const workingTxt = working.map((a) => `${esc(empName(empById(a.employee_id)))} ${timeHM(a.clock_in)}${a.verified?" ✅":" ⚠️"}`).join("<br>");
   const lowTxt = low.slice(0,4).map((i) => `${esc(ko?i.name:(i.name_en||i.name))} ${Number(i.stock)}/${Number(i.reorder_level)}${esc(i.unit||"")}`).join("<br>");
@@ -544,7 +580,7 @@ async function screenDashboard(){
   $("screen").innerHTML = `<div class="report-title">${ko?"오늘의 매장":"Today at the cafe"} <span>· ${d}</span></div>
     ${supErr}
     <div class="kpi-row four">
-      <div class="kpi accent"><div class="kpi-label">${ko?"오늘 매출":"Today's sales"}</div><div class="kpi-value">${sales===null?"—":fmt(sales)}</div><div class="delta flat">${sales===null?(ko?"마감 전":"Not closed yet"):(ko?"마감 완료":"Closed")}</div></div>
+      <div class="kpi accent" role="button" tabindex="0" style="cursor:pointer" onclick="openClosing(today())"><div class="kpi-label">${ko?"오늘 매출":"Today's sales"}</div><div class="kpi-value">${sales===null?"—":fmt(sales)}</div><div class="delta flat">${sales===null?(ko?"마감 전":"Not closed yet"):(ko?"마감 완료":"Closed")}</div></div>
       <div class="kpi"><div class="kpi-label">${ko?"근무 중":"Working now"}</div><div class="kpi-value">${working.length}</div><div class="kpi-sub">${workingTxt}</div></div>
       <div class="kpi ${low.length?"alert":""}"><div class="kpi-label">${ko?"저재고":"Low stock"}</div><div class="kpi-value">${low.length}</div><div class="kpi-sub">${lowTxt}</div></div>
       <div class="kpi ${sup.count?"alert":""}"><div class="kpi-label">${ko?"승인 대기":"Pending approval"}</div><div class="kpi-value">${sup.error?"—":(sup.count||0)}</div><div class="kpi-sub">${ko?"☕ 공급요청":"☕ Supply requests"}</div></div>
@@ -557,6 +593,7 @@ async function screenDashboard(){
 // ── 관리: 직원 · 매장 좌표 ───────────────────────
 async function screenManage(){
   await loadEmployees();
+  const salesHTML = await manageSalesHTML();
   const ko = state.lang === "ko";
   const rows = state.employees.map((e) => `<div class="emp-row ${e.active===false?"off":""}">
       <div><b>${esc(e.name)}</b>${e.name_en?`<span class="m-en">${esc(e.name_en)}</span>`:""}</div>
@@ -588,7 +625,8 @@ async function screenManage(){
         <div class="kv" style="margin-top:14px"><span>${ko?"직원 마감 입력 허용":"Staff can enter closing"}</span>
           <input type="checkbox" ${s.staff_closing==="1"?"checked":""} onchange="setSetting('staff_closing', this.checked?'1':'0').then(()=>toast(tt('saved')))" style="width:22px;height:22px"></div>
       </div>
-    </div>`;
+    </div>
+    <div class="grid-2">${salesHTML}</div>`;
   $("geofence").addEventListener("change", async (e) => {
     const v = Math.max(10, Number(e.target.value) || 100);
     const { error } = await setSetting("geofence_m", v);
@@ -1268,6 +1306,371 @@ async function receiveRequest(id){
     return renderScreen();
   }
   toast(ko ? "입고 처리했습니다" : "Received into stock"); renderScreen();
+}
+
+// ── 마감 · 매출 · 지출 ─────────────────────────────
+const MENU_CATS = {
+  COFFEE:{ko:"커피",en:"Coffee",tl:"Kape"},
+  NONCOFFEE:{ko:"음료",en:"Drinks",tl:"Inumin"},
+  FOOD:{ko:"디저트·푸드",en:"Food & Dessert",tl:"Pagkain"},
+  OTHER:{ko:"기타",en:"Other",tl:"Iba pa"},
+};
+const menuCat = (m) => MENU_CATS[m?.category] ? m.category : "OTHER";
+const menuCatLabel = (c) => state.lang==="ko" ? MENU_CATS[c].ko : MENU_CATS[c].en;
+const EXP_CATS = {
+  LABOR:{ko:"인건비",en:"Wages"}, RENT:{ko:"임대료",en:"Rent"}, ELECTRIC:{ko:"전기세",en:"Electricity"}, WATER:{ko:"수도세",en:"Water"},
+  INTERNET:{ko:"인터넷·통신",en:"Internet"}, INGREDIENTS:{ko:"원두·재료",en:"Beans & ingredients"}, DAIRY:{ko:"우유·유제품",en:"Milk & dairy"},
+  PACKAGING:{ko:"포장재(컵·빨대)",en:"Cups & packaging"}, SUPPLIES:{ko:"소모품",en:"Supplies"}, REPAIR:{ko:"수리·유지보수",en:"Repairs"}, OTHER:{ko:"기타",en:"Other"},
+};
+const expCatLabel = (c) => { const e = EXP_CATS[c]; return !e ? (c || "—") : (state.lang==="ko" ? e.ko : e.en); };
+const WEEKDAYS = { ko:["일","월","화","수","목","금","토"], en:["Sun","Mon","Tue","Wed","Thu","Fri","Sat"] };
+const weekday = (d) => WEEKDAYS[state.lang==="ko"?"ko":"en"][new Date(d+"T00:00:00").getDay()];
+const kfmt = (n) => { n = Number(n)||0; const a = Math.abs(n); return a >= 1000 ? PESO+(n/1000).toFixed(a%1000===0?0:1)+"k" : PESO+Math.round(n); };
+const menuName = (m) => !m ? "" : (state.lang==="ko" ? m.name : (m.name_en || m.name));
+function monthRange(month){
+  const [y, m] = month.split("-").map(Number), nx = m === 12 ? `${y+1}-01` : `${y}-${String(m+1).padStart(2,"0")}`, pv = m === 1 ? `${y-1}-12` : `${y}-${String(m-1).padStart(2,"0")}`;
+  return { start:`${month}-01`, end:`${nx}-01`, prev:pv, days:new Date(y, m, 0).getDate() };
+}
+function monthsEnding(month, n){ const out = []; let [y, m] = month.split("-").map(Number); for (let k = 0; k < n; k++) { out.unshift(`${y}-${String(m).padStart(2,"0")}`); if (--m === 0) { m = 12; y--; } } return out; }
+const closingTotal = (c) => Number(c.cash||0) + Number(c.gcash||0) + Number(c.card||0);
+// items → { menuId: {q, rev, free} }
+function closingLines(items){
+  const out = {};
+  Object.entries(items||{}).forEach(([id, v]) => {
+    if (id === "_free") { Object.entries(v||{}).forEach(([fid, q]) => { (out[fid] ||= { q:0, rev:0, free:0 }).free += Number(q)||0; }); return; }
+    if (id.startsWith("_")) return;
+    const o = (out[id] ||= { q:0, rev:0, free:0 });
+    if (v && typeof v === "object") { o.q += Number(v.q)||0; o.rev += (Number(v.q)||0) * (Number(v.p)||0); }
+    else { const m = menuById(id); o.q += Number(v)||0; o.rev += (Number(v)||0) * Number(m?.price||0); }
+  });
+  return out;
+}
+async function loadMenus(){
+  const { data, error } = await sb.from("menus").select("id,name,name_en,price,category,sort,active").order("sort").order("id");
+  if (error) throw error;
+  state.menusAll = data || []; state.menus = state.menusAll.filter((m) => m.active !== false);
+}
+const menuById = (id) => (state.menusAll||[]).find((m) => m.id === id);
+
+// ── 일일 마감 ──
+const cl = { date:null, loadedFor:null, qty:{}, promo:{}, free:{}, cash:"", gcash:"", card:"", note:"", exists:false, by:null, at:null };
+async function loadClosing(date){
+  Object.assign(cl, { qty:{}, promo:{}, free:{}, cash:"", gcash:"", card:"", note:"", exists:false, by:null, at:null });
+  const { data, error } = await sb.from("closings").select("items,cash,gcash,card,note,closed_by,updated_at").eq("date", date).maybeSingle();
+  if (error) throw error;
+  if (data) {
+    Object.assign(cl, { exists:true, cash:data.cash ?? "", gcash:data.gcash ?? "", card:data.card || "", note:data.note || "", by:data.closed_by, at:data.updated_at });
+    Object.entries(data.items||{}).forEach(([id, v]) => {
+      if (id === "_free") { cl.free = { ...(v||{}) }; return; }
+      if (id.startsWith("_")) return;
+      const m = menuById(id), q = v && typeof v === "object" ? Number(v.q)||0 : Number(v)||0, p = v && typeof v === "object" ? Number(v.p) : null;
+      cl.qty[id] = q; if (p && m && p !== Number(m.price)) cl.promo[id] = p;
+    });
+  }
+  cl.loadedFor = date;
+}
+function openClosing(date){ cl.date = date; cl.loadedFor = null; go("closing"); }
+function changeClosingDate(d){ if (!d) return; cl.date = d; cl.loadedFor = null; screenClosing(); }
+const unitPrice = (m) => { const p = Number(cl.promo[m.id]); return p > 0 ? p : Number(m.price)||0; };
+function minClosingDate(){ if (isAdmin()) return ""; const d = new Date(today()+"T00:00:00"); d.setDate(d.getDate()-1); return d.toLocaleDateString("en-CA"); }
+async function screenClosing(){
+  await loadMenus();
+  if (!cl.date) cl.date = today();
+  if (!isAdmin() && cl.date < minClosingDate()) cl.date = today();
+  if (cl.loadedFor !== cl.date) await loadClosing(cl.date);
+  const ko = state.lang === "ko";
+  const [prev, exps] = await Promise.all([
+    sb.from("closings").select("date,cash,gcash,card").order("date", { ascending:false }).limit(7),
+    sb.from("expenses").select("id,category,amount,note,created_by").eq("date", cl.date).order("id"),
+  ]);
+  const groups = Object.keys(MENU_CATS).map((c) => {
+    const ms = state.menus.filter((m) => menuCat(m) === c); if (!ms.length) return "";
+    return `<div class="section-label">${menuCatLabel(c)}${ko?"":`<span class="lang-sub">${MENU_CATS[c].tl}</span>`}</div>${ms.map(clRowHTML).join("")}`;
+  }).join("");
+  const freeIds = Object.keys(cl.free).filter((id) => cl.free[id] > 0);
+  const expRows = (exps.data||[]).map((e) => `<div class="prev-row"><span>${esc(expCatLabel(e.category))}${e.note ? ` <span class="muted">· ${esc(e.note)}</span>` : ""}</span>
+      <span><b>${fmt(e.amount)}</b>${isAdmin() || String(e.created_by) === String(state.user.id) ? ` <button class="link-del" aria-label="delete" onclick="delExpense(${e.id})">✕</button>` : ""}</span></div>`).join("");
+  $("screen").innerHTML = `${cl.exists ? `<div class="setup-note">✏️ ${ko?`<b>${cl.date}</b> 마감이 이미 저장되어 있어요. 고친 뒤 저장하면 갱신됩니다.`:`A closing for <b>${cl.date}</b> is already saved. Saving will update it.`}${cl.by ? ` <span class="muted">(${esc(empName(empById(cl.by)))} · ${ago(cl.at)})</span>` : ""}</div>` : ""}
+    <div class="grid-2">
+    <div class="card">
+      <div class="card-head"><h2>${tl("closing_title")}</h2>
+        <input class="date-pill" type="date" aria-label="date" value="${cl.date}" max="${today()}" ${minClosingDate() ? `min="${minClosingDate()}"` : ""} onchange="changeClosingDate(this.value)" style="border:1px solid #D8CDBD;min-height:36px"></div>
+      ${state.menus.length ? `<div class="cl-row cl-head"><span>${tt("h_menu")}</span><span>${tt("h_qty")}</span><span>${tt("h_promo")}</span><span>${tt("h_sub")}</span></div>${groups}`
+        : `<p class="empty">${ko?"등록된 메뉴가 없습니다. 관리 탭에서 메뉴를 먼저 등록하세요.":"No menu items yet. Add them in Settings first."}</p>`}
+      <div class="section-label">🎁 ${tl("free_label")}</div>
+      <div class="add-form"><select id="freeSel" aria-label="menu">${state.menus.map((m) => `<option value="${esc(m.id)}">${esc(menuName(m))}</option>`).join("")}</select>
+        <input id="freeQty" type="number" inputmode="numeric" value="1" min="1" style="max-width:64px;text-align:center" aria-label="qty">
+        <button class="btn-mini" onclick="addFree()">${tt("free_add")}</button></div>
+      <div class="order-items">${freeIds.map((id) => `<span class="chip">${esc(menuName(menuById(id)) || id)} ×${cl.free[id]} <button class="chip-x" aria-label="remove" onclick="delete cl.free['${esc(id)}'];screenClosing()">✕</button></span>`).join("") || `<span class="hint" style="margin:0">${tt("free_hint")}</span>`}</div>
+    </div>
+    <div class="card sticky">
+      <h2>${tl("income_verify")}</h2>
+      ${[["cash","cash"],["gcash","gcash"],["card","card_other"]].map(([k, lab]) => `<div class="pay-input"><label for="pay_${k}">${tl(lab)}</label><div class="peso-field"><span>${PESO}</span><input id="pay_${k}" type="number" inputmode="decimal" placeholder="0" value="${esc(cl[k])}" oninput="cl.${k}=this.value;recalcClosing()"></div></div>`).join("")}
+      <div class="reconcile">
+        <div class="rec-row"><span>${tt("menu_total")}</span><b id="menuTotal">${PESO}0</b></div>
+        <div class="rec-row"><span>${tt("recv_total")}</span><b id="recvTotal">${PESO}0</b></div>
+        <div class="rec-flag idle" id="flag">${tt("flag_idle")}</div>
+      </div>
+      <div class="field"><label for="clNote">${tl("memo")}</label><textarea id="clNote" rows="2" oninput="cl.note=this.value">${esc(cl.note)}</textarea></div>
+      <button class="btn-primary" id="saveBtn" disabled onclick="saveClosing()">${cl.exists ? (ko?"수정 저장":"Update closing") : tl("save_closing")}</button>
+      <p class="hint">${tt("closing_hint")}</p>
+      <div class="section-label">💸 ${tl("today_expenses")} · ${cl.date.slice(5)}</div>
+      ${expRows || `<p class="muted" style="margin-bottom:8px">—</p>`}
+      ${expenseFormHTML("cx", false)}
+      ${prev.data?.length ? `<div class="section-label">${tl("prev_closing")}</div>${prev.data.map((p) => `<button class="prev-row prev-btn ${p.date===cl.date?"sel":""}" onclick="changeClosingDate('${p.date}')" ${!isAdmin() && p.date < minClosingDate() ? "disabled" : ""}><span>${p.date} ${weekday(p.date)}</span><b>${fmt(closingTotal(p))}</b></button>`).join("")}` : ""}
+    </div></div>`;
+  recalcClosing();
+}
+function clRowHTML(m){
+  const q = cl.qty[m.id] || 0, id = esc(m.id);
+  return `<div class="cl-row">
+    <span class="cl-name"><span class="m-name">${esc(menuName(m))}</span><span class="m-price">${fmt(m.price)}</span></span>
+    <div class="stepper"><button aria-label="minus" onclick="stepQty('${id}',-1)">−</button>
+      <input type="number" inputmode="numeric" id="q_${id}" aria-label="qty" value="${q||""}" placeholder="0" oninput="setQty('${id}',this.value)">
+      <button aria-label="plus" onclick="stepQty('${id}',1)">+</button></div>
+    <input class="promo-box" type="number" inputmode="numeric" id="p_${id}" aria-label="promo price" value="${cl.promo[m.id]||""}" placeholder="${Number(m.price)}" oninput="setPromo('${id}',this.value)">
+    <span class="m-sub" id="sub_${id}">${q>0 ? fmt(q*unitPrice(m)) : "—"}</span></div>`;
+}
+function updSub(id){ const m = menuById(id), q = cl.qty[id]||0; $("sub_"+id).textContent = q > 0 ? fmt(q*unitPrice(m)) : "—"; recalcClosing(); }
+function setQty(id, v){ cl.qty[id] = Math.max(0, Math.floor(Number(v)||0)); updSub(id); }
+function stepQty(id, d){ cl.qty[id] = Math.max(0, (cl.qty[id]||0) + d); $("q_"+id).value = cl.qty[id] || ""; updSub(id); }
+function setPromo(id, v){ cl.promo[id] = v; updSub(id); }
+function addFree(){ const id = $("freeSel")?.value; if (!id) return; cl.free[id] = (cl.free[id]||0) + Math.max(1, Number($("freeQty").value)||1); screenClosing(); }
+function recalcClosing(){
+  const menuTotal = state.menus.reduce((s, m) => s + (cl.qty[m.id]||0) * unitPrice(m), 0);
+  const recv = (Number(cl.cash)||0) + (Number(cl.gcash)||0) + (Number(cl.card)||0), diff = recv - menuTotal, has = menuTotal > 0;
+  if (!$("menuTotal")) return;
+  $("menuTotal").textContent = fmt(menuTotal); $("recvTotal").textContent = fmt(recv);
+  const f = $("flag");
+  if (!has) { f.className = "rec-flag idle"; f.textContent = tt("flag_idle"); }
+  else if (Math.abs(diff) < 0.005) { f.className = "rec-flag ok"; f.textContent = tt("flag_ok"); }
+  else { f.className = "rec-flag bad"; f.textContent = state.lang==="ko" ? `차액 ${diff>0?"+":""}${fmt(diff)} — 확인 필요` : `Diff ${diff>0?"+":""}${fmt(diff)} — please check / pakisuri`; }
+  $("saveBtn").disabled = !(has || recv > 0);
+}
+async function saveClosing(){
+  const items = {};
+  state.menus.forEach((m) => { const q = cl.qty[m.id]||0; if (q > 0) items[m.id] = { q, p: unitPrice(m) }; });
+  const free = {}; Object.entries(cl.free).forEach(([id, q]) => { if (Number(q) > 0) free[id] = Number(q); });
+  if (Object.keys(free).length) items._free = free;
+  const menuTotal = Object.values(items).reduce((s, v) => s + (v.q ? v.q*v.p : 0), 0);
+  const recv = (Number(cl.cash)||0) + (Number(cl.gcash)||0) + (Number(cl.card)||0);
+  if (Math.abs(recv - menuTotal) >= 0.005 && !confirm(state.lang==="ko" ? `메뉴 합계(${fmt(menuTotal)})와 실제 수입(${fmt(recv)})이 다릅니다. 그대로 저장할까요?` : `Menu total (${fmt(menuTotal)}) and income (${fmt(recv)}) differ. Save anyway?`)) return;
+  const btn = $("saveBtn"); btn.disabled = true; btn.textContent = tt("saving");
+  const { error } = await sb.from("closings").upsert({ date: cl.date, items, cash: Number(cl.cash)||0, gcash: Number(cl.gcash)||0, card: Number(cl.card)||0,
+    note: cl.note.trim() || null, closed_by: state.user.id }, { onConflict:"date" });
+  if (error) { toast(tt("save_fail") + error.message); btn.disabled = false; btn.innerHTML = tl("save_closing"); return; }
+  toast(tt("saved_closing")); cl.loadedFor = null; screenClosing();
+}
+
+// ── 지출 ──
+function expenseFormHTML(prefix, withDate){
+  const ko = state.lang === "ko";
+  return `<div class="add-form">
+    ${withDate ? `<input id="${prefix}Date" type="date" value="${today()}" max="${today()}" aria-label="date" style="flex:none;max-width:150px">` : ""}
+    <select id="${prefix}Cat" aria-label="category">${Object.keys(EXP_CATS).map((k) => `<option value="${k}">${expCatLabel(k)}</option>`).join("")}</select>
+    <input id="${prefix}Amt" type="number" inputmode="decimal" min="0" placeholder="${PESO}" aria-label="amount" style="max-width:100px">
+    <input id="${prefix}Note" placeholder="${ko?"메모":"Note"}" aria-label="note">
+    <button class="btn-mini" onclick="addExpense('${prefix}')">${ko?"지출 추가":"Add expense"}</button></div>`;
+}
+async function addExpense(prefix){
+  const amount = Number($(prefix+"Amt").value);
+  if (!(amount > 0)) { toast(state.lang==="ko" ? "금액을 입력하세요" : "Enter an amount"); return; }
+  const date = $(prefix+"Date")?.value || cl.date || today();
+  const { error } = await sb.from("expenses").insert({ date, category: $(prefix+"Cat").value, amount, note: $(prefix+"Note").value.trim() || null, created_by: state.user.id });
+  if (error) { toast(tt("save_fail") + error.message); return; }
+  toast(tt("saved")); renderScreen();
+}
+async function delExpense(id){
+  if (!confirm(state.lang==="ko" ? "이 지출을 삭제할까요?" : "Delete this expense?")) return;
+  const { error } = await sb.from("expenses").delete().eq("id", id);
+  if (error) { toast(error.message); return; }
+  renderScreen();
+}
+
+// ── 일별 매출 (사장) ──
+const sales = { month:null, rankMonth:null, rankBy:"q", repMonth:null, expMonth:null };
+async function screenDaily(){
+  const month = sales.month ||= thisMonth(), { start, end, days } = monthRange(month), ko = state.lang === "ko", d0 = today();
+  const [cs, ex, first] = await Promise.all([
+    sb.from("closings").select("date,cash,gcash,card,note").gte("date", start).lt("date", end),
+    sb.from("expenses").select("date,amount").gte("date", start).lt("date", end),
+    sb.from("closings").select("date").order("date").limit(1),
+  ]);
+  const firstDate = first.data?.[0]?.date || d0;
+  if (cs.error) throw cs.error;
+  const byDate = Object.fromEntries((cs.data||[]).map((c) => [c.date, c])), expBy = {};
+  (ex.data||[]).forEach((e) => { expBy[e.date] = (expBy[e.date]||0) + Number(e.amount); });
+  const dates = []; for (let i = days; i >= 1; i--) { const d = `${month}-${String(i).padStart(2,"0")}`; if (d <= d0) dates.push(d); }
+  const tot = { cash:0, gcash:0, card:0, sales:0, exp:0 };
+  const rows = dates.map((d) => {
+    const c = byDate[d], e = expBy[d] || 0, s = c ? closingTotal(c) : 0;
+    if (c) { tot.cash += Number(c.cash); tot.gcash += Number(c.gcash); tot.card += Number(c.card||0); tot.sales += s; } tot.exp += e;
+    return `<tr class="${[0,6].includes(new Date(d+"T00:00:00").getDay())?"we":""}" onclick="openClosing('${d}')" style="cursor:pointer">
+      <td>${d.slice(8)} <span class="muted">${weekday(d)}</span></td>
+      ${c ? `<td class="num">${fmt(c.cash)}</td><td class="num">${fmt(c.gcash)}</td><td class="num">${fmt(c.card||0)}</td><td class="num"><b>${fmt(s)}</b>${c.note?" 📝":""}</td>`
+          : `<td colspan="4" class="muted" style="text-align:center">${d===d0?(ko?"마감 전":"not closed yet"):d<firstDate?"—":`<span class="tag-due">${ko?"미마감":"missing"}</span>`}</td>`}
+      <td class="num">${e ? fmt(e) : "—"}</td><td class="num ${s-e>=0?"pos":"neg"}">${c||e ? fmt(s-e) : "—"}</td></tr>`;
+  }).join("");
+  const closedDays = Object.keys(byDate).length;
+  const chartDates = dates.slice().reverse();
+  $("screen").innerHTML = `<div class="report-title">${tt("tab_daily")} <span>· ${month}</span></div>
+    <div class="filter-bar"><input type="month" value="${month}" max="${thisMonth()}" aria-label="month" onchange="sales.month=this.value;screenDaily()"></div>
+    <div class="kpi-row four">
+      <div class="kpi accent"><div class="kpi-label">${ko?"월 매출":"Sales"}</div><div class="kpi-value">${fmt(tot.sales)}</div></div>
+      <div class="kpi"><div class="kpi-label">${ko?"지출":"Expenses"}</div><div class="kpi-value">${fmt(tot.exp)}</div></div>
+      <div class="kpi"><div class="kpi-label">${ko?"순이익":"Profit"}</div><div class="kpi-value" style="color:${tot.sales-tot.exp>=0?"#1F7A43":"#B5322E"}">${fmt(tot.sales-tot.exp)}</div></div>
+      <div class="kpi"><div class="kpi-label">${ko?"일평균 매출":"Avg / day"}</div><div class="kpi-value">${fmt(closedDays ? Math.round(tot.sales/closedDays) : 0)}</div><div class="delta flat">${closedDays}${ko?"일 마감":" days closed"}</div></div>
+    </div>
+    ${chartDates.length ? `<div class="card">${svgBars(chartDates.map((d) => d.slice(8)), chartDates.map((d) => byDate[d] ? closingTotal(byDate[d]) : 0))}</div>` : ""}
+    <div class="card"><div class="tscroll"><table class="data-table">
+      <thead><tr><th>${ko?"날짜":"Date"}</th><th class="num">${ko?"현금":"Cash"}</th><th class="num">GCash</th><th class="num">${ko?"카드/기타":"Card"}</th><th class="num">${ko?"매출":"Sales"}</th><th class="num">${ko?"지출":"Exp."}</th><th class="num">${ko?"순이익":"Net"}</th></tr></thead>
+      <tbody>${rows || `<tr><td colspan="7" class="empty">—</td></tr>`}
+      <tr class="att-total"><td>${ko?"합계":"Total"}</td><td class="num">${fmt(tot.cash)}</td><td class="num">${fmt(tot.gcash)}</td><td class="num">${fmt(tot.card)}</td><td class="num">${fmt(tot.sales)}</td><td class="num">${fmt(tot.exp)}</td><td class="num">${fmt(tot.sales-tot.exp)}</td></tr></tbody></table></div>
+      <p class="hint">${ko?"날짜를 누르면 그날 마감을 열어 수정할 수 있어요.":"Tap a day to open and edit its closing."}</p></div>`;
+}
+function svgBars(labels, values){
+  const W = 720, H = 260, pl = 78, pr = 8, pt = 16, pb = 36, iw = W-pl-pr, ih = H-pt-pb, max = Math.max(...values, 1), n = labels.length, bw = iw/n;
+  let g = "";
+  for (let i = 0; i <= 3; i++) { const y = pt + ih - ih*i/3; g += `<line x1="${pl}" y1="${y}" x2="${W-pr}" y2="${y}" stroke="#EEE6DA"/><text x="${pl-8}" y="${y+7}" text-anchor="end" font-size="20" fill="#807460">${kfmt(max*i/3)}</text>`; }
+  const bars = values.map((v, i) => { const h = ih * v / max, x = pl + i*bw + bw*0.15; return `<rect x="${x.toFixed(1)}" y="${(pt+ih-h).toFixed(1)}" width="${(bw*0.7).toFixed(1)}" height="${h.toFixed(1)}" rx="2" fill="var(--accent)"><title>${labels[i]} · ${fmt(v)}</title></rect>`; }).join("");
+  const step = Math.ceil(n / 8);
+  const xl = labels.map((l, i) => i % step ? "" : `<text x="${(pl + i*bw + bw/2).toFixed(1)}" y="${H-8}" text-anchor="middle" font-size="20" fill="#807460">${l}</text>`).join("");
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto" role="img" aria-label="daily sales">${g}${bars}${xl}</svg>`;
+}
+function svgTrend(labels, series){
+  const W = 720, H = 340, pl = 86, pr = 24, pt = 20, pb = 42, iw = W-pl-pr, ih = H-pt-pb;
+  const all = series.flatMap((s) => s.values), max = Math.max(...all, 1), min = Math.min(0, ...all);
+  const x = (i) => pl + (labels.length <= 1 ? iw/2 : iw*i/(labels.length-1)), y = (v) => pt + ih - ((v-min)/((max-min)||1))*ih;
+  let g = "";
+  for (let i = 0; i <= 4; i++) { const v = min + (max-min)*i/4, yy = pt + ih - ih*i/4; g += `<line x1="${pl}" y1="${yy.toFixed(1)}" x2="${W-pr}" y2="${yy.toFixed(1)}" stroke="#EEE6DA"/><text x="${pl-10}" y="${(yy+7).toFixed(1)}" text-anchor="end" font-size="20" fill="#807460">${kfmt(v)}</text>`; }
+  const xl = labels.map((l, i) => `<text x="${x(i).toFixed(1)}" y="${H-10}" text-anchor="middle" font-size="20" fill="#807460">${l}</text>`).join("");
+  const lines = series.map((s) => `<polyline points="${s.values.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ")}" fill="none" stroke="${s.color}" stroke-width="4" stroke-linejoin="round"/>` +
+    s.values.map((v, i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="6" fill="${s.color}"><title>${labels[i]} · ${s.name} ${fmt(v)}</title></circle>`).join("")).join("");
+  return `<div class="legend">${series.map((s) => `<span><i style="background:${s.color}"></i>${s.name}</span>`).join("")}</div><svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto" role="img" aria-label="trend">${g}${lines}${xl}</svg>`;
+}
+
+// ── 메뉴 순위 ──
+async function screenMenuRank(){
+  await loadMenus();
+  const month = sales.rankMonth ||= thisMonth(), { start, end } = monthRange(month), ko = state.lang === "ko";
+  const { data, error } = await sb.from("closings").select("items").gte("date", start).lt("date", end);
+  if (error) throw error;
+  const agg = {};
+  (data||[]).forEach((c) => Object.entries(closingLines(c.items)).forEach(([id, o]) => { const a = (agg[id] ||= { q:0, rev:0, free:0 }); a.q += o.q; a.rev += o.rev; a.free += o.free; }));
+  const by = sales.rankBy, list = Object.entries(agg).map(([id, o]) => ({ id, ...o, m: menuById(id) })).sort((a, b) => (by === "rev" ? b.rev - a.rev : (b.q + b.free) - (a.q + a.free)));
+  const max = Math.max(...list.map((r) => by === "rev" ? r.rev : r.q + r.free), 1), totQ = list.reduce((s, r) => s + r.q, 0), totR = list.reduce((s, r) => s + r.rev, 0);
+  const catAgg = {}; list.forEach((r) => { const c = menuCat(r.m); catAgg[c] = (catAgg[c]||0) + r.rev; });
+  $("screen").innerHTML = `<div class="report-title">${tt("tab_menurank")} <span>· ${month}</span></div>
+    <div class="filter-bar"><input type="month" value="${month}" max="${thisMonth()}" aria-label="month" onchange="sales.rankMonth=this.value;screenMenuRank()">
+      <div class="fchips" style="margin:0">${[["q", ko?"판매 수량":"By quantity"], ["rev", ko?"매출액":"By revenue"]].map(([k, l]) => `<button class="fchip ${by===k?"on":""}" onclick="sales.rankBy='${k}';screenMenuRank()">${l}</button>`).join("")}</div></div>
+    <div class="grid-2">
+      <div class="card"><h2>${ko?"메뉴별":"By menu"} <span class="muted">${totQ}${ko?"잔/개":" sold"} · ${fmt(totR)}</span></h2>
+        ${list.map((r, i) => { const v = by === "rev" ? r.rev : r.q + r.free; return `<div class="bar-row rank-row"><span class="bar-name"><b class="rank-no">${i+1}</b>${esc(menuName(r.m) || r.id)}</span>
+          <div class="bar-track"><div class="bar-fill" style="width:${(v/max*100).toFixed(1)}%"></div></div>
+          <span class="bar-val">${by === "rev" ? fmt(r.rev) : `${r.q}${r.free ? ` <small class="muted">+🎁${r.free}</small>` : ""}`}</span></div>`; }).join("") || `<p class="empty">${ko?"이 달의 마감 기록이 없습니다.":"No closings this month."}</p>`}
+      </div>
+      <div class="card"><h2>${ko?"분류별 매출":"Sales by category"}</h2>
+        ${Object.keys(MENU_CATS).filter((c) => catAgg[c]).map((c) => `<div class="ebar-row"><span class="ebar-name">${menuCatLabel(c)}</span><div class="ebar-track"><div class="ebar-fill" style="width:${(catAgg[c]/(totR||1)*100).toFixed(1)}%"></div></div><span class="ebar-val">${Math.round(catAgg[c]/(totR||1)*100)}%</span></div>`).join("") || `<p class="empty">—</p>`}
+        <p class="hint">🎁 ${ko?"= 쿠폰/무료 제공 수량 (매출 0, 수량 순위에만 포함)":"= free/coupon items (₱0, counted in quantity only)"}</p></div>
+    </div>`;
+}
+
+// ── 월별 보고서 ──
+async function screenReport(){
+  await loadMenus();
+  const month = sales.repMonth ||= thisMonth(), months = monthsEnding(month, 6), ko = state.lang === "ko";
+  const first = monthRange(months[0]).start, { end, prev } = monthRange(month);
+  const [cs, ex] = await Promise.all([
+    sb.from("closings").select("date,cash,gcash,card,items").gte("date", first).lt("date", end),
+    sb.from("expenses").select("date,category,amount").gte("date", first).lt("date", end),
+  ]);
+  if (cs.error) throw cs.error;
+  const stat = (mo) => {
+    const c = (cs.data||[]).filter((x) => x.date.startsWith(mo)), e = (ex.data||[]).filter((x) => x.date.startsWith(mo));
+    const s = { cash:0, gcash:0, card:0, sales:0, exp:0, days:c.length, byCat:{}, wd:[0,0,0,0,0,0,0], wdN:[0,0,0,0,0,0,0], lines:{} };
+    c.forEach((x) => { s.cash += Number(x.cash); s.gcash += Number(x.gcash); s.card += Number(x.card||0); const t = closingTotal(x); s.sales += t; const w = new Date(x.date+"T00:00:00").getDay(); s.wd[w] += t; s.wdN[w]++;
+      Object.entries(closingLines(x.items)).forEach(([id, o]) => { const a = (s.lines[id] ||= { q:0, rev:0 }); a.q += o.q; a.rev += o.rev; }); });
+    e.forEach((x) => { s.exp += Number(x.amount); s.byCat[x.category] = (s.byCat[x.category]||0) + Number(x.amount); });
+    s.profit = s.sales - s.exp; s.margin = s.sales ? s.profit / s.sales * 100 : 0;
+    return s;
+  };
+  const cur = stat(month), pv = months.includes(prev) ? stat(prev) : null;
+  const delta = (a, b, lowerIsBetter) => { if (!pv) return ""; if (!b) return `<div class="delta flat">—</div>`; const p = (a-b)/Math.abs(b)*100, good = lowerIsBetter ? -p : p; return `<div class="delta ${good>0.5?"up":good<-0.5?"down":"flat"}">${p>0?"▲":p<0?"▼":"–"} ${Math.abs(p).toFixed(0)}% ${ko?"전월 대비":"vs last month"}</div>`; };
+  const expCats = Object.entries(cur.byCat).sort((a, b) => b[1] - a[1]), expMax = Math.max(...expCats.map((e) => e[1]), 1);
+  const top = Object.entries(cur.lines).sort((a, b) => b[1].rev - a[1].rev).slice(0, 5);
+  const wdAvg = cur.wd.map((v, i) => cur.wdN[i] ? v / cur.wdN[i] : 0), wdMax = Math.max(...wdAvg, 1);
+  const trend = months.map(stat);
+  $("screen").innerHTML = `<div class="report-title">${tt("tab_report")} <span>· ${month}</span></div>
+    <div class="filter-bar"><input type="month" value="${month}" max="${thisMonth()}" aria-label="month" onchange="sales.repMonth=this.value;screenReport()"></div>
+    <div class="kpi-row four">
+      <div class="kpi accent"><div class="kpi-label">${ko?"매출":"Sales"}</div><div class="kpi-value">${fmt(cur.sales)}</div>${delta(cur.sales, pv?.sales)}</div>
+      <div class="kpi"><div class="kpi-label">${ko?"지출":"Expenses"}</div><div class="kpi-value">${fmt(cur.exp)}</div>${delta(cur.exp, pv?.exp, true)}</div>
+      <div class="kpi"><div class="kpi-label">${ko?"순이익":"Profit"}</div><div class="kpi-value" style="color:${cur.profit>=0?"#1F7A43":"#B5322E"}">${fmt(cur.profit)}</div>${delta(cur.profit, pv?.profit)}</div>
+      <div class="kpi"><div class="kpi-label">${ko?"이익률":"Margin"}</div><div class="kpi-value">${cur.margin.toFixed(1)}%</div><div class="delta flat">${cur.days}${ko?"일 영업 · 일평균 ":" days · avg "}${fmt(cur.days ? Math.round(cur.sales/cur.days) : 0)}</div></div>
+    </div>
+    <div class="grid-2">
+      <div class="card report-pl"><h2>${ko?"손익":"Profit & loss"}</h2>
+        <div class="pl-row"><span>${ko?"매출":"Sales"}</span><b>${fmt(cur.sales)}</b></div>
+        <div class="pl-row pl-sub"><span>${ko?"현금":"Cash"}</span><span class="num">${fmt(cur.cash)}</span></div>
+        <div class="pl-row pl-sub"><span>GCash</span><span class="num">${fmt(cur.gcash)}</span></div>
+        <div class="pl-row pl-sub"><span>${ko?"카드/기타":"Card / other"}</span><span class="num">${fmt(cur.card)}</span></div>
+        <div class="pl-row"><span>${ko?"지출":"Expenses"}</span><b>−${fmt(cur.exp)}</b></div>
+        ${expCats.map(([c, v]) => `<div class="ebar-row pl-sub"><span class="ebar-name">${esc(expCatLabel(c))}</span><div class="ebar-track"><div class="ebar-fill" style="width:${(v/expMax*100).toFixed(1)}%"></div></div><span class="ebar-val">${fmt(v)}</span></div>`).join("")}
+        <div class="pl-row total"><span>${ko?"순이익":"Profit"}</span><b style="color:${cur.profit>=0?"#1F7A43":"#B5322E"}">${fmt(cur.profit)}</b></div>
+      </div>
+      <div class="card"><h2>${ko?"매출 상위 메뉴":"Top menu items"}</h2>
+        ${top.map(([id, o], i) => `<div class="prev-row"><span><b class="rank-no">${i+1}</b>${esc(menuName(menuById(id)) || id)} <span class="muted">×${o.q}</span></span><b>${fmt(o.rev)}</b></div>`).join("") || `<p class="empty">—</p>`}
+        <div class="section-label">${ko?"요일별 평균 매출":"Average sales by weekday"}</div>
+        ${[1,2,3,4,5,6,0].map((w) => `<div class="ebar-row"><span class="ebar-name">${WEEKDAYS[ko?"ko":"en"][w]}</span><div class="ebar-track"><div class="bar-fill" style="width:${(wdAvg[w]/wdMax*100).toFixed(1)}%"></div></div><span class="ebar-val">${wdAvg[w] ? kfmt(wdAvg[w]) : "—"}</span></div>`).join("")}
+      </div>
+    </div>
+    <div class="card"><h2>${ko?"최근 6개월":"Last 6 months"}</h2>
+      ${svgTrend(months.map((m) => m.slice(2).replace("-", ".")), [
+        { name: ko?"매출":"Sales", color:"#8B4A25", values: trend.map((t) => t.sales) },
+        { name: ko?"지출":"Expenses", color:"#C9842A", values: trend.map((t) => t.exp) },
+        { name: ko?"순이익":"Profit", color:"#1F7A43", values: trend.map((t) => t.profit) }])}</div>`;
+}
+
+// ── 관리: 메뉴 · 지출 ──
+async function manageSalesHTML(){
+  await loadMenus();
+  const ko = state.lang === "ko", month = sales.expMonth ||= thisMonth(), { start, end } = monthRange(month);
+  const { data: exps } = await sb.from("expenses").select("id,date,category,amount,note,created_by").gte("date", start).lt("date", end).order("date", { ascending:false }).order("id", { ascending:false });
+  const menuRows = Object.keys(MENU_CATS).map((c) => {
+    const ms = (state.menusAll||[]).filter((m) => menuCat(m) === c); if (!ms.length) return "";
+    return `<div class="section-label">${menuCatLabel(c)}</div>` + ms.map((m) => `<div class="menu-mng ${m.active===false?"off":""}">
+      <div><b>${esc(m.name)}</b>${m.name_en ? `<span class="m-en">${esc(m.name_en)}</span>` : ""}</div>
+      <select aria-label="category" onchange="updateMenu('${esc(m.id)}','category',this.value)">${Object.keys(MENU_CATS).map((k) => `<option value="${k}" ${menuCat(m)===k?"selected":""}>${menuCatLabel(k)}</option>`).join("")}</select>
+      <div class="peso-field"><span>${PESO}</span><input type="number" inputmode="decimal" min="0" aria-label="price" value="${Number(m.price)}" onchange="updateMenu('${esc(m.id)}','price',Number(this.value)||0)"></div>
+      <button class="mng-del" onclick="updateMenu('${esc(m.id)}','active',${m.active===false})">${m.active===false?(ko?"복구":"Restore"):(ko?"숨김":"Hide")}</button></div>`).join("");
+  }).join("");
+  const expTotal = (exps||[]).reduce((s, e) => s + Number(e.amount), 0);
+  return `<div class="card"><h2>☕ ${ko?"메뉴":"Menu"}</h2>
+      <div class="add-form">
+        <input id="mnName" placeholder="${ko?"메뉴명":"Name"}"><input id="mnNameEn" placeholder="${ko?"영문명":"English name"}">
+        <select id="mnCat" aria-label="category">${Object.keys(MENU_CATS).map((k) => `<option value="${k}">${menuCatLabel(k)}</option>`).join("")}</select>
+        <input id="mnPrice" type="number" inputmode="decimal" min="0" placeholder="${PESO}" style="max-width:90px">
+        <button class="btn-mini" onclick="addMenu()">${ko?"추가":"Add"}</button></div>
+      ${menuRows || `<p class="empty">${ko?"메뉴가 없습니다.":"No menu items."}</p>`}
+      <p class="hint">${ko?"가격을 바꿔도 지난 마감 매출은 그대로입니다(마감 때 단가를 함께 저장). 안 파는 메뉴는 '숨김'.":"Changing a price doesn't change past closings. Hide items you no longer sell."}</p></div>
+    <div class="card"><div class="card-head"><h2>💸 ${ko?"지출":"Expenses"} <span class="muted">${fmt(expTotal)}</span></h2>
+        <input type="month" value="${month}" max="${thisMonth()}" aria-label="month" onchange="sales.expMonth=this.value;renderScreen()" style="border:1px solid #D8CDBD;border-radius:9px;padding:6px 8px"></div>
+      ${expenseFormHTML("mx", true)}
+      ${(exps||[]).map((e) => `<div class="prev-row"><span>${e.date.slice(5)} · ${esc(expCatLabel(e.category))}${e.note ? ` <span class="muted">· ${esc(e.note)}</span>` : ""}${e.created_by ? ` <span class="muted">· ${esc(empName(empById(e.created_by)))}</span>` : ""}</span>
+        <span><b>${fmt(e.amount)}</b> <button class="link-del" aria-label="delete" onclick="delExpense(${e.id})">✕</button></span></div>`).join("") || `<p class="empty">—</p>`}</div>`;
+}
+async function addMenu(){
+  const name = $("mnName").value.trim(), price = Number($("mnPrice").value);
+  if (!name || !(price >= 0) || $("mnPrice").value === "") { toast(state.lang==="ko" ? "메뉴명과 가격을 입력하세요" : "Enter a name and price"); return; }
+  const id = "m" + Date.now().toString(36);
+  const { error } = await sb.from("menus").insert({ id, name, name_en: $("mnNameEn").value.trim() || null, price, category: $("mnCat").value, sort: (state.menusAll||[]).length + 1 });
+  if (error) { toast(tt("save_fail") + error.message); return; }
+  toast(tt("saved")); renderScreen();
+}
+async function updateMenu(id, field, value){
+  const { error } = await sb.from("menus").update({ [field]: value }).eq("id", id);
+  if (error) { toast(tt("save_fail") + error.message); return; }
+  toast(tt("saved")); renderScreen();
 }
 
 init();
