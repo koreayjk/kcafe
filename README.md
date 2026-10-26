@@ -12,7 +12,9 @@
    - [`supabase/06_sales.sql`](supabase/06_sales.sql) — 마감(카드/기타 결제, 마감자·수정시각)·지출 기록자
    - [`supabase/07_photo_cleanup.sql`](supabase/07_photo_cleanup.sql) — 출근 사진 보관기간(기본 90일) 지난 것만 정리 허용
    - [`supabase/08_field_update.sql`](supabase/08_field_update.sql) — 현장 피드백: 메뉴판·물품 목록·급여·청소 사진·재고 확인·유입 경로
-2. **Integrations → Data API → Settings → Exposed schemas** 에 `cafe` 추가 (`kfr` 도 유지)
+   - [`supabase/09_fixes.sql`](supabase/09_fixes.sql) — 검수 수정: 퇴근 잊은 근무 보호, 공급요청 시작 상태 고정, 판매 재고 차감 DB 처리
+   - [`supabase/10_test_mode.sql`](supabase/10_test_mode.sql) — 직원 모드(테스트) 전용 공간 `cafe_test` (실행 후 Exposed schemas 에 `cafe_test` 추가)
+2. **Integrations → Data API → Settings → Exposed schemas** 에 `cafe`, `cafe_test` 추가 (`kfr` 도 유지)
 3. 앱 접속 → `사장` / PIN `0000` 로그인 → **관리** 탭에서 PIN 변경, 직원 추가
 4. 매장 안에서 **관리 → 📍 지금 위치를 매장 좌표로 등록** (출근 지오펜스 기준점, 기본 반경 100m)
 5. GitHub → Settings → Pages → Source: **GitHub Actions** (main 푸시 시 자동 배포, HTTPS라 카메라·GPS 사용 가능)
@@ -33,5 +35,8 @@
 | 6 | 마감/매출 · 일별 매출 · 메뉴 순위 · 월별 보고서 · 메뉴/지출 관리 | ✅ |
 | + | 출근 사진 자동 정리(기본 90일, 관리 탭에서 변경·즉시 정리) | ✅ |
 | 8 | 현장 피드백: 로고·색, 메뉴판 전체(+모조스·감자튀김·바하이 세트), 쿠폰 무료 음료, 유입 경로, 지출 분류, 물품 신청(분류·세부 그룹·직원도 품목 추가), 판매→재고 자동 차감, 퇴근 전 재고 확인, 퇴근 전 청소 사진, 급여 자동 계산(일급·근무시간표·지각/조퇴 차감·15일/말일 지급·급여 기록지 인쇄) | ✅ |
+| + | 사장 화면 '👀 직원 모드': 직원 화면을 테스트 공간(cafe_test)에서 그대로 연습 — 실제 데이터·K-Food 에 반영 안 됨, 🔄 테스트 초기화 | ✅ |
+
+> `10_test_mode.sql` 은 cafe_schema~09 를 `cafe_test` 로 바꾼 복사본입니다. 실제 스키마를 바꾸는 SQL 을 새로 추가하면 이 파일도 다시 만들어 실행해야 합니다.
 
 기획 전체는 인수인계 문서(Bahay Cafe 관리 프로그램 — 기획 & 인수인계 MD v2) 참고.

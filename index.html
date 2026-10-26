@@ -191,7 +191,7 @@ input:focus, select:focus, textarea:focus { border-color:var(--accent); }
 .s-PENDING { background:#F0E9DD; color:#8E7A5E; }
 .s-APPROVED { background:var(--accent-bg); color:var(--accent); }
 .s-REJECTED { background:#FBE4E3; color:#B5322E; }
-@media(max-width:560px){ .topbar{ flex-wrap:wrap; padding:10px 16px; } .who{ width:100%; justify-content:space-between; } .content{ padding:16px; } }
+@media(max-width:560px){ .topbar{ flex-wrap:wrap; padding:10px 16px; } .who{ width:100%; justify-content:space-between; flex-wrap:wrap; gap:8px; } .content{ padding:16px; } .who .lang-toggle button { padding:6px 8px; } }
 .cam-wrap { background:#1E1A17; border-radius:14px; overflow:hidden; margin-bottom:12px; aspect-ratio:4/3; }
 .cam-wrap video, .cam-wrap img { width:100%; height:100%; object-fit:cover; display:block; }
 .cam-wrap video { transform:scaleX(-1); }
@@ -331,6 +331,11 @@ textarea { width:100%; border:1.5px solid #D8CDBD; border-radius:11px; padding:1
 .toast { pointer-events:none; }
 .cat-sel { display:block; margin-top:4px; border:1px solid #D8CDBD; border-radius:6px; padding:3px 4px; font-size:12px; max-width:120px; }
 .emp-pay input[type=time] { max-width:120px; }
+.staff-mode-btn { border:1.5px solid var(--accent); background:#fff; color:var(--accent); border-radius:9px; padding:6px 10px; font-size:12px; font-weight:800; cursor:pointer; min-height:36px; white-space:nowrap; }
+.staff-mode-btn.on { background:var(--accent); color:#fff; }
+.test-banner { background:#FFF4D6; border-bottom:1px solid #E9CF8A; color:#6B4E0E; padding:10px 16px; font-size:13px; line-height:1.5; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+.test-banner .btn-mini { margin-left:auto; }
+@media(max-width:560px){ .item-row { grid-template-columns:1fr 64px 70px; } .item-row.head { display:none; } .item-row > :nth-child(1) { grid-column:1/-1; } }
 .kv { display:flex; justify-content:space-between; gap:10px; padding:8px 0; border-bottom:1px solid #F0E9DD; font-size:14px; }
 .kv b { font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-variant-numeric:tabular-nums; }
 </style>
@@ -363,7 +368,10 @@ const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
 const timeHM = (ts) => ts ? new Date(ts).toLocaleTimeString("en-GB", { timeZone: STORE_TZ, hour:"2-digit", minute:"2-digit" }) : "—";
 
-let sb = null, sbk = null;
+let sb = null, sbk = null, sbLive = null, sbkLive = null, sbTest = null;
+// 직원 모드(테스트): 사장이 직원 화면을 연습용 공간(cafe_test)에서 그대로 써 봄 — 실제 데이터와 분리
+const TEST_SCHEMA = "cafe_test";
+const pathPrefix = () => state.staffMode ? "test/" : "";
 const state = { user:null, employees:[], settings:{}, tab:null, lang:(localStorage.getItem("cafe_lang")||"en") };
 
 // ── 다국어: ko / en(+tl 병기) ──
@@ -467,7 +475,8 @@ function langButtons(){ return [["ko","한국어"],["en","English · Tagalog"]].
 function setLang(l){ state.lang=l; localStorage.setItem("cafe_lang",l); if(state.user) renderApp(); else renderLogin(); }
 const empName = (e) => !e ? "" : (state.lang==="ko" ? e.name : (e.name_en || e.name));
 const empById = (id) => state.employees.find((e) => String(e.id) === String(id));
-const isAdmin = () => state.user?.role === "ADMIN";
+const isOwner = () => state.user?.role === "ADMIN";            // 실제 권한 (사장)
+const isAdmin = () => isOwner() && !state.staffMode;            // 화면 권한 (직원 모드에서는 직원 화면)
 
 function logoHTML(big){
   if (LOGO) return big ? `<img class="login-logo-img" src="${LOGO}" alt="Bahayy Cafe"><div class="sub">${tl("system_name")}</div>` : `<img class="topbar-logo" src="${LOGO}" alt="Bahayy Cafe">`;
@@ -479,8 +488,8 @@ function setupError(msg, e){
 }
 
 async function init() {
-  sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { db: { schema: SUPABASE_SCHEMA } });
-  sbk = sb.schema(SHARED_SCHEMA);
+  sb = sbLive = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { db: { schema: SUPABASE_SCHEMA } });
+  sbk = sbkLive = sb.schema(SHARED_SCHEMA);
   try {
     await loadEmployees();
     await loadSettings();
@@ -540,13 +549,40 @@ function setUser(e){
   state.user = { id: e.id, name: e.name, name_en: e.name_en, role: e.role };
   state.tab = tabsFor().some(([k]) => k === state.tab) ? state.tab : tabsFor()[0][0];
 }
-function logout() { state.user = null; state.tab = null; localStorage.removeItem("cafe_user"); renderLogin(); }
+function logout() { resetCam(); if (state.staffMode) leaveStaffMode(true); cl.loadedFor = null; cl.date = null; state.user = null; state.tab = null; localStorage.removeItem("cafe_user"); renderLogin(); }
+async function enterStaffMode(){
+  // 사진 업로드(storage)·rpc 까지 되는 별도 클라이언트 (schema() 만 바꾸면 storage 가 없음)
+  const ko = state.lang === "ko", t = sbTest ||= supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { db: { schema: TEST_SCHEMA }, auth: { persistSession: false, storageKey: "cafe-test" } });
+  const chk = await t.from("employees").select("id", { count:"exact", head:true });
+  if (chk.error) { alert(ko ? "직원 모드용 테스트 공간이 아직 없습니다.\n\nSupabase SQL Editor 에서 supabase/10_test_mode.sql 을 실행하고,\nData API → Exposed schemas 에 cafe_test 를 추가해 주세요." : "The test space isn't set up yet. Run supabase/10_test_mode.sql and add cafe_test to Exposed schemas."); return; }
+  // 처음이거나 마지막 초기화가 12시간 넘었으면 실제 데이터(직원·메뉴·재고·설정)로 다시 맞춤
+  const mark = await t.from("app_settings").select("value").eq("key", "test_reset_at").maybeSingle();
+  const age = mark.data?.value ? Date.now() - new Date(mark.data.value).getTime() : Infinity;
+  if (!chk.count || !(age < 12 * 3600e3)) { const r = await t.rpc("reset_from_live"); if (r.error) { toast(r.error.message); return; } }
+  resetCam(); state.staffMode = true; sb = t; sbk = t; state.ownerTab = state.tab;
+  await loadEmployees(); await loadSettings();
+  state.tab = "clock"; renderApp();
+}
+async function leaveStaffMode(silent){
+  resetCam(); state.staffMode = false; sb = sbLive; sbk = sbkLive;
+  if (silent) return;
+  await loadEmployees(); await loadSettings();
+  state.tab = state.ownerTab || "dashboard"; renderApp();
+}
+async function resetTestData(){
+  const ko = state.lang === "ko";
+  if (!confirm(ko ? "테스트 기록(출퇴근·마감·신청·메모 등)을 모두 지우고, 직원·메뉴·재고·설정을 실제 데이터로 다시 맞출까요?" : "Erase all test records and copy staff, menu, stock and settings from live data again?")) return;
+  const r = await sb.rpc("reset_from_live");
+  if (r.error) { toast(tt("save_fail") + r.error.message); return; }
+  inv.check = {}; inv.req = {}; cl.loadedFor = null;
+  await loadEmployees(); await loadSettings(); toast(ko ? "테스트 데이터를 초기화했습니다" : "Test data reset"); renderApp();
+}
 
 // ── 탭 라우팅 (role 로 분기) ─────────────────────
 function tabsFor(){
   if (isAdmin()) return ["dashboard","closing","daily","menurank","report","attendance","payroll","inventory","supply","board","manage"].map((k)=>[k,tt("tab_"+k)]);
   const t = ["clock","inventory","board"];
-  if (state.settings.staff_closing === "1") t.push("closing");
+  if (state.settings.staff_closing === "1" || state.staffMode) t.push("closing");
   return t.map((k)=>[k,tt("tab_"+k)]);
 }
 function renderApp() {
@@ -555,9 +591,13 @@ function renderApp() {
     <div class="topbar">
       ${logoHTML(false)}
       <div class="who"><div class="lang-toggle">${langButtons()}</div>
-        <div class="who-name">${esc(empName(u))}<small>${tt("role_"+u.role)}</small></div>
+        <div class="who-name">${esc(empName(u))}<small>${state.staffMode ? (state.lang==="ko" ? "직원 모드" : "Staff mode") : tt("role_"+u.role)}</small></div>
+        ${isOwner() ? `<button class="staff-mode-btn ${state.staffMode?"on":""}" onclick="${state.staffMode ? "leaveStaffMode()" : "enterStaffMode()"}">${state.staffMode ? (state.lang==="ko" ? "👔 사장 모드" : "👔 Owner") : (state.lang==="ko" ? "👀 직원 모드" : "👀 Staff view")}</button>` : ""}
         <button class="logout" onclick="logout()">${tt("logout")}</button></div>
     </div>
+    ${state.staffMode ? `<div class="test-banner">🧪 <b>${state.lang==="ko" ? "직원 모드 · 테스트" : "Staff view · test"}</b> — ${state.lang==="ko" ? "직원 화면을 그대로 써 보는 연습 공간입니다. 여기서 입력한 내용은 실제 데이터·K-Food에 반영되지 않습니다." : "Practice space showing the staff screens. Nothing here touches live data or K-Food."}
+      ${state.settings.test_reset_at ? `<span class="muted">${state.lang==="ko" ? "초기화" : "reset"} ${ago(state.settings.test_reset_at)}</span>` : ""}
+      <button class="btn-mini" onclick="resetTestData()">🔄 ${state.lang==="ko" ? "테스트 초기화" : "Reset test"}</button></div>` : ""}
     <nav class="tabs" role="tablist">${tabsFor().map(([k,l])=>`<button id="tab_${k}" class="tab ${state.tab===k?'on':''}" role="tab" aria-selected="${state.tab===k}" onclick="go('${k}')">${l}</button>`).join("")}</nav>
     <main class="content" id="screen"><div class="loading">${tt("loading")}</div></main>`;
   renderScreen();
@@ -770,21 +810,24 @@ function storeDistance(lat, lng){
   return Math.round(2 * R * Math.asin(Math.sqrt(h)));
 }
 const distTxt = (d) => d == null ? "📍 —" : `📍 ${d}m`;
+const STALE_MS = 16 * 3600e3; // 16시간 넘게 열린 근무 = 퇴근을 잊은 근무 (사장님이 근태 탭에서 퇴근 시각 입력)
 async function openShift(empId){
-  const { data, error } = await sb.from("attendance").select("id,clock_in,verified,distance_m")
+  const { data, error } = await sb.from("attendance").select("id,date,clock_in,verified,distance_m")
     .eq("employee_id", empId).is("clock_out", null).order("id", { ascending:false }).limit(1);
   if (error) throw error;
-  return data?.[0] || null;
+  const r = data?.[0] || null;
+  return r && Date.now() - new Date(r.clock_in).getTime() > STALE_MS ? { ...r, stale:true } : r;
 }
 async function screenClock(){
   resetCam();
   await loadSettings();
   const uid = state.user.id;
-  const [open, recent] = await Promise.all([
+  const [shift, recent] = await Promise.all([
     openShift(uid),
     sb.from("attendance").select("id,date,clock_in,clock_out,verified,distance_m").eq("employee_id", uid).order("id", { ascending:false }).limit(10),
   ]);
   if (recent.error) throw recent.error;
+  const open = shift && !shift.stale ? shift : null, stale = shift?.stale ? shift : null;
   const storeSet = state.settings.store_lat && state.settings.store_lng;
   if (!open) Object.keys(cleanShots).forEach((a) => { URL.revokeObjectURL(cleanShots[a]); delete cleanShots[a]; });
   const latest = open ? await cleanPhotosFor(open.id) : null;
@@ -797,6 +840,7 @@ async function screenClock(){
        ${need && nClean < 4 ? `<button class="link-btn" onclick="clockOut(${open.id}, true)">${tt("clean_skip")}</button>` : ""}`
     : `<div class="clock-state">${tl("off_duty")}</div>
        <div class="clock-sub">${esc(empName(state.user))} · ${today()}</div>
+       ${stale ? `<div class="setup-note">⚠️ ${state.lang==="ko" ? `${stale.date} 근무의 퇴근 기록이 없어요. 사장님께 퇴근 시각 입력을 요청하세요. 오늘 출근은 그대로 하면 됩니다.` : `No clock-out for ${stale.date}. Ask the owner to enter it. You can clock in today as usual.`}</div>` : ""}
        <div id="camBox"><button class="btn-primary" onclick="startClockIn()">📷 ${tl("start_clock_in")}</button>
        <p class="hint">${tt("photo_note")}</p></div>`;
   const rows = (recent.data||[]).map((r) => `<tr><td>${r.date.slice(5)}</td><td class="num">${timeHM(r.clock_in)}</td>
@@ -867,8 +911,9 @@ async function confirmClockIn(){
     if (!cam.pos && !cam.posErr) await Promise.race([cam.posPromise, new Promise((r) => setTimeout(r, 10000))]);
     if (!cam.pos && !confirm(tt("no_gps_confirm"))) { restore(); return; }
     const uid = state.user.id;
-    if (await openShift(uid)) { toast(tt("already_in")); return screenClock(); }
-    const path = `attendance/${today()}/${uid}_${Date.now()}.jpg`;
+    const cur = await openShift(uid);
+    if (cur && !cur.stale) { toast(tt("already_in")); return screenClock(); }
+    const path = `${pathPrefix()}attendance/${today()}/${uid}_${Date.now()}.jpg`;
     const up = await sb.storage.from(STORAGE_BUCKET).upload(path, cam.blob, { contentType:"image/jpeg", upsert:false });
     if (up.error) throw up.error;
     // clock_in/date/verified/distance_m 은 DB 트리거가 서버 기준으로 덮어씀
@@ -1071,7 +1116,7 @@ async function saveNote(){
   try {
     let photo_path = null;
     if (board.photo) {
-      photo_path = `notes/${today()}/${state.user.id}_${Date.now()}.jpg`;
+      photo_path = `${pathPrefix()}notes/${today()}/${state.user.id}_${Date.now()}.jpg`;
       const up = await sb.storage.from(STORAGE_BUCKET).upload(photo_path, board.photo, { contentType:"image/jpeg", upsert:false });
       if (up.error) throw up.error;
     }
@@ -1262,7 +1307,7 @@ function dailyCheckHTML(items, checks, closedToday, missingTable){
     const diff = v === "" ? null : Number(v) - Number(i.stock);
     return `<div class="chk-row">
       <span class="inv-name">${esc(itemName(i))}${done ? ` <span class="chk-done ${Number(done.diff)===0?"ok":"bad"}">${Number(done.diff)===0 ? "✓" : `${Number(done.diff)>0?"+":""}${qtyFmt(done.diff)}`}</span>` : ""}</span>
-      <span class="muted num">${ko?"예상":"exp."} <b>${qtyFmt(i.stock)}</b>${esc(i.unit||"")}</span>
+      <span class="muted num">${ko?"예상":"exp."} <b class="${Number(i.stock) < 0 ? "neg" : ""}">${qtyFmt(i.stock)}</b>${esc(i.unit||"")}</span>
       <input type="number" inputmode="decimal" min="0" step="any" aria-label="counted" placeholder="${ko?"실제":"count"}" value="${esc(v)}" oninput="setCheck(${i.id}, this.value)">
       <span class="chk-diff num ${diff===null?"":diff===0?"ok":"bad"}" id="cd_${i.id}">${diff===null ? "" : diff===0 ? "✓" : `${diff>0?"+":""}${qtyFmt(diff)}`}</span></div>`;
   }).join("");
@@ -1272,6 +1317,7 @@ function dailyCheckHTML(items, checks, closedToday, missingTable){
       return `<div class="prev-row"><span>${d.slice(5)} ${weekday(d)} · ${esc(empName(empById(byDate[d][0].employee_id)))}</span><span>${bad.length ? `<span class="tag-due">${ko?`불일치 ${bad.length}`:`${bad.length} off`}</span> ${bad.map((c) => `${esc(itemName(inv.items.find((i) => i.id === c.item_id)))} ${Number(c.diff)>0?"+":""}${qtyFmt(c.diff)}`).join(", ")}` : `<span class="done-mark">✓ ${ko?"모두 일치":"all match"}</span>`}</span></div>`; }).join("");
   })() : "";
   return `<div class="card chk-card"><h2>📋 ${tl("daily_check")} <span class="muted">${d0.slice(5)}</span></h2>
+    ${list.some((i) => Number(i.stock) < 0) ? `<div class="setup-note">${ko?"예상 개수가 마이너스인 품목은 아직 처음 재고가 입력되지 않은 것입니다. 오늘은 실제 개수를 그대로 입력해 저장하면 그 수량으로 맞춰지고, 내일부터 정확히 비교됩니다.":"Items with a negative expected count have no opening stock yet. Enter the actual count today; comparisons are accurate from tomorrow."}</div>` : ""}
     ${closedToday ? "" : `<div class="setup-note">${ko?"오늘 마감(판매 수량)을 먼저 저장하면 판매한 만큼 빠진 '예상' 개수와 비교할 수 있어요.":"Save today's closing first so the expected count includes today's sales. / I-save muna ang closing."}</div>`}
     ${rows}
     <button class="btn-primary" id="chkSave" onclick="saveDailyCheck()">${tl("save_check")}</button>
@@ -1293,7 +1339,7 @@ async function saveDailyCheck(){
   const rows = entries.map(([id, v]) => { const i = inv.items.find((x) => String(x.id) === id); return { item_id: Number(id), expected: Number(i.stock), counted: Number(v), employee_id: state.user.id }; });
   const { error } = await sb.from("stock_checks").insert(rows);
   if (error) { toast(tt("save_fail") + error.message); btn.disabled = false; return; }
-  const adj = rows.filter((r) => r.counted !== r.expected).map((r) => ({ item_id: r.item_id, type:"ADJUST", qty: r.counted, ref:`check:${today()}`, note: ko ? "퇴근 전 재고 확인" : "End-of-day count", employee_id: state.user.id }));
+  const adj = rows.map((r) => ({ item_id: r.item_id, type:"ADJUST", qty: r.counted, ref:`check:${today()}`, note: ko ? "퇴근 전 재고 확인" : "End-of-day count", employee_id: state.user.id }));
   if (adj.length) { const a = await sb.from("inventory_moves").insert(adj); if (a.error) toast(tt("save_fail") + a.error.message); }
   const off = rows.filter((r) => r.counted !== r.expected).length;
   inv.check = {};
@@ -1439,6 +1485,10 @@ async function delUsage(menuId, itemId){
 }
 // 마감 저장 시: 판매 수량 × 사용량 만큼 재고 자동 출고 (같은 날 다시 저장하면 먼저 되돌리고 다시 반영)
 async function syncSalesUsage(date, items){
+  const rpc = await sb.rpc("sync_sales_usage", { p_date: date, p_employee: state.user.id });
+  if (!rpc.error) return rpc.data || 0;
+  if (!/sync_sales_usage|function|schema cache/i.test(rpc.error.message)) { toast(tt("save_fail") + rpc.error.message); return 0; }
+  // 09 SQL 실행 전: 앱에서 처리
   const { data: usage, error } = await sb.from("menu_usage").select("menu_id,item_id,qty");
   if (error || !usage?.length) return 0;
   const lines = closingLines(items), per = {};
@@ -1447,7 +1497,7 @@ async function syncSalesUsage(date, items){
   const del = await sb.from("inventory_moves").delete().eq("ref", ref);
   if (del.error) return 0;
   const rows = Object.entries(per).filter(([, q]) => q > 0).map(([id, q]) => ({ item_id: Number(id), type:"OUT", qty: q, ref, note: `${state.lang==="ko"?"판매 차감":"Sold"} ${date}`, employee_id: state.user.id }));
-  if (rows.length) await sb.from("inventory_moves").insert(rows);
+  if (rows.length) { const ins = await sb.from("inventory_moves").insert(rows); if (ins.error) { toast(tt("save_fail") + ins.error.message); return 0; } }
   return rows.length;
 }
 
@@ -1603,6 +1653,8 @@ async function loadClosing(date){
 }
 function openClosing(date){ cl.date = date; cl.loadedFor = null; go("closing"); }
 function changeClosingDate(d){ if (!d) return; cl.date = d; cl.loadedFor = null; screenClosing(); }
+// 마감 화면 메뉴 = 판매 중 메뉴 + (숨겼지만 이 날 판매 기록이 있는 메뉴) — 다시 저장해도 기록이 사라지지 않게
+const closingMenus = () => [...state.menus, ...(state.menusAll||[]).filter((m) => m.active === false && (cl.qty[m.id] > 0 || cl.free[m.id] > 0))];
 const unitPrice = (m) => { const p = Number(cl.promo[m.id]); return p > 0 ? p : Number(m.price)||0; };
 function minClosingDate(){ if (isAdmin()) return ""; const d = new Date(today()+"T00:00:00"); d.setDate(d.getDate()-1); return d.toLocaleDateString("en-CA"); }
 async function screenClosing(){
@@ -1616,7 +1668,7 @@ async function screenClosing(){
     sb.from("expenses").select("id,category,amount,note,created_by").eq("date", cl.date).order("id"),
   ]);
   const groups = Object.keys(MENU_CATS).map((c) => {
-    const ms = state.menus.filter((m) => menuCat(m) === c); if (!ms.length) return "";
+    const ms = closingMenus().filter((m) => menuCat(m) === c); if (!ms.length) return "";
     return `<div class="section-label">${menuCatLabel(c)}${ko?"":`<span class="lang-sub">${MENU_CATS[c].tl}</span>`}</div>${ms.map(clRowHTML).join("")}`;
   }).join("");
   const freeIds = Object.keys(cl.free).filter((id) => cl.free[id] > 0);
@@ -1660,7 +1712,7 @@ async function screenClosing(){
 function clRowHTML(m){
   const q = cl.qty[m.id] || 0, id = esc(m.id);
   return `<div class="cl-row">
-    <span class="cl-name"><span class="m-name">${esc(menuName(m))}</span><span class="m-price">${fmt(m.price)}</span></span>
+    <span class="cl-name"><span class="m-name">${esc(menuName(m))}${m.active === false ? ` <span class="muted">(${state.lang==="ko"?"숨김":"hidden"})</span>` : ""}</span><span class="m-price">${fmt(m.price)}</span></span>
     <div class="stepper"><button aria-label="minus" onclick="stepQty('${id}',-1)">−</button>
       <input type="number" inputmode="numeric" id="q_${id}" aria-label="qty" value="${q||""}" placeholder="0" oninput="setQty('${id}',this.value)">
       <button aria-label="plus" onclick="stepQty('${id}',1)">+</button></div>
@@ -1674,7 +1726,7 @@ function setPromo(id, v){ cl.promo[id] = v; updSub(id); }
 function stepSrc(k, d){ cl.src[k] = Math.max(0, (cl.src[k]||0) + d); $("src_"+k).value = cl.src[k] || ""; }
 function addFree(){ const id = $("freeSel")?.value; if (!id) return; cl.free[id] = (cl.free[id]||0) + Math.max(1, Number($("freeQty").value)||1); screenClosing(); }
 function recalcClosing(){
-  const menuTotal = state.menus.reduce((s, m) => s + (cl.qty[m.id]||0) * unitPrice(m), 0);
+  const menuTotal = closingMenus().reduce((s, m) => s + (cl.qty[m.id]||0) * unitPrice(m), 0);
   const recv = (Number(cl.cash)||0) + (Number(cl.gcash)||0) + (Number(cl.card)||0), diff = recv - menuTotal, has = menuTotal > 0;
   if (!$("menuTotal")) return;
   $("menuTotal").textContent = fmt(menuTotal); $("recvTotal").textContent = fmt(recv);
@@ -1686,7 +1738,7 @@ function recalcClosing(){
 }
 async function saveClosing(){
   const items = {};
-  state.menus.forEach((m) => { const q = cl.qty[m.id]||0; if (q > 0) items[m.id] = { q, p: unitPrice(m) }; });
+  closingMenus().forEach((m) => { const q = cl.qty[m.id]||0; if (q > 0) items[m.id] = { q, p: unitPrice(m) }; });
   const free = {}; Object.entries(cl.free).forEach(([id, q]) => { if (Number(q) > 0) free[id] = Number(q); });
   if (Object.keys(free).length) items._free = free;
   const menuTotal = Object.values(items).reduce((s, v) => s + (v.q ? v.q*v.p : 0), 0);
@@ -1928,6 +1980,7 @@ async function purgeOldPhotos(manual){
   purgeRunning = true;
   const btn = manual ? $("purgeBtn") : null; if (btn) btn.disabled = true;
   try {
+    await loadSettings(); // 다른 기기에서 바꾼 보관기간 반영
     const keep = Math.max(30, Number(state.settings.photo_retention_days) || 90);
     const c = new Date(today() + "T00:00:00"); c.setDate(c.getDate() - keep);
     const cutoff = c.toLocaleDateString("en-CA");
@@ -1937,11 +1990,10 @@ async function purgeOldPhotos(manual){
       const { data, error } = await sb.from("attendance").select("id,photo_path,photo_purged_at").not("photo_path", "is", null).lt("date", cutoff).order("id").limit(100);
       if (error) throw error;
       if (!data?.length) break;
-      const rm = await sb.storage.from(STORAGE_BUCKET).remove(data.map((r) => r.photo_path));
-      if (rm.error) throw rm.error;
       const up = await sb.from("attendance").update({ photo_path: null }).in("id", data.map((r) => r.id)).select("id,photo_path");
       if (up.error) throw up.error;
-      const cleared = (up.data||[]).filter((r) => !r.photo_path).length;
+      const ok = new Set((up.data||[]).filter((r) => !r.photo_path).map((r) => r.id)), cleared = ok.size;
+      if (cleared) { const rm = await sb.storage.from(STORAGE_BUCKET).remove(data.filter((r) => ok.has(r.id)).map((r) => r.photo_path)); if (rm.error) throw rm.error; }
       total += cleared;
       if (data.length < 100 || !cleared) break;
     }
@@ -1949,11 +2001,10 @@ async function purgeOldPhotos(manual){
     for (let round = 0; round < 20; round++) {
       const { data, error } = await sb.from("clean_photos").select("id,photo_path").not("photo_path", "is", null).lt("created_at", new Date(cutoff + "T00:00:00+08:00").toISOString()).order("id").limit(100);
       if (error || !data?.length) break;
-      const rm = await sb.storage.from(STORAGE_BUCKET).remove(data.map((r) => r.photo_path));
-      if (rm.error) throw rm.error;
       const up = await sb.from("clean_photos").update({ photo_path: null }).in("id", data.map((r) => r.id)).select("id,photo_path");
       if (up.error) throw up.error;
-      const cleared = (up.data||[]).filter((r) => !r.photo_path).length;
+      const ok = new Set((up.data||[]).filter((r) => !r.photo_path).map((r) => r.id)), cleared = ok.size;
+      if (cleared) { const rm = await sb.storage.from(STORAGE_BUCKET).remove(data.filter((r) => ok.has(r.id)).map((r) => r.photo_path)); if (rm.error) throw rm.error; }
       total += cleared;
       if (data.length < 100 || !cleared) break;
     }
@@ -1973,7 +2024,8 @@ const minOfDay = (ts, d) => Math.round((new Date(ts).getTime() - dayStart(d)) / 
 const fmtH = (min) => { const h = Math.floor(min / 60), m = Math.round(min % 60); return m ? `${h}h ${m}m` : `${h}h`; };
 const round2 = (n) => Math.round(n * 100) / 100;
 const fmt2 = (n) => PESO + (Number(n) || 0).toLocaleString("en-PH", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
-const empPay = (e) => ({ rate: Number(e?.daily_rate ?? 508), std: Number(e?.std_hours ?? 8), start: hmToMin(e?.shift_start || "09:00"), end: hmToMin(e?.shift_end || "18:00"), brk: Number(e?.break_min ?? 60) });
+const empPay = (e) => { const start = hmToMin(e?.shift_start || "09:00"); let end = hmToMin(e?.shift_end || "18:00"); if (end <= start) end += 1440; // 자정 넘는 근무시간표
+  return { rate: Number(e?.daily_rate ?? 508), std: Number(e?.std_hours ?? 8), start, end, brk: Number(e?.break_min ?? 60) }; };
 function payPeriod(month, half){ const { days } = monthRange(month); return half === 1 ? { start:`${month}-01`, end:`${month}-15` } : { start:`${month}-16`, end:`${month}-${String(days).padStart(2,"0")}` }; }
 function currentPeriod(){ const d = today(); return { month: d.slice(0, 7), half: Number(d.slice(8)) <= 15 ? 1 : 2 }; }
 // 한 사람의 하루 출퇴근 기록들 → 정규시간·지각·조퇴·연장
@@ -1985,8 +2037,10 @@ function shiftCalc(e, date, recs){
     const span = Math.max(0, Math.min(outM, p.end) - Math.max(inM, p.start));
     reg += Math.max(0, span - (span > 300 ? p.brk : 0));
     if (k === 0) late = Math.max(0, inM - p.start);
-    if (k === recs.length - 1) { early = Math.max(0, p.end - outM); const o = outM - p.end; if (o >= 30) ot += Math.floor(o / 30) * 30; }
+    if (k === recs.length - 1) early = Math.max(0, p.end - outM);
+    ot += Math.max(0, outM - Math.max(inM, p.end)); // 각 기록에서 퇴근 시각 이후 실제로 일한 시간만 (사이 쉰 시간 제외)
   });
+  ot = Math.floor(ot / 30) * 30; // 30분 단위
   reg = Math.min(reg, p.std * 60);
   return { reg, ot, late, early, open };
 }
@@ -2066,9 +2120,10 @@ function payDetailHTML(r, period, paid, ended){
       <div class="pl-row total"><span>${ko?"실지급액":"Net pay"}</span><b>${fmt2(r.net)}</b></div></div>
     ${r.open ? `<div class="setup-note">⚠️ ${ko?`퇴근 기록이 없는 날이 ${r.open}일 있어요. 근태 탭에서 퇴근 시각을 입력하면 계산에 포함됩니다.`:`${r.open} day(s) have no clock-out. Fix them in Attendance to include them.`}</div>` : ""}
     ${paid ? `<div class="done-mark" style="margin-top:10px">✓ ${ko?"지급 완료":"Paid"} · ${fmt2(paid.net)} · ${ago(paid.paid_at)} ${ko?"(지출 '직원월급'에 기록됨)":"(recorded as a wage expense)"}</div>
+        ${Math.abs(Number(paid.net) - r.net) >= 0.01 ? `<div class="setup-note">⚠️ ${ko?`지급 후 근태가 바뀌어 지금 계산(${fmt2(r.net)})이 지급액(${fmt2(paid.net)})과 다릅니다. 차액은 다음 기간 '기타 지급/공제'로 정리하거나, 지급 취소 후 다시 처리하세요.`:`Attendance changed after payment: now ${fmt2(r.net)} vs paid ${fmt2(paid.net)}. Settle the difference next period or undo and re-pay.`}</div>` : ""}
         <button class="btn-ghost" onclick="undoPay(${paid.id}, ${paid.expense_id || "null"})">${ko?"지급 취소":"Undo payment"}</button>`
-      : `<button class="btn-primary" onclick="markPaid(${r.id})" ${ended ? "" : `title="${ko?"기간이 끝나기 전":"period not ended"}"`}>💸 ${ko?"지급 완료 처리":"Mark as paid"} · ${fmt2(r.net)}</button>
-        <p class="hint">${ko?"지급 완료 처리하면 지출(직원월급)에 자동으로 기록되고 이 기간 금액이 고정됩니다.":"Marking as paid records a wage expense and locks this period."}</p>`}
+      : `<button class="btn-primary" onclick="markPaid(${r.id})" ${ended ? "" : "disabled"}>💸 ${ko?"지급 완료 처리":"Mark as paid"} · ${fmt2(r.net)}</button>
+        <p class="hint">${ended ? "" : (ko ? `지급일(${period.end.slice(5)})부터 지급 완료 처리할 수 있어요. ` : `Available from pay day (${period.end.slice(5)}). `)}${ko?"지급 완료 처리하면 지출(직원월급)에 자동으로 기록되고 이 기간 금액이 고정됩니다.":"Marking as paid records a wage expense and locks this period."}</p>`}
   </div>`;
 }
 async function addAdj(empId){
@@ -2167,7 +2222,7 @@ function cleanCardHTML(open, latest){
 }
 async function takeCleanPhoto(attId, area){
   const blob = await cameraModal(`🧹 ${areaLabel(area)}`, "environment"); if (!blob) return;
-  const path = `clean/${today()}/${state.user.id}_${attId}_${area}_${Date.now()}.jpg`;
+  const path = `${pathPrefix()}clean/${today()}/${state.user.id}_${attId}_${area}_${Date.now()}.jpg`;
   const up = await sb.storage.from(STORAGE_BUCKET).upload(path, blob, { contentType:"image/jpeg", upsert:false });
   if (up.error) { toast(tt("save_fail") + up.error.message); return; }
   const { error } = await sb.from("clean_photos").insert({ attendance_id: attId, employee_id: state.user.id, area, photo_path: path });
