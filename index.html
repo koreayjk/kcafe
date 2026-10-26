@@ -3,17 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#F6F2EC">
-<title>Bahay Cafe</title>
+<meta name="theme-color" content="#B7E4F7">
+<link rel="icon" href="logo.png">
+<title>Bahayy Cafe</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <style>
-/* ── 브랜드 팔레트: 로고 받으면 여기 5개 값만 교체 (K-Food 크림 베이스 유지) ── */
+/* ── 브랜드 팔레트: 로고 하늘색(#B7E4F7)에서 추출 (K-Food 크림 베이스 유지) ── */
 :root {
-  --accent:#8B4A25;      /* 메인 액센트 (흰 배경 대비 6.5:1) */
-  --accent-dark:#6B3519; /* 그라데이션 끝 */
-  --accent-2:#A65D33;    /* 막대 그래프 시작색 */
-  --accent-soft:#EBD3C2; /* 액센트 배경 위 보조 글자 */
-  --accent-bg:#F8EEE7;   /* 선택된 행/카드 배경 */
+  --accent:#1D6A8E;      /* 메인 액센트 — 로고 하늘색을 진하게 (흰 배경 대비 5.9:1) */
+  --accent-dark:#144F6B; /* 그라데이션 끝 */
+  --accent-2:#3A90B8;    /* 막대 그래프 시작색 */
+  --accent-soft:#CDEBF8; /* 액센트 배경 위 보조 글자 */
+  --accent-bg:#E8F6FC;   /* 선택된 행/카드 배경 (로고 하늘색 연하게) */
+  --sky:#B7E4F7;         /* 로고 배경 하늘색 */
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: -apple-system, "Pretendard", "Segoe UI", sans-serif; background:#F6F2EC; color:#1E1A17; -webkit-text-size-adjust:100%; }
@@ -289,6 +291,46 @@ textarea { width:100%; border:1.5px solid #D8CDBD; border-radius:11px; padding:1
 .menu-mng .peso-field input { padding:7px; font-size:13px; }
 .menu-mng.off { opacity:.55; }
 @media(max-width:560px){ .menu-mng { grid-template-columns:1fr 1fr; } }
+.login-logo-img { max-width:200px; border-radius:18px; }
+.topbar-logo { height:40px; border-radius:8px; }
+.mv-tag.mv-SALE { background:#F3E6DC; color:#7A4321; }
+.chk-card { border-color:var(--accent-soft); }
+.chk-row { display:grid; grid-template-columns:1fr auto 84px 54px; gap:8px; align-items:center; padding:8px 0; border-bottom:1px solid #F0E9DD; }
+.chk-row input { border:1.5px solid #D8CDBD; border-radius:9px; padding:9px; font-size:15px; text-align:center; width:100%; min-height:42px; }
+.chk-diff { font-weight:800; text-align:right; } .chk-diff.ok, .chk-done.ok { color:#1F7A43; } .chk-diff.bad, .chk-done.bad { color:#B5322E; }
+.chk-done { font-size:12px; font-weight:800; }
+.req-row { display:grid; grid-template-columns:1fr auto 34px; gap:8px; align-items:center; padding:6px 0; border-bottom:1px solid #F0E9DD; }
+.req-unit { font-size:12px; }
+.add-item summary { cursor:pointer; color:var(--accent); font-weight:700; font-size:13px; margin:12px 0 4px; min-height:32px; }
+.usage-box { background:var(--accent-bg); border-radius:10px; padding:10px 12px; margin:4px 0 10px; font-size:13px; }
+.item-row { grid-template-columns:1fr 64px 70px 44px 48px auto; }
+.chk-toggle { display:flex; align-items:center; gap:2px; font-size:13px; }
+.emp-pay { grid-column:1/-1; display:flex; flex-wrap:wrap; gap:6px 12px; font-size:12px; color:#5E4A36; padding:2px 0 4px; }
+.emp-pay label { display:flex; align-items:center; gap:4px; }
+.emp-pay input { width:auto; max-width:92px; padding:5px 6px; }
+.peso-mini { display:inline-flex; align-items:center; gap:2px; }
+.late-tag { display:inline-block; font-size:11px; font-weight:700; color:#B5322E; background:#FBE4E3; border-radius:5px; padding:0 5px; margin-left:4px; }
+.link-btn { background:none; border:none; color:#5E4A36; text-decoration:underline; font-size:13px; margin-top:10px; cursor:pointer; min-height:36px; width:100%; }
+.clean-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:6px; }
+@media(max-width:560px){ .clean-grid { grid-template-columns:repeat(2,1fr); } }
+.clean-tile { border:1.5px dashed #D8CDBD; background:#fff; border-radius:12px; padding:8px 6px; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:4px; min-height:96px; font:inherit; color:inherit; }
+.clean-tile.done { border-style:solid; border-color:#9ED1B0; background:#F1FAF4; }
+.clean-tile img { width:100%; height:56px; object-fit:cover; border-radius:8px; }
+.clean-ico { font-size:22px; line-height:56px; }
+.clean-tile b { font-size:13px; } .clean-tile small { font-size:11px; color:#807460; }
+.cam-sheet { background:#fff; border-radius:16px; padding:16px; width:100%; max-width:420px; }
+.cam-title { font-weight:800; margin-bottom:10px; }
+.clean-gallery { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; max-width:680px; width:100%; }
+.clean-gallery figure { margin:0; } .clean-gallery img { width:100%; border-radius:10px; display:block; }
+.clean-gallery figcaption { color:#fff; font-size:13px; text-align:center; margin-top:4px; }
+.clean-missing { background:#333; color:#ccc; border-radius:10px; aspect-ratio:4/3; display:grid; place-items:center; }
+.pay-table tr.sel td { background:var(--accent-bg); }
+.payday { width:100%; text-align:left; background:var(--sky); color:#0E3A4F; border:none; border-radius:14px; padding:14px 16px; font-size:15px; font-weight:800; margin-bottom:16px; cursor:pointer; }
+.src-row { display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid #F0E9DD; font-size:14px; font-weight:600; }
+.grid-2 > * { min-width:0; }
+.toast { pointer-events:none; }
+.cat-sel { display:block; margin-top:4px; border:1px solid #D8CDBD; border-radius:6px; padding:3px 4px; font-size:12px; max-width:120px; }
+.emp-pay input[type=time] { max-width:120px; }
 .kv { display:flex; justify-content:space-between; gap:10px; padding:8px 0; border-bottom:1px solid #F0E9DD; font-size:14px; }
 .kv b { font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-variant-numeric:tabular-nums; }
 </style>
@@ -310,7 +352,7 @@ const STORAGE_BUCKET = "cafe";
 // 영업일 기준 시간대: 사장님이 한국에서 보더라도 '오늘'은 필리핀 매장 기준
 const STORE_TZ = "Asia/Manila";
 // 로고: 받으면 파일을 저장소에 올리고 경로를 넣으세요 (예: "logo.png"). 비우면 글자 로고.
-const LOGO = "";
+const LOGO = "logo.png";
 // ════════════════════════════════════════════════════════
 
 const PESO = "₱";
@@ -339,7 +381,8 @@ const I18N = {
   tab_dashboard:{ko:"대시보드",en:"Dashboard"},
   tab_clock:{ko:"출퇴근",en:"Time Clock"},
   tab_inventory:{ko:"재고",en:"Inventory"},
-  tab_board:{ko:"게시판",en:"Board"},
+  tab_board:{ko:"매장 메모",en:"Store notes"},
+  tab_payroll:{ko:"급여",en:"Payroll"},
   tab_closing:{ko:"마감",en:"Closing"},
   tab_daily:{ko:"일별 매출",en:"Daily Sales"},
   tab_menurank:{ko:"메뉴 순위",en:"Menu Ranking"},
@@ -394,7 +437,7 @@ const I18N = {
   receive_stock:{ko:"입고 처리 (재고에 더하기)",en:"Receive into stock",tl:"Idagdag sa stock"},
   closing_title:{ko:"일일 마감",en:"Daily Closing",tl:"Araw-araw na Closing"},
   h_menu:{ko:"메뉴",en:"Menu"}, h_qty:{ko:"수량",en:"Qty"}, h_promo:{ko:"할인가",en:"Promo"}, h_sub:{ko:"소계",en:"Subtotal"},
-  free_label:{ko:"쿠폰 / 무료 제공",en:"Coupon / Free item",tl:"Kupon / Libreng item"},
+  free_label:{ko:"쿠폰 · 무료 음료",en:"Coupon / free drink",tl:"Kupon / libreng inumin"},
   free_add:{ko:"추가",en:"Add"},
   free_hint:{ko:"무료로 준 음료·메뉴. 매출은 0, 수량만 순위에 집계됩니다.",en:"Items given free: ₱0 sales, counted in the ranking only. / Libreng item: ₱0."},
   income_verify:{ko:"수입 입력 & 검증",en:"Income & Verification",tl:"Kita at Beripikasyon"},
@@ -410,6 +453,12 @@ const I18N = {
   prev_closing:{ko:"최근 마감",en:"Recent closings",tl:"Mga huling closing"},
   saved_closing:{ko:"마감이 저장되었습니다",en:"Closing saved / Na-save ang closing"},
   today_expenses:{ko:"이 날 지출",en:"Expenses this day",tl:"Gastos ngayong araw"},
+  daily_check:{ko:"퇴근 전 재고 확인",en:"End-of-day stock count",tl:"Bilang bago umuwi"},
+  save_check:{ko:"재고 확인 저장",en:"Save count",tl:"I-save ang bilang"},
+  clean_photos:{ko:"퇴근 전 청소 사진",en:"Cleaning photos before clock-out",tl:"Litrato ng paglilinis"},
+  clean_skip:{ko:"사진 없이 퇴근 (사유 입력)",en:"Clock out without photos (give reason)"},
+  sources:{ko:"유입 경로 (손님이 어떻게 알고 왔나요?)",en:"How did customers find us?",tl:"Paano nila kami nalaman?"},
+  my_pay:{ko:"이번 급여 기간",en:"This pay period",tl:"Ngayong pay period"},
   store_not_set:{ko:"매장 위치가 아직 등록되지 않았어요. 사장님께 '관리 → 매장 좌표 등록'을 요청하세요.",en:"Store location isn't set yet. Ask the owner to set it in Settings."},
 };
 function tt(k){ const e=I18N[k]; if(!e) return k; return state.lang==="ko" ? (e.ko??k) : (e.en??k); }
@@ -421,8 +470,8 @@ const empById = (id) => state.employees.find((e) => String(e.id) === String(id))
 const isAdmin = () => state.user?.role === "ADMIN";
 
 function logoHTML(big){
-  if (LOGO) return big ? `<img class="login-logo-img" src="${LOGO}" alt="Bahay Cafe">` : `<img class="topbar-logo" src="${LOGO}" alt="Bahay Cafe">`;
-  return big ? `<div class="wordmark"><b>☕ Bahay Cafe</b><small>${tl("system_name")}</small></div>` : `<span class="topbar-mark">☕ Bahay Cafe</span>`;
+  if (LOGO) return big ? `<img class="login-logo-img" src="${LOGO}" alt="Bahayy Cafe"><div class="sub">${tl("system_name")}</div>` : `<img class="topbar-logo" src="${LOGO}" alt="Bahayy Cafe">`;
+  return big ? `<div class="wordmark"><b>☕ Bahayy Cafe</b><small>${tl("system_name")}</small></div>` : `<span class="topbar-mark">☕ Bahayy Cafe</span>`;
 }
 function setupError(msg, e){
   const hint = /schema/i.test(e?.message||"") ? `<br><br>👉 Supabase → Settings → API → <b>Exposed schemas</b> 에 <b>cafe</b>, <b>kfr</b> 가 모두 있는지 확인하세요.` : "";
@@ -446,7 +495,8 @@ async function init() {
 }
 async function loadEmployees(){
   // PIN 은 로그인 순간에만 조회 (목록에는 싣지 않음)
-  const { data, error } = await sb.from("employees").select("id,name,name_en,role,active").order("id");
+  let { data, error } = await sb.from("employees").select("id,name,name_en,role,active,daily_rate,std_hours,shift_start,shift_end,break_min").order("id");
+  if (error) ({ data, error } = await sb.from("employees").select("id,name,name_en,role,active").order("id")); // 08 SQL 실행 전
   if (error) throw error;
   state.employees = data || [];
 }
@@ -494,7 +544,7 @@ function logout() { state.user = null; state.tab = null; localStorage.removeItem
 
 // ── 탭 라우팅 (role 로 분기) ─────────────────────
 function tabsFor(){
-  if (isAdmin()) return ["dashboard","closing","daily","menurank","report","attendance","inventory","supply","board","manage"].map((k)=>[k,tt("tab_"+k)]);
+  if (isAdmin()) return ["dashboard","closing","daily","menurank","report","attendance","payroll","inventory","supply","board","manage"].map((k)=>[k,tt("tab_"+k)]);
   const t = ["clock","inventory","board"];
   if (state.settings.staff_closing === "1") t.push("closing");
   return t.map((k)=>[k,tt("tab_"+k)]);
@@ -520,6 +570,7 @@ const SCREENS = {
   manage:    () => screenManage(),
   clock:      () => screenClock(),
   attendance: () => screenAttendance(),
+  payroll:    () => screenPayroll(),
   board:      () => screenBoard(),
   inventory:  () => screenInventory(),
   supply:     () => screenSupply(),
@@ -547,6 +598,12 @@ async function screenDashboard(){
     unreadNoteIds(),
   ]);
   const reqs = await sbk.from("supply_requests").select("id,items,status,requested_by,created_at,status_at,received_at").eq("source","CAFE").gte("status_at", since).order("id", { ascending:false }).limit(10);
+  const [checks, cleans] = await Promise.all([
+    sb.from("stock_checks").select("date,item_id,diff,employee_id,created_at").gte("date", addDays(d, -6)),
+    att.data?.length ? sb.from("clean_photos").select("attendance_id,area").in("attendance_id", att.data.map((a) => a.id)) : Promise.resolve({ data: [] }),
+  ]);
+  const cleanN = {}; (cleans.data||[]).forEach((c) => (cleanN[c.attendance_id] ||= new Set()).add(c.area));
+  const itemNm = (id) => itemName((inv.data||[]).find((i) => i.id === id)) || `#${id}`;
   const attRows = att.data || []; attRows.forEach((r) => photoRows.set(r.id, r));
   const working = attRows.filter((a) => a.clock_in && !a.clock_out);
   const low = (inv.data||[]).filter((i) => Number(i.stock) < Number(i.reorder_level));
@@ -570,16 +627,25 @@ async function screenDashboard(){
     events.push({ t: a.clock_in, html: `<div class="feed-row"><span class="feed-ico">🟢</span>
       <div class="feed-main"><b>${who}</b> ${ko?"출근":"clocked in"} ${timeHM(a.clock_in)} · ${distTxt(a.distance_m)} ${a.verified?"✅":"⚠️"}
       ${a.photo_path ? ` <button class="photo-btn" aria-label="photo" onclick="showPhoto(${a.id})">📷</button>` : ""}</div><span class="muted">${ago(a.clock_in)}</span></div>` });
+    const cn = cleanN[a.id]?.size || 0;
     if (a.clock_out) events.push({ t: a.clock_out, html: `<div class="feed-row"><span class="feed-ico">⚪</span>
-      <div class="feed-main"><b>${who}</b> ${ko?"퇴근":"clocked out"} ${timeHM(a.clock_out)} · ${fmtDur(durMin(a.clock_in, a.clock_out))}</div><span class="muted">${ago(a.clock_out)}</span></div>` });
+      <div class="feed-main"><b>${who}</b> ${ko?"퇴근":"clocked out"} ${timeHM(a.clock_out)} · ${fmtDur(durMin(a.clock_in, a.clock_out))}
+      ${cn ? ` <button class="photo-btn" onclick="showCleanPhotos(${a.id})">🧹 ${cn}/4</button>` : cleans.error ? "" : ` <span class="tag-due">🧹 0/4</span>`}</div><span class="muted">${ago(a.clock_out)}</span></div>` });
   });
   (reqs.data||[]).forEach((r) => { const t = r.status_at || r.created_at, toRecv = r.status === "DELIVERED" && !r.received_at;
     events.push({ t, html: `<button class="feed-row feed-btn" onclick="go('${toRecv ? "inventory" : "supply"}')"><span class="feed-ico">${r.status==="DELIVERED" ? "🚚" : "📦"}</span>
     <div class="feed-main"><div><b>${esc(personName(r.requested_by))}</b> ${ko?"주문요청":"request"} ${supBadge(r.status)}${toRecv ? ` <span class="dot-red">${ko?"입고 대기":"to receive"}</span>` : ""}</div><div class="muted">${reqItemsTxt(r.items)}</div></div>
     <span class="muted">${ago(t)}</span></button>` }); });
+  const byDay = {}; (checks.data||[]).forEach((c) => (byDay[c.date] ||= []).push(c));
+  Object.entries(byDay).forEach(([day, list]) => { const bad = list.filter((c) => Number(c.diff) !== 0), t = list.map((c) => c.created_at).sort().pop();
+    events.push({ t, html: `<button class="feed-row feed-btn" onclick="go('inventory')"><span class="feed-ico">📋</span>
+      <div class="feed-main"><div><b>${esc(empName(empById(list[0].employee_id)))}</b> ${ko?"재고 확인":"stock count"} ${bad.length ? `<span class="tag-due">${ko?`불일치 ${bad.length}`:`${bad.length} off`}</span>` : `<span class="done-mark">✓</span>`}</div>
+      ${bad.length ? `<div class="muted">${bad.map((c) => `${esc(itemNm(c.item_id))} ${Number(c.diff)>0?"+":""}${qtyFmt(c.diff)}`).join(", ")}</div>` : ""}</div><span class="muted">${ago(t)}</span></button>` }); });
   events.sort((a, b) => new Date(b.t) - new Date(a.t));
+  const pp = (() => { const c = currentPeriod(); return payPeriod(c.month, c.half); })();
   $("screen").innerHTML = `<div class="report-title">${ko?"오늘의 매장":"Today at the cafe"} <span>· ${d}</span></div>
     ${supErr}
+    ${d === pp.end ? `<button class="payday" onclick="pay.month=null;go('payroll')">💸 ${ko?`오늘은 급여일입니다 (${pp.start.slice(5)} ~ ${pp.end.slice(5)}) — 급여 확인하기`:`Pay day today (${pp.start.slice(5)} – ${pp.end.slice(5)}) — open payroll`} →</button>` : ""}
     <div class="kpi-row four">
       <div class="kpi accent" role="button" tabindex="0" style="cursor:pointer" onclick="openClosing(today())"><div class="kpi-label">${ko?"오늘 매출":"Today's sales"}</div><div class="kpi-value">${sales===null?"—":fmt(sales)}</div><div class="delta flat">${sales===null?(ko?"마감 전":"Not closed yet"):(ko?"마감 완료":"Closed")}</div></div>
       <div class="kpi"><div class="kpi-label">${ko?"근무 중":"Working now"}</div><div class="kpi-value">${working.length}</div><div class="kpi-sub">${workingTxt}</div></div>
@@ -602,6 +668,12 @@ async function screenManage(){
         ${["STAFF","ADMIN"].map((r)=>`<option value="${r}" ${e.role===r?"selected":""}>${tt("role_"+r)}</option>`).join("")}</select>
       <input type="password" inputmode="numeric" placeholder="${ko?"새 PIN":"New PIN"}" aria-label="PIN" onchange="updateEmployee(${e.id},'pin',this.value)">
       <button class="mng-del" onclick="updateEmployee(${e.id},'active',${e.active===false})">${e.active===false?(ko?"복구":"Restore"):(ko?"비활성":"Disable")}</button>
+      ${e.daily_rate !== undefined ? `<div class="emp-pay">
+        <label>${ko?"일급":"Daily"} <span class="peso-mini">${PESO}<input type="number" min="0" step="any" value="${Number(e.daily_rate)}" onchange="updateEmployee(${e.id},'daily_rate',Number(this.value)||0)"></span></label>
+        <label>${ko?"출근":"In"} <input type="time" value="${toHM(e.shift_start)}" onchange="updateEmployee(${e.id},'shift_start',this.value)"></label>
+        <label>${ko?"퇴근":"Out"} <input type="time" value="${toHM(e.shift_end)}" onchange="updateEmployee(${e.id},'shift_end',this.value)"></label>
+        <label>${ko?"기준":"Std"} <input type="number" min="1" max="24" step="0.5" value="${Number(e.std_hours)}" onchange="updateEmployee(${e.id},'std_hours',Number(this.value)||8)">h</label>
+        <label>${ko?"휴게":"Break"} <input type="number" min="0" max="180" step="5" value="${Number(e.break_min)}" onchange="updateEmployee(${e.id},'break_min',Number(this.value)||0)">${ko?"분":"m"}</label></div>` : ""}
     </div>`).join("");
   const s = state.settings;
   const hasStore = s.store_lat && s.store_lng;
@@ -616,7 +688,7 @@ async function screenManage(){
           <button class="btn-mini" onclick="addEmployee()">${ko?"추가":"Add"}</button>
         </div>
         ${rows || `<p class="empty">—</p>`}
-        <p class="hint">${ko?"PIN 칸에 새 번호를 입력하고 칸을 벗어나면 저장됩니다. 퇴사자는 삭제 대신 '비활성'(근태 기록 보존).":"Type a new PIN and leave the box to save. Disable instead of deleting to keep attendance history."}</p>
+        <p class="hint">${ko?"PIN 칸에 새 번호를 입력하고 칸을 벗어나면 저장됩니다. 퇴사자는 삭제 대신 '비활성'(근태 기록 보존). 일급·근무시간표는 급여 자동 계산에 쓰입니다(기본 ₱508 · 09:00–18:00 · 8시간 · 휴게 60분).":"Type a new PIN and leave the box to save. Disable instead of deleting to keep history. Daily rate and shift are used for payroll (default ₱508 · 09:00–18:00 · 8h · 60m break)."}</p>
       </div>
       <div class="card sticky"><h2>${ko?"매장 위치 (출근 지오펜스)":"Store location (geofence)"}</h2>
         <div class="kv"><span>${ko?"매장 좌표":"Store coordinates"}</span><b>${hasStore?`${Number(s.store_lat).toFixed(5)}, ${Number(s.store_lng).toFixed(5)}`:(ko?"미등록":"Not set")}</b></div>
@@ -714,10 +786,15 @@ async function screenClock(){
   ]);
   if (recent.error) throw recent.error;
   const storeSet = state.settings.store_lat && state.settings.store_lng;
+  if (!open) Object.keys(cleanShots).forEach((a) => { URL.revokeObjectURL(cleanShots[a]); delete cleanShots[a]; });
+  const latest = open ? await cleanPhotosFor(open.id) : null;
+  const need = latest && state.settings.clean_photos_required !== "0", nClean = latest ? Object.keys(CLEAN_AREAS).filter((a) => latest[a]).length : 0;
   const status = open
     ? `<div class="clock-state on">● ${tt("on_duty")}</div>
        <div class="clock-sub">${state.lang==="ko" ? `${timeHM(open.clock_in)}부터` : `since ${timeHM(open.clock_in)}`} · ${fmtDur(durMin(open.clock_in, new Date()))} · ${distTxt(open.distance_m)} ${open.verified?"✅":"⚠️"}</div>
-       <button class="btn-primary" id="clockOutBtn" onclick="clockOut(${open.id})">${tl("clock_out")}</button>`
+       ${cleanCardHTML(open, latest)}
+       <button class="btn-primary" id="clockOutBtn" onclick="clockOut(${open.id})" ${need && nClean < 4 ? "disabled" : ""}>${need && nClean < 4 ? `🧹 ${nClean}/4 · ` : ""}${tl("clock_out")}</button>
+       ${need && nClean < 4 ? `<button class="link-btn" onclick="clockOut(${open.id}, true)">${tt("clean_skip")}</button>` : ""}`
     : `<div class="clock-state">${tl("off_duty")}</div>
        <div class="clock-sub">${esc(empName(state.user))} · ${today()}</div>
        <div id="camBox"><button class="btn-primary" onclick="startClockIn()">📷 ${tl("start_clock_in")}</button>
@@ -729,6 +806,7 @@ async function screenClock(){
     ${storeSet ? "" : `<div class="setup-note">${tt("store_not_set")}</div>`}
     <div class="grid-2">
       <div class="card">${status}</div>
+      ${await myPayHTML()}
       <div class="card"><h2>${tl("my_records")}</h2>
         ${rows ? `<table class="data-table"><thead><tr><th>${tt("h_date")}</th><th class="num">${tt("h_in")}</th><th class="num">${tt("h_out")}</th><th class="num">${tt("h_hours")}</th><th></th></tr></thead><tbody>${rows}</tbody></table>` : `<p class="empty">—</p>`}
       </div>
@@ -804,12 +882,17 @@ async function confirmClockIn(){
     screenClock();
   } catch (e) { toast(tt("save_fail") + (e.message || e)); restore(); }
 }
-async function clockOut(id){
-  if (!confirm(tt("clock_out_confirm"))) return;
+async function clockOut(id, skipPhotos){
+  let reason = null;
+  if (skipPhotos) {
+    reason = prompt(state.lang==="ko" ? "청소 사진 없이 퇴근하는 사유 (사장님께 표시됩니다)" : "Reason for clocking out without cleaning photos (shown to the owner)", "");
+    if (reason === null) return;
+    if (!reason.trim()) { toast(state.lang==="ko" ? "사유를 입력하세요" : "Please give a reason"); return; }
+  } else if (!confirm(tt("clock_out_confirm"))) return;
   const btn = $("clockOutBtn"); if (btn) { btn.disabled = true; btn.textContent = tt("gps_checking"); }
   let pos = null; try { pos = (await getPosition()).coords; } catch (_) {}
   const { data, error } = await sb.from("attendance")
-    .update({ clock_out: new Date().toISOString(), out_lat: pos?.latitude ?? null, out_lng: pos?.longitude ?? null })
+    .update({ clock_out: new Date().toISOString(), out_lat: pos?.latitude ?? null, out_lng: pos?.longitude ?? null, ...(reason ? { note: `🧹✕ ${reason.trim()}` } : {}) })
     .eq("id", id).select("clock_in,clock_out").single();
   if (error) { toast(tt("save_fail") + error.message); return screenClock(); }
   toast(`${tt("clocked_out")} ${timeHM(data.clock_out)} · ${fmtDur(durMin(data.clock_in, data.clock_out))}`);
@@ -824,21 +907,26 @@ async function screenAttendance(){
   const [y, m] = month.split("-").map(Number);
   const end = `${month}-${String(new Date(y, m, 0).getDate()).padStart(2,"0")}`;
   await loadEmployees();
-  const { data, error } = await sb.from("attendance")
-    .select("id,employee_id,date,clock_in,clock_out,photo_path,photo_purged_at,distance_m,out_distance_m,accuracy_m,verified,manual_edit")
-    .gte("date", `${month}-01`).lte("date", end).order("clock_in");
+  const cols = "id,employee_id,date,clock_in,clock_out,photo_path,photo_purged_at,distance_m,out_distance_m,accuracy_m,verified,manual_edit,note";
+  let { data, error } = await sb.from("attendance").select(cols + ",orig_clock_in").gte("date", `${month}-01`).lte("date", end).order("clock_in");
+  if (error) ({ data, error } = await sb.from("attendance").select(cols).gte("date", `${month}-01`).lte("date", end).order("clock_in"));
   if (error) throw error;
+  const cp = data?.length ? await sb.from("clean_photos").select("attendance_id,area").in("attendance_id", data.map((r) => r.id)) : { data: [] };
+  const cleanN = {}; (cp.data||[]).forEach((c) => (cleanN[c.attendance_id] ||= new Set()).add(c.area));
   const rows = attState.rows = data || [];
   rows.forEach((r) => photoRows.set(r.id, r));
   const ko = state.lang === "ko", d0 = today();
   const emps = state.employees.filter((e) => rows.some((r) => r.employee_id === e.id) || (e.active !== false && e.role === "STAFF"));
   const dates = [...new Set(rows.map((r) => r.date))].sort().reverse();
-  const cell = (list) => list.map((r) => {
-    const open = !r.clock_out;
-    const fix = open && r.date < d0 ? ` <button class="photo-btn" onclick="fixClockOut(${r.id})">${ko?"퇴근 입력":"Set out"}</button>` : "";
+  const cell = (list) => list.map((r, k) => {
+    const open = !r.clock_out, e = empById(r.employee_id);
+    const fix = ` <button class="photo-btn" aria-label="edit" title="${ko?"시각 수정":"Edit time"}" onclick="editShift(${r.id})">${open && r.date < d0 ? (ko?"퇴근 입력":"Set out") : "✏️"}</button>`;
+    const sc = k === 0 && e?.shift_start ? shiftCalc(e, r.date, list) : null, cn = cleanN[r.id]?.size || 0;
     return `<div class="shift ${r.verified?"":"warn"} ${open?"open":""}">
-      <b>${timeHM(r.clock_in)}–${open ? (r.date === d0 ? (ko?"근무 중":"on duty") : "?") : timeHM(r.clock_out)}</b>${r.manual_edit ? ` <span class="muted">${ko?"수정됨":"edited"}</span>` : ""}<br>
-      ${distTxt(r.distance_m)} ${r.verified?"✅":"⚠️"}${r.photo_path ? ` <button class="photo-btn" aria-label="photo" onclick="showPhoto(${r.id})">📷</button>` : r.photo_purged_at ? ` <span class="muted" title="${ko?"보관기간이 지나 사진 정리됨":"Photo removed after retention period"}">📷✕</span>` : ""}${fix}
+      <b>${timeHM(r.clock_in)}–${open ? (r.date === d0 ? (ko?"근무 중":"on duty") : "?") : timeHM(r.clock_out)}</b>${r.manual_edit ? ` <span class="muted">${ko?"수정됨":"edited"}${r.orig_clock_in ? ` (${ko?"원래":"was"} ${timeHM(r.orig_clock_in)})` : ""}</span>` : ""}
+      ${sc?.late ? `<span class="late-tag">${ko?"지각":"late"} ${sc.late}${ko?"분":"m"}</span>` : ""}<br>
+      ${distTxt(r.distance_m)} ${r.verified?"✅":"⚠️"}${r.photo_path ? ` <button class="photo-btn" aria-label="photo" onclick="showPhoto(${r.id})">📷</button>` : r.photo_purged_at ? ` <span class="muted" title="${ko?"보관기간이 지나 사진 정리됨":"Photo removed after retention period"}">📷✕</span>` : ""}${cn ? ` <button class="photo-btn" onclick="showCleanPhotos(${r.id})">🧹 ${cn}/4</button>` : (r.clock_out && !cp.error ? ` <span class="muted">🧹0</span>` : "")}${fix}
+      ${r.note ? `<br><span class="muted">${esc(r.note)}</span>` : ""}
       ${r.clock_out ? `<br><span class="muted">${fmtDur(durMin(r.clock_in, r.clock_out))}${r.out_distance_m != null ? ` · ${ko?"퇴근":"out"} ${r.out_distance_m}m` : ""}</span>` : ""}
     </div>`;
   }).join("");
@@ -857,8 +945,14 @@ async function screenAttendance(){
         <thead><tr><th>${ko?"날짜":"Date"}</th>${emps.map((e) => `<th>${esc(empName(e))}</th>`).join("")}</tr></thead>
         <tbody>${body}<tr class="att-total"><td>${ko?"월 합계":"Total"}</td>${totals}</tr></tbody></table></div>`
         : `<p class="empty">${ko?"이 달의 출근 기록이 없습니다.":"No attendance this month."}</p>`}
-      <p class="hint">✅ ${ko?"매장 반경 안에서 출근":"Clocked in inside the store radius"} · ⚠️ ${ko?"반경 밖이거나 위치 없음":"Outside the radius or no location"} · ${ko?"시각은 모두 서버 기록(필리핀 시간)":"All times are server-recorded (PH time)"}</p>
-    </div>`;
+      <p class="hint">✅ ${ko?"매장 반경 안에서 출근":"Clocked in inside the store radius"} · ⚠️ ${ko?"반경 밖이거나 위치 없음":"Outside the radius or no location"} · ${ko?"시각은 모두 서버 기록(필리핀 시간). ✏️로 수정하면 '수정됨'과 원래 시각이 남습니다.":"All times are server-recorded (PH time). Edits with ✏️ keep an 'edited' mark and the original time."}</p>
+    </div>
+    <div class="card"><h2>＋ ${ko?"빠진 근무 추가":"Add a missing shift"}</h2>
+      <div class="add-form"><select id="asEmp" aria-label="staff">${state.employees.filter((e) => e.active !== false).map((e) => `<option value="${e.id}">${esc(empName(e))}</option>`).join("")}</select>
+        <input id="asDate" type="date" value="${d0}" max="${d0}" aria-label="date" style="flex:none;max-width:150px">
+        <input id="asIn" type="time" value="09:00" aria-label="in" style="flex:none;max-width:110px"><input id="asOut" type="time" value="18:00" aria-label="out" style="flex:none;max-width:110px">
+        <button class="btn-mini" onclick="addShift()">${ko?"추가":"Add"}</button></div>
+      <p class="hint">${ko?"출근 사진을 못 찍은 날 등. 사진·위치 없이 '수정됨'으로 표시되고 급여 계산에 포함됩니다.":"For days without a photo clock-in. Marked as edited, no photo/location, included in payroll."}</p></div>`;
 }
 async function showPhoto(id){
   const r = photoRows.get(id); if (!r?.photo_path) return;
@@ -871,18 +965,6 @@ async function showPhoto(id){
   const onKey = (ev) => { if (ev.key === "Escape") close(); };
   m.onclick = close; document.addEventListener("keydown", onKey);
   document.body.appendChild(m);
-}
-async function fixClockOut(id){
-  const r = attState.rows.find((x) => x.id === id); if (!r) return;
-  const ko = state.lang === "ko";
-  const hm = prompt(ko ? `${r.date} 퇴근 시각 (필리핀 시간, 예: 18:00)` : `Clock-out time for ${r.date} (PH time, e.g. 18:00)`, "18:00");
-  if (!hm) return;
-  if (!/^([01]?\d|2[0-3]):[0-5]\d$/.test(hm.trim())) { toast(ko ? "HH:MM 형식으로 입력하세요" : "Use HH:MM"); return; }
-  let out = new Date(`${r.date}T${hm.trim().padStart(5,"0")}:00+08:00`);
-  if (out < new Date(r.clock_in)) out = new Date(out.getTime() + 86400000); // 자정 넘긴 근무
-  const { error } = await sb.from("attendance").update({ clock_out: out.toISOString(), manual_edit: true }).eq("id", id);
-  if (error) { toast(tt("save_fail") + error.message); return; }
-  toast(tt("saved")); screenAttendance();
 }
 
 // ── 게시판: 글(분류·사진) + 댓글 + 안 읽음 ──────────
@@ -1081,43 +1163,64 @@ const reqItemName = (it) => state.lang==="ko" ? it.name : (it.name_en || it.name
 const reqItemsTxt = (items) => (items||[]).map((it) => `${esc(reqItemName(it))} ${qtyFmt(it.qty)}${esc(it.unit||"")}`).join(", ");
 // 공급요청에는 이름(text)이 저장됨 → 직원이면 현재 언어 이름으로 표시
 const personName = (n) => { const e = state.employees.find((x) => x.name === n); return e ? empName(e) : (n || ""); };
-const inv = { items:[], move:{ itemId:"", type:"OUT" }, req:{} };
+const INV_CATS = {
+  DRINK:{ko:"음료",en:"Drinks",tl:"Inumin"},
+  DESSERT:{ko:"디저트",en:"Dessert",tl:"Panghimagas"},
+  FOOD:{ko:"음식",en:"Food",tl:"Pagkain"},
+  SUPPLY:{ko:"기타용품",en:"Supplies",tl:"Mga gamit"},
+};
+const invCatLabel = (c) => { const e = INV_CATS[c]; return !e ? (state.lang==="ko" ? "기타" : "Other") : (state.lang==="ko" ? e.ko : e.en); };
+const itemCat = (i) => INV_CATS[i.category] ? i.category : "SUPPLY";
+// 품목이 속한 세부 그룹 (예: "DRINK/커피") — 없으면 분류 기본 그룹
+const itemGroups = (i) => (i.groups && i.groups.length) ? i.groups : [`${itemCat(i)}/${state.lang==="ko" ? "기타" : "Other"}`];
+const isTracked = (i) => i.daily_check || Number(i.reorder_level) > 0;
+const inv = { items:[], move:{ itemId:"", type:"OUT" }, req:{}, reqNote:"", reqCat:"DRINK", filter:"CHECK", check:{}, usageOpen:null, adminCat:"DRINK" };
 
 async function loadInventoryItems(){
-  const { data, error } = await sb.from("inventory_items").select("id,name,name_en,unit,stock,reorder_level,active,sort").order("sort").order("id");
-  if (error) throw error;
-  inv.items = data || [];
+  let r = await sb.from("inventory_items").select("id,name,name_en,unit,stock,reorder_level,active,sort,category,groups,daily_check").order("sort").order("id");
+  if (r.error) r = await sb.from("inventory_items").select("id,name,name_en,unit,stock,reorder_level,active,sort").order("sort").order("id"); // 08 SQL 실행 전
+  if (r.error) throw r.error;
+  inv.items = r.data || [];
 }
 async function screenInventory(){
   await loadInventoryItems();
-  const ko = state.lang === "ko", items = inv.items.filter((i) => i.active !== false);
-  const [moves, reqs] = await Promise.all([
-    sb.from("inventory_moves").select("id,item_id,type,qty,delta,stock_after,date,note,employee_id,created_at").order("id", { ascending:false }).limit(30),
+  const ko = state.lang === "ko", d0 = today(), items = inv.items.filter((i) => i.active !== false);
+  const [moves, reqs, checks, closed] = await Promise.all([
+    sb.from("inventory_moves").select("id,item_id,type,qty,delta,stock_after,date,note,employee_id,created_at,ref").order("id", { ascending:false }).limit(30),
     sbk.from("supply_requests").select("id,date,items,status,note,requested_by,created_at,status_at,received_at").eq("source","CAFE").order("id", { ascending:false }).limit(10),
+    sb.from("stock_checks").select("id,date,item_id,expected,counted,diff,employee_id,created_at").gte("date", addDays(d0, -6)).order("id", { ascending:false }),
+    sb.from("closings").select("date").eq("date", d0).maybeSingle(),
   ]);
-  if (moves.error) throw moves.error;
+  if (moves.error) { // 08 SQL 실행 전 (ref 컬럼 없음)
+    const m2 = await sb.from("inventory_moves").select("id,item_id,type,qty,delta,stock_after,date,note,employee_id,created_at").order("id", { ascending:false }).limit(30);
+    if (m2.error) throw m2.error; moves.data = m2.data;
+  }
   const low = items.filter(isLow);
   if (!inv.move.itemId && items[0]) inv.move.itemId = String(items[0].id);
   const lowBox = low.length ? `<div class="low-box"><b>🔴 ${ko?`주문 필요 ${low.length}품목`:`Low stock: ${low.length}`}</b>
       <div>${low.map((i) => `${esc(itemName(i))} <b>${qtyFmt(i.stock)}</b>/${qtyFmt(i.reorder_level)}${esc(i.unit||"")}`).join(" · ")}</div>
       <button class="btn-mini" onclick="requestLowItems()">📦 ${ko?"부족 품목 주문요청 담기":"Add low items to request"}</button></div>` : "";
-  const rows = items.map((i) => `<button class="inv-row ${isLow(i)?"low":""} ${String(i.id)===inv.move.itemId?"sel":""}" onclick="pickMoveItem(${i.id})">
+  // 현재고 목록 (필터: 매일 확인 / 분류별 / 전체)
+  const filters = [["CHECK", ko?"📋 매일 확인":"📋 Daily check"], ...Object.keys(INV_CATS).map((c) => [c, invCatLabel(c)]), ["ALL", ko?"전체":"All"]];
+  const shown = items.filter((i) => inv.filter === "ALL" ? true : inv.filter === "CHECK" ? isTracked(i) : itemCat(i) === inv.filter);
+  const rows = shown.map((i) => `<button class="inv-row ${isLow(i)?"low":""} ${String(i.id)===inv.move.itemId?"sel":""}" onclick="pickMoveItem(${i.id})">
       <span class="inv-name">${esc(itemName(i))}${state.lang==="ko" && i.name_en ? `<span class="m-en">${esc(i.name_en)}</span>` : ""}</span>
       <span class="inv-stock num">${qtyFmt(i.stock)}<small> ${esc(i.unit||"")}</small></span>
-      <span class="inv-min muted num">${ko?"최소":"min"} ${qtyFmt(i.reorder_level)}</span></button>`).join("");
+      <span class="inv-min muted num">${Number(i.reorder_level) > 0 ? `${ko?"최소":"min"} ${qtyFmt(i.reorder_level)}` : ""}</span></button>`).join("");
   const sel = items.find((i) => String(i.id) === inv.move.itemId);
   const moveCard = items.length ? `<div class="card sticky"><h2>${tl("record_move")}</h2>
       <div class="field"><label for="mvItem">${tl("item")}</label><select id="mvItem" onchange="inv.move.itemId=this.value;screenInventory()">
-        ${items.map((i) => `<option value="${i.id}" ${String(i.id)===inv.move.itemId?"selected":""}>${esc(itemName(i))} (${qtyFmt(i.stock)}${esc(i.unit||"")})</option>`).join("")}</select></div>
+        ${Object.keys(INV_CATS).map((c) => `<optgroup label="${esc(invCatLabel(c))}">${items.filter((i) => itemCat(i) === c).map((i) => `<option value="${i.id}" ${String(i.id)===inv.move.itemId?"selected":""}>${esc(itemName(i))} (${qtyFmt(i.stock)}${esc(i.unit||"")})</option>`).join("")}</optgroup>`).join("")}</select></div>
       <div class="seg" role="radiogroup">${Object.keys(MOVE_TYPES).map((t) => `<button role="radio" aria-checked="${inv.move.type===t}" class="${inv.move.type===t?"on":""} mv-${t}" onclick="setMoveType('${t}')">${moveLabel(t)}${state.lang==="ko"?"":`<span class="lang-sub">${MOVE_TYPES[t].tl}</span>`}</button>`).join("")}</div>
       <div class="field"><label for="mvQty">${inv.move.type==="ADJUST" ? tl("counted_qty") : tl("qty")} ${sel ? `(${esc(sel.unit||"")})` : ""}</label>
         <input id="mvQty" type="number" inputmode="decimal" min="0" step="any" placeholder="0" value="${esc(inv.move.qty||"")}" oninput="inv.move.qty=this.value"></div>
-      <div class="field"><label for="mvNote">${tl("memo")}</label><input id="mvNote" value="${esc(inv.move.note||"")}" oninput="inv.move.note=this.value" placeholder="${ko?"예: 시장 구매, 폐기, 실사":"e.g. market purchase, waste"}"></div>
+      <div class="field"><label for="mvNote">${tl("memo")}</label><input id="mvNote" value="${esc(inv.move.note||"")}" oninput="inv.move.note=this.value" placeholder="${ko?"예: 시장 구매, 폐기":"e.g. market purchase, waste"}"></div>
       <button class="btn-primary" id="mvSave" onclick="saveMove()">${tl("save")}</button>
-      <p class="hint">${inv.move.type==="ADJUST" ? (ko?"실사: 실제로 세어 본 수량을 입력하면 현재고가 그 수량으로 맞춰집니다.":"Count: enter the actual counted amount; stock is set to it.") : (ko?"입고는 더하고, 출고는 뺍니다.":"In adds, Out subtracts.")}</p></div>` : "";
+      <p class="hint">${inv.move.type==="ADJUST" ? (ko?"실사: 실제로 세어 본 수량을 입력하면 현재고가 그 수량으로 맞춰집니다.":"Count: enter the actual counted amount; stock is set to it.") : (ko?"입고는 더하고, 출고는 뺍니다. 판매분은 마감 저장 때 자동으로 빠집니다.":"In adds, Out subtracts. Sales are deducted automatically when the closing is saved.")}</p></div>` : "";
   const ledger = (moves.data||[]).map((m) => {
     const it = inv.items.find((i) => i.id === m.item_id), d = Number(m.delta ?? 0);
-    return `<tr><td>${m.date.slice(5)}</td><td>${esc(itemName(it))}</td><td><span class="mv-tag mv-${m.type}">${moveLabel(m.type)}</span></td>
+    const tag = m.ref?.startsWith("sale:") ? `<span class="mv-tag mv-SALE">${ko?"판매":"Sold"}</span>` : m.ref?.startsWith("check:") ? `<span class="mv-tag mv-ADJUST">${ko?"재고확인":"Check"}</span>` : `<span class="mv-tag mv-${m.type}">${moveLabel(m.type)}</span>`;
+    return `<tr><td>${m.date.slice(5)}</td><td>${esc(itemName(it))}</td><td>${tag}</td>
       <td class="num ${d>=0?"pos":"neg"}">${d>0?"+":""}${qtyFmt(d)}</td><td class="num">${qtyFmt(m.stock_after)}</td>
       <td>${esc(empName(empById(m.employee_id)))}${m.note ? `<div class="muted">${esc(m.note)}</div>` : ""}</td>
       ${isAdmin() ? `<td><button class="link-del" aria-label="delete" onclick="delMove(${m.id})">✕</button></td>` : ""}</tr>`;
@@ -1132,8 +1235,11 @@ async function screenInventory(){
     </div>`).join("");
   $("screen").innerHTML = `<div class="report-title">${tt("tab_inventory")}</div>
     ${lowBox}
+    ${dailyCheckHTML(items, checks.data || [], !!closed.data, !!checks.error)}
     <div class="grid-2">
-      <div class="card"><h2>${tl("current_stock")}</h2>${rows || `<p class="empty">${ko?"등록된 품목이 없습니다.":"No items yet."}${isAdmin()?"":(ko?" 사장님께 품목 등록을 요청하세요.":" Ask the owner to add items.")}</p>`}</div>
+      <div class="card"><h2>${tl("current_stock")}</h2>
+        <div class="fchips">${filters.map(([k, l]) => `<button class="fchip ${inv.filter===k?"on":""}" onclick="inv.filter='${k}';screenInventory()">${l}</button>`).join("")}</div>
+        ${rows || `<p class="empty">${ko?"품목이 없습니다.":"No items."}</p>`}</div>
       ${moveCard}
     </div>
     <div class="card" id="reqCard"><h2>📦 ${tl("order_request")}</h2>${requestFormHTML(items)}</div>
@@ -1141,8 +1247,60 @@ async function screenInventory(){
     <div class="card"><h2>${tl("ledger")}</h2>${ledger ? `<div class="tscroll"><table class="data-table">
       <thead><tr><th>${ko?"날짜":"Date"}</th><th>${tt("item")}</th><th></th><th class="num">±</th><th class="num">${ko?"재고":"Stock"}</th><th>${ko?"담당":"By"}</th>${isAdmin()?"<th></th>":""}</tr></thead>
       <tbody>${ledger}</tbody></table></div>` : `<p class="empty">—</p>`}</div>
-    ${isAdmin() ? itemAdminHTML() : ""}`;
+    ${isAdmin() ? await itemAdminHTML() : ""}`;
 }
+const addDays = (d, n) => { const x = new Date(d + "T00:00:00"); x.setDate(x.getDate() + n); return x.toLocaleDateString("en-CA"); };
+
+// ── 퇴근 전 재고 확인: 예상(현재고 = 판매 차감 반영) vs 실제 개수 ──
+function dailyCheckHTML(items, checks, closedToday, missingTable){
+  const ko = state.lang === "ko", d0 = today(), list = items.filter((i) => i.daily_check);
+  if (missingTable || !list.length) return "";
+  const todays = checks.filter((c) => c.date === d0), lastBy = {};
+  todays.forEach((c) => { if (!lastBy[c.item_id]) lastBy[c.item_id] = c; });
+  const rows = list.map((i) => {
+    const done = lastBy[i.id], v = inv.check[i.id] ?? "";
+    const diff = v === "" ? null : Number(v) - Number(i.stock);
+    return `<div class="chk-row">
+      <span class="inv-name">${esc(itemName(i))}${done ? ` <span class="chk-done ${Number(done.diff)===0?"ok":"bad"}">${Number(done.diff)===0 ? "✓" : `${Number(done.diff)>0?"+":""}${qtyFmt(done.diff)}`}</span>` : ""}</span>
+      <span class="muted num">${ko?"예상":"exp."} <b>${qtyFmt(i.stock)}</b>${esc(i.unit||"")}</span>
+      <input type="number" inputmode="decimal" min="0" step="any" aria-label="counted" placeholder="${ko?"실제":"count"}" value="${esc(v)}" oninput="setCheck(${i.id}, this.value)">
+      <span class="chk-diff num ${diff===null?"":diff===0?"ok":"bad"}" id="cd_${i.id}">${diff===null ? "" : diff===0 ? "✓" : `${diff>0?"+":""}${qtyFmt(diff)}`}</span></div>`;
+  }).join("");
+  const history = isAdmin() ? (() => {
+    const byDate = {}; checks.forEach((c) => (byDate[c.date] ||= []).push(c));
+    return Object.keys(byDate).sort().reverse().map((d) => { const bad = byDate[d].filter((c) => Number(c.diff) !== 0);
+      return `<div class="prev-row"><span>${d.slice(5)} ${weekday(d)} · ${esc(empName(empById(byDate[d][0].employee_id)))}</span><span>${bad.length ? `<span class="tag-due">${ko?`불일치 ${bad.length}`:`${bad.length} off`}</span> ${bad.map((c) => `${esc(itemName(inv.items.find((i) => i.id === c.item_id)))} ${Number(c.diff)>0?"+":""}${qtyFmt(c.diff)}`).join(", ")}` : `<span class="done-mark">✓ ${ko?"모두 일치":"all match"}</span>`}</span></div>`; }).join("");
+  })() : "";
+  return `<div class="card chk-card"><h2>📋 ${tl("daily_check")} <span class="muted">${d0.slice(5)}</span></h2>
+    ${closedToday ? "" : `<div class="setup-note">${ko?"오늘 마감(판매 수량)을 먼저 저장하면 판매한 만큼 빠진 '예상' 개수와 비교할 수 있어요.":"Save today's closing first so the expected count includes today's sales. / I-save muna ang closing."}</div>`}
+    ${rows}
+    <button class="btn-primary" id="chkSave" onclick="saveDailyCheck()">${tl("save_check")}</button>
+    <p class="hint">${ko?"실제 개수를 입력하면 차이가 바로 보입니다. 저장하면 기록이 남고 재고가 실제 개수로 맞춰집니다.":"Enter the actual count to see the difference. Saving records it and sets stock to the actual count."}</p>
+    ${history ? `<div class="section-label">${ko?"최근 7일 재고 확인":"Last 7 days"}</div>${history}` : ""}</div>`;
+}
+function setCheck(id, v){
+  inv.check[id] = v;
+  const i = inv.items.find((x) => x.id === id), el = $("cd_" + id); if (!el || !i) return;
+  if (v === "") { el.textContent = ""; el.className = "chk-diff num"; return; }
+  const diff = Number(v) - Number(i.stock);
+  el.textContent = diff === 0 ? "✓" : `${diff>0?"+":""}${qtyFmt(diff)}`; el.className = "chk-diff num " + (diff === 0 ? "ok" : "bad");
+}
+async function saveDailyCheck(){
+  const ko = state.lang === "ko";
+  const entries = Object.entries(inv.check).filter(([, v]) => v !== "" && Number(v) >= 0);
+  if (!entries.length) { toast(ko ? "실제 개수를 입력하세요" : "Enter counts first"); return; }
+  const btn = $("chkSave"); btn.disabled = true;
+  const rows = entries.map(([id, v]) => { const i = inv.items.find((x) => String(x.id) === id); return { item_id: Number(id), expected: Number(i.stock), counted: Number(v), employee_id: state.user.id }; });
+  const { error } = await sb.from("stock_checks").insert(rows);
+  if (error) { toast(tt("save_fail") + error.message); btn.disabled = false; return; }
+  const adj = rows.filter((r) => r.counted !== r.expected).map((r) => ({ item_id: r.item_id, type:"ADJUST", qty: r.counted, ref:`check:${today()}`, note: ko ? "퇴근 전 재고 확인" : "End-of-day count", employee_id: state.user.id }));
+  if (adj.length) { const a = await sb.from("inventory_moves").insert(adj); if (a.error) toast(tt("save_fail") + a.error.message); }
+  const off = rows.filter((r) => r.counted !== r.expected).length;
+  inv.check = {};
+  toast(off ? (ko ? `저장 · 불일치 ${off}품목 (사장님께 표시됩니다)` : `Saved · ${off} item(s) differ`) : (ko ? "저장 · 모두 일치 ✓" : "Saved · all match ✓"));
+  screenInventory();
+}
+
 function setMoveType(t){ inv.move.type = t; screenInventory(); }
 function pickMoveItem(id){ inv.move.itemId = String(id); screenInventory().then(() => $("mvQty")?.focus()); }
 async function saveMove(){
@@ -1163,39 +1321,59 @@ async function delMove(id){
   screenInventory();
 }
 
-// 주문요청 (→ kfr.supply_requests, source=CAFE, PENDING)
+// ── 물품 신청: 분류(음료/디저트/음식/기타용품) → 세부 그룹 → 수량 ──
 function requestFormHTML(items){
-  const ko = state.lang === "ko";
+  const ko = state.lang === "ko", cat = inv.reqCat;
+  const groups = {}; items.forEach((i) => itemGroups(i).forEach((g) => { const [c, name] = g.split("/"); if (c === cat) (groups[name] ||= []).push(i); }));
   const picked = Object.entries(inv.req).filter(([, q]) => Number(q) > 0);
-  return `<div class="add-form">
-      <select id="rqItem" aria-label="item"><option value="">${ko?"품목 선택":"Choose item"}</option>
-        ${items.map((i) => `<option value="${i.id}">${esc(itemName(i))}${isLow(i)?" 🔴":""}</option>`).join("")}</select>
-      <input id="rqQty" type="number" inputmode="decimal" min="0" step="any" placeholder="${ko?"수량":"Qty"}" style="max-width:90px">
-      <button class="btn-mini" onclick="addReqItem()">${ko?"담기":"Add"}</button></div>
+  const counts = {}; picked.forEach(([id]) => { const i = inv.items.find((x) => String(x.id) === id); if (i) counts[itemCat(i)] = (counts[itemCat(i)]||0) + 1; });
+  const groupNames = [...new Set([...items.flatMap((i) => itemGroups(i)).filter((g) => g.startsWith(cat + "/")).map((g) => g.split("/")[1])])];
+  return `<div class="fchips">${Object.keys(INV_CATS).map((c) => `<button class="fchip ${cat===c?"on":""}" onclick="inv.reqCat='${c}';screenInventory().then(()=>$('reqCard').scrollIntoView({block:'start'}))">${invCatLabel(c)}${counts[c] ? ` <b>${counts[c]}</b>` : ""}</button>`).join("")}</div>
+    ${Object.entries(groups).map(([g, list]) => `<div class="section-label">${esc(g)}</div>${list.map((i) => `<div class="req-row">
+        <span class="inv-name">${esc(itemName(i))}${isTracked(i) ? ` <span class="muted">(${qtyFmt(i.stock)}${esc(i.unit||"")})</span>` : ""}${isLow(i) ? " 🔴" : ""}</span>
+        <div class="stepper"><button aria-label="minus" onclick="stepReq(${i.id},-1)">−</button>
+        <input type="number" inputmode="decimal" min="0" step="any" class="rq_${i.id}" aria-label="qty" value="${esc(inv.req[i.id]||"")}" placeholder="0" oninput="setReq(${i.id},this.value)">
+        <button aria-label="plus" onclick="stepReq(${i.id},1)">+</button></div><span class="muted req-unit">${esc(i.unit||"")}</span></div>`).join("")}`).join("") || `<p class="empty">—</p>`}
+    <details class="add-item"><summary>＋ ${ko?"목록에 없는 품목 추가":"Add an item not on the list"}</summary>
+      <div class="add-form" style="margin-top:10px">
+        <input id="niName" placeholder="${ko?"품목명":"Name"}"><input id="niNameEn" placeholder="${ko?"영문명 (선택)":"English name (optional)"}">
+        <input id="niGroup" list="niGroups" placeholder="${ko?"세부 그룹 (예: 커피)":"Group (e.g. Coffee)"}" style="max-width:150px"><datalist id="niGroups">${groupNames.map((g) => `<option value="${esc(g)}">`).join("")}</datalist>
+        <input id="niUnit" placeholder="${ko?"단위":"Unit"}" style="max-width:80px">
+        <button class="btn-mini" onclick="addCatalogItem()">${ko?`'${invCatLabel(cat)}'에 추가`:`Add to ${invCatLabel(cat)}`}</button></div></details>
+    <div class="section-label">${ko?"담은 품목":"Selected"} (${picked.length})</div>
     <div class="order-items">${picked.map(([id, q]) => { const i = inv.items.find((x) => String(x.id) === id);
-      return `<span class="chip">${esc(itemName(i))} ×${qtyFmt(q)}${esc(i?.unit||"")} <button class="chip-x" aria-label="remove" onclick="delete inv.req['${id}'];screenInventory()">✕</button></span>`; }).join("")}</div>
+      return `<span class="chip">${esc(itemName(i))} ×${qtyFmt(q)}${esc(i?.unit||"")} <button class="chip-x" aria-label="remove" onclick="delete inv.req['${id}'];screenInventory()">✕</button></span>`; }).join("") || `<span class="muted">—</span>`}</div>
     <div class="field"><label for="rqNote">${tl("memo")}</label><textarea id="rqNote" rows="2" oninput="inv.reqNote=this.value" placeholder="${ko?"예: 금요일까지 필요":"e.g. needed by Friday"}">${esc(inv.reqNote||"")}</textarea></div>
     <button class="btn-primary" id="rqSave" onclick="submitRequest()" ${picked.length?"":"disabled"}>${tl("send_request")}</button>
     <p class="hint">${ko?"사장님이 승인하면 K-Food 주문함으로 넘어갑니다.":"After the owner approves, it goes to the K-Food order list."}</p>`;
 }
-function addReqItem(){
-  const id = $("rqItem").value, q = Number($("rqQty").value);
-  if (!id || !(q > 0)) { toast(state.lang==="ko" ? "품목과 수량을 입력하세요" : "Choose an item and quantity"); return; }
-  inv.req[id] = (Number(inv.req[id]) || 0) + q; screenInventory().then(() => $("reqCard")?.scrollIntoView({ block:"center" }));
-}
+function setReq(id, v){ inv.req[id] = Math.max(0, Number(v) || 0); document.querySelectorAll(".rq_" + id).forEach((el) => { if (el !== document.activeElement) el.value = inv.req[id] || ""; }); refreshReqSummary(); }
+function stepReq(id, d){ inv.req[id] = Math.max(0, (Number(inv.req[id]) || 0) + d); document.querySelectorAll(".rq_" + id).forEach((el) => { el.value = inv.req[id] || ""; }); refreshReqSummary(); }
+function refreshReqSummary(){ const n = Object.values(inv.req).filter((q) => Number(q) > 0).length, b = $("rqSave"); if (b) b.disabled = !n; }
 function requestLowItems(){
   inv.items.filter((i) => i.active !== false && isLow(i)).forEach((i) => {
     if (!(Number(inv.req[i.id]) > 0)) inv.req[i.id] = Math.max(1, Number(i.reorder_level) * 2 - Number(i.stock));
   });
-  screenInventory().then(() => $("reqCard")?.scrollIntoView({ block:"center" }));
+  const first = inv.items.find((i) => i.active !== false && isLow(i)); if (first) inv.reqCat = itemCat(first);
+  screenInventory().then(() => $("reqCard")?.scrollIntoView({ block:"start" }));
+}
+async function addCatalogItem(){
+  const ko = state.lang === "ko", name = $("niName").value.trim();
+  if (!name) { toast(ko ? "품목명을 입력하세요" : "Enter a name"); return; }
+  const group = $("niGroup").value.trim() || (ko ? "기타" : "Other");
+  const { error } = await sb.from("inventory_items").insert({ name, name_en: $("niNameEn").value.trim() || null, unit: $("niUnit").value.trim() || "개",
+    category: inv.reqCat, groups: [`${inv.reqCat}/${group}`], reorder_level: 0, stock: 0, sort: inv.items.length + 1 });
+  if (error) { toast(tt("save_fail") + error.message); return; }
+  toast(tt("saved")); screenInventory().then(() => $("reqCard")?.scrollIntoView({ block:"start" }));
 }
 async function submitRequest(){
   const items = Object.entries(inv.req).filter(([, q]) => Number(q) > 0).map(([id, q]) => {
-    const i = inv.items.find((x) => String(x.id) === id); return { item_id: Number(id), name: i?.name || id, name_en: i?.name_en || null, qty: Number(q), unit: i?.unit || "" };
+    const i = inv.items.find((x) => String(x.id) === id);
+    return { item_id: Number(id), name: i?.name || id, name_en: i?.name_en || null, qty: Number(q), unit: i?.unit || "", category: i ? itemCat(i) : null };
   });
   if (!items.length) return;
   const btn = $("rqSave"); btn.disabled = true;
-  const { error } = await sbk.from("supply_requests").insert({ source:"CAFE", requested_by: state.user.name, date: today(), items, status:"PENDING", note: $("rqNote").value.trim() || null });
+  const { error } = await sbk.from("supply_requests").insert({ source:"CAFE", requested_by: state.user.name, date: today(), items, status:"PENDING", note: (inv.reqNote||"").trim() || null });
   if (error) { toast(tt("save_fail") + error.message); btn.disabled = false; return; }
   inv.req = {}; inv.reqNote = ""; toast(state.lang==="ko" ? "주문요청을 보냈습니다" : "Request sent / Naipadala"); screenInventory();
 }
@@ -1203,43 +1381,76 @@ async function cancelRequest(id){
   if (!confirm(state.lang==="ko" ? "이 요청을 취소할까요?" : "Cancel this request?")) return;
   const { error } = await sbk.from("supply_requests").delete().eq("id", id).eq("status", "PENDING");
   if (error) { toast(error.message); return; }
-  screenRefresh();
+  renderScreen();
 }
-function screenRefresh(){ renderScreen(); }
 
-// 품목 관리 (사장)
-function itemAdminHTML(){
-  const ko = state.lang === "ko";
-  const rows = inv.items.map((i) => `<div class="item-row ${i.active===false?"off":""}">
-      <div><b>${esc(i.name)}</b>${i.name_en ? `<span class="m-en">${esc(i.name_en)}</span>` : ""}</div>
+// ── 품목 관리 (사장): 분류·그룹·최소재고·매일 확인·판매 시 차감 ──
+async function itemAdminHTML(){
+  const ko = state.lang === "ko", cat = inv.adminCat;
+  await loadMenus();
+  const { data: usage } = await sb.from("menu_usage").select("menu_id,item_id,qty");
+  const useBy = {}; (usage||[]).forEach((u) => (useBy[u.item_id] ||= []).push(u));
+  const rows = inv.items.filter((i) => itemCat(i) === cat).map((i) => {
+    const us = useBy[i.id] || [];
+    return `<div class="item-row ${i.active===false?"off":""}">
+      <div><b>${esc(i.name)}</b>${i.name_en ? `<span class="m-en">${esc(i.name_en)}</span>` : ""}
+        <span class="m-en">${itemGroups(i).map((g) => esc(g.split("/")[1])).join(" · ")}</span>
+        <select class="cat-sel" aria-label="category" onchange="updateItemCat(${i.id}, this.value)">${Object.keys(INV_CATS).map((c) => `<option value="${c}" ${itemCat(i)===c?"selected":""}>${invCatLabel(c)}</option>`).join("")}</select></div>
       <input aria-label="unit" value="${esc(i.unit||"")}" onchange="updateItem(${i.id},'unit',this.value.trim())">
       <input aria-label="reorder level" type="number" min="0" step="any" value="${qtyFmt(i.reorder_level)}" onchange="updateItem(${i.id},'reorder_level',Number(this.value)||0)">
-      <button class="mng-del" onclick="updateItem(${i.id},'active',${i.active===false})">${i.active===false?(ko?"복구":"Restore"):(ko?"숨김":"Hide")}</button></div>`).join("");
+      <label class="chk-toggle"><input type="checkbox" ${i.daily_check?"checked":""} onchange="updateItem(${i.id},'daily_check',this.checked)"> 📋</label>
+      <button class="btn-mini" onclick="inv.usageOpen=inv.usageOpen===${i.id}?null:${i.id};screenInventory()">🔗 ${us.length || ""}</button>
+      <button class="mng-del" onclick="updateItem(${i.id},'active',${i.active===false})">${i.active===false?(ko?"복구":"Restore"):(ko?"숨김":"Hide")}</button></div>
+      ${inv.usageOpen === i.id ? `<div class="usage-box"><b>${ko?"판매 1개당 재고에서 빠지는 양":"Used per item sold"}</b>
+        ${us.map((u) => `<div class="prev-row"><span>${esc(menuName(menuById(u.menu_id)) || u.menu_id)}</span><span>${qtyFmt(u.qty)}${esc(i.unit||"")} <button class="link-del" aria-label="remove" onclick="delUsage('${esc(u.menu_id)}',${i.id})">✕</button></span></div>`).join("") || `<p class="muted">—</p>`}
+        <div class="add-form" style="margin-top:8px"><select id="usMenu">${(state.menus||[]).map((m) => `<option value="${esc(m.id)}">${esc(menuName(m))}</option>`).join("")}</select>
+          <input id="usQty" type="number" min="0" step="any" value="1" style="max-width:80px" aria-label="qty"><button class="btn-mini" onclick="addUsage(${i.id})">${ko?"연결":"Link"}</button></div></div>` : ""}`;
+  }).join("");
   return `<div class="card"><h2>${ko?"품목 관리":"Items"}</h2>
-    <div class="add-form">
-      <input id="itName" placeholder="${ko?"품목명":"Name"}"><input id="itNameEn" placeholder="${ko?"영문명":"English name"}">
-      <input id="itUnit" placeholder="${ko?"단위 (kg, 팩)":"Unit"}" style="max-width:90px">
-      <input id="itMin" type="number" min="0" step="any" placeholder="${ko?"최소재고":"Min"}" style="max-width:90px">
-      <input id="itStock" type="number" min="0" step="any" placeholder="${ko?"현재고":"Stock"}" style="max-width:90px">
-      <button class="btn-mini" onclick="addItem()">${ko?"추가":"Add"}</button></div>
-    <div class="item-row head muted"><span>${ko?"품목":"Item"}</span><span>${ko?"단위":"Unit"}</span><span>${ko?"최소재고":"Min stock"}</span><span></span></div>
+    <div class="fchips">${Object.keys(INV_CATS).map((c) => `<button class="fchip ${cat===c?"on":""}" onclick="inv.adminCat='${c}';screenInventory()">${invCatLabel(c)}</button>`).join("")}</div>
+    <div class="item-row head muted"><span>${ko?"품목":"Item"}</span><span>${ko?"단위":"Unit"}</span><span>${ko?"최소재고":"Min"}</span><span>${ko?"매일":"Daily"}</span><span>${ko?"판매연결":"Menu"}</span><span></span></div>
     ${rows || `<p class="empty">—</p>`}
-    <p class="hint">${ko?"최소재고보다 적으면 대시보드와 재고 화면에 빨간 경고가 뜹니다. 현재고는 입출고/실사 기록으로만 바뀝니다.":"Below min stock shows a red alert. Stock only changes through in/out/count entries."}</p></div>`;
-}
-async function addItem(){
-  const name = $("itName").value.trim(); if (!name) { toast(state.lang==="ko" ? "품목명을 입력하세요" : "Enter a name"); return; }
-  const stock = $("itStock").value === "" ? null : Number($("itStock").value);
-  const { data, error } = await sb.from("inventory_items").insert({ name, name_en: $("itNameEn").value.trim() || null, unit: $("itUnit").value.trim() || "개",
-    reorder_level: Number($("itMin").value) || 0, stock: 0, sort: inv.items.length + 1 }).select("id").single();
-  if (error) { toast(tt("save_fail") + error.message); return; }
-  if (stock > 0) await sb.from("inventory_moves").insert({ item_id: data.id, type:"ADJUST", qty: stock, note: state.lang==="ko" ? "최초 재고" : "Opening stock", employee_id: state.user.id });
-  toast(tt("saved")); screenInventory();
+    <p class="hint">${ko?"📋 = 퇴근 전 매일 개수 확인 품목. 🔗 = 메뉴가 팔릴 때 재고에서 자동으로 빠지는 양(예: 산도 1개 판매 → 산도 1개). 최소재고보다 적으면 빨간 경고. 새 품목은 위 '물품 신청'에서 추가합니다.":"📋 = counted every day before closing. 🔗 = amount deducted per menu item sold. Below min stock shows red. Add new items in the order request above."}</p></div>`;
 }
 async function updateItem(id, field, value){
   const { error } = await sb.from("inventory_items").update({ [field]: value }).eq("id", id);
   if (error) { toast(tt("save_fail") + error.message); return; }
   toast(tt("saved")); screenInventory();
 }
+// 분류를 바꾸면 세부 그룹 이름은 유지하고 분류만 옮김
+async function updateItemCat(id, cat){
+  const i = inv.items.find((x) => x.id === id); if (!i) return;
+  const names = [...new Set(itemGroups(i).map((g) => g.split("/")[1]))];
+  const { error } = await sb.from("inventory_items").update({ category: cat, groups: names.map((n) => `${cat}/${n}`) }).eq("id", id);
+  if (error) { toast(tt("save_fail") + error.message); return; }
+  inv.adminCat = cat; toast(tt("saved")); screenInventory();
+}
+async function addUsage(itemId){
+  const qty = Number($("usQty").value);
+  if (!(qty > 0)) { toast(state.lang==="ko" ? "수량을 입력하세요" : "Enter a quantity"); return; }
+  const { error } = await sb.from("menu_usage").upsert({ menu_id: $("usMenu").value, item_id: itemId, qty });
+  if (error) { toast(tt("save_fail") + error.message); return; }
+  toast(tt("saved")); screenInventory();
+}
+async function delUsage(menuId, itemId){
+  const { error } = await sb.from("menu_usage").delete().eq("menu_id", menuId).eq("item_id", itemId);
+  if (error) { toast(error.message); return; }
+  screenInventory();
+}
+// 마감 저장 시: 판매 수량 × 사용량 만큼 재고 자동 출고 (같은 날 다시 저장하면 먼저 되돌리고 다시 반영)
+async function syncSalesUsage(date, items){
+  const { data: usage, error } = await sb.from("menu_usage").select("menu_id,item_id,qty");
+  if (error || !usage?.length) return 0;
+  const lines = closingLines(items), per = {};
+  usage.forEach((u) => { const o = lines[u.menu_id]; if (o) per[u.item_id] = (per[u.item_id]||0) + (o.q + o.free) * Number(u.qty); });
+  const ref = `sale:${date}`;
+  const del = await sb.from("inventory_moves").delete().eq("ref", ref);
+  if (del.error) return 0;
+  const rows = Object.entries(per).filter(([, q]) => q > 0).map(([id, q]) => ({ item_id: Number(id), type:"OUT", qty: q, ref, note: `${state.lang==="ko"?"판매 차감":"Sold"} ${date}`, employee_id: state.user.id }));
+  if (rows.length) await sb.from("inventory_moves").insert(rows);
+  return rows.length;
+}
+
 
 // ── 공급요청 승인 (사장) ─────────────────────────
 async function screenSupply(){
@@ -1257,7 +1468,7 @@ async function screenSupply(){
         <button class="btn-mini on" onclick="decideRequest(${r.id},'APPROVED')">✓ ${ko?"승인 → K-Food로":"Approve → K-Food"}</button></div>`
         : `<div class="muted">${r.approved_by ? `${ko?"결정":"By"}: ${esc(personName(r.approved_by))}` : ""}${r.status_at ? ` · ${ago(r.status_at)}` : ""}</div>${receiveHTML(r)}`}
     </div>`;
-  $("screen").innerHTML = `<div class="report-title">${tt("tab_supply")} <span>· ☕ Bahay Cafe → K-Food</span></div>
+  $("screen").innerHTML = `<div class="report-title">${tt("tab_supply")} <span>· ☕ Bahayy Cafe → K-Food</span></div>
     <div class="card"><h2>${ko?"승인 대기":"Pending"} ${pending.length ? `<span class="dot-red">${pending.length}</span>` : ""}</h2>
       ${pending.map(card).join("") || `<p class="empty">${ko?"대기 중인 요청이 없습니다.":"Nothing to approve."}</p>`}</div>
     <div class="card"><h2>${ko?"처리 내역":"History"}</h2>${rest.map(card).join("") || `<p class="empty">—</p>`}
@@ -1322,18 +1533,26 @@ async function receiveRequest(id){
 // ── 마감 · 매출 · 지출 ─────────────────────────────
 const MENU_CATS = {
   COFFEE:{ko:"커피",en:"Coffee",tl:"Kape"},
-  NONCOFFEE:{ko:"음료",en:"Drinks",tl:"Inumin"},
-  FOOD:{ko:"디저트·푸드",en:"Food & Dessert",tl:"Pagkain"},
+  FRAPPE:{ko:"프라페",en:"Frappe",tl:"Frappe"},
+  SIGNATURE:{ko:"시그니처",en:"Signature",tl:"Signature"},
+  NONCOFFEE:{ko:"논커피",en:"Non-coffee",tl:"Hindi kape"},
+  SET:{ko:"세트",en:"Set",tl:"Set"},
+  PASTA:{ko:"파스타",en:"Pasta",tl:"Pasta"},
+  DESSERT:{ko:"디저트",en:"Dessert",tl:"Panghimagas"},
+  FOOD:{ko:"푸드·사이드",en:"Food & sides",tl:"Pagkain"},
   OTHER:{ko:"기타",en:"Other",tl:"Iba pa"},
 };
+const DRINK_CATS = ["COFFEE","FRAPPE","SIGNATURE","NONCOFFEE"];
 const menuCat = (m) => MENU_CATS[m?.category] ? m.category : "OTHER";
 const menuCatLabel = (c) => state.lang==="ko" ? MENU_CATS[c].ko : MENU_CATS[c].en;
+// 지출 분류 (현장 요청: 재료비·전기세·수도세·인터넷·월세·직원월급·홍보비 + 용품·장비·기타)
 const EXP_CATS = {
-  LABOR:{ko:"인건비",en:"Wages"}, RENT:{ko:"임대료",en:"Rent"}, ELECTRIC:{ko:"전기세",en:"Electricity"}, WATER:{ko:"수도세",en:"Water"},
-  INTERNET:{ko:"인터넷·통신",en:"Internet"}, INGREDIENTS:{ko:"원두·재료",en:"Beans & ingredients"}, DAIRY:{ko:"우유·유제품",en:"Milk & dairy"},
-  PACKAGING:{ko:"포장재(컵·빨대)",en:"Cups & packaging"}, SUPPLIES:{ko:"소모품",en:"Supplies"}, REPAIR:{ko:"수리·유지보수",en:"Repairs"}, OTHER:{ko:"기타",en:"Other"},
+  INGREDIENTS:{ko:"재료비",en:"Ingredients"}, ELECTRIC:{ko:"전기세",en:"Electricity"}, WATER:{ko:"수도세",en:"Water"},
+  INTERNET:{ko:"인터넷비용",en:"Internet"}, RENT:{ko:"월세",en:"Rent"}, LABOR:{ko:"직원월급",en:"Wages"}, MARKETING:{ko:"홍보비용",en:"Marketing"},
+  SUPPLIES:{ko:"소모품·용품",en:"Supplies"}, EQUIPMENT:{ko:"장비·비품",en:"Equipment"}, OTHER:{ko:"기타",en:"Other"},
 };
-const expCatLabel = (c) => { const e = EXP_CATS[c]; return !e ? (c || "—") : (state.lang==="ko" ? e.ko : e.en); };
+const EXP_LEGACY = { DAIRY:{ko:"우유·유제품",en:"Milk & dairy"}, PACKAGING:{ko:"포장재",en:"Packaging"}, REPAIR:{ko:"수리·유지보수",en:"Repairs"} };
+const expCatLabel = (c) => { const e = EXP_CATS[c] || EXP_LEGACY[c]; return !e ? (c || "—") : (state.lang==="ko" ? e.ko : e.en); };
 const WEEKDAYS = { ko:["일","월","화","수","목","금","토"], en:["Sun","Mon","Tue","Wed","Thu","Fri","Sat"] };
 const weekday = (d) => WEEKDAYS[state.lang==="ko"?"ko":"en"][new Date(d+"T00:00:00").getDay()];
 const kfmt = (n) => { n = Number(n)||0; const a = Math.abs(n); return a >= 1000 ? PESO+(n/1000).toFixed(a%1000===0?0:1)+"k" : PESO+Math.round(n); };
@@ -1364,13 +1583,15 @@ async function loadMenus(){
 const menuById = (id) => (state.menusAll||[]).find((m) => m.id === id);
 
 // ── 일일 마감 ──
-const cl = { date:null, loadedFor:null, qty:{}, promo:{}, free:{}, cash:"", gcash:"", card:"", note:"", exists:false, by:null, at:null };
+const cl = { date:null, loadedFor:null, qty:{}, promo:{}, free:{}, src:{}, cash:"", gcash:"", card:"", note:"", exists:false, by:null, at:null };
+const SOURCES = { REELS:{ko:"릴스·SNS",en:"Reels / SNS",tl:"Reels"}, FLYER:{ko:"전단지",en:"Flyer",tl:"Flyer"}, WALKIN:{ko:"지나가다가",en:"Walk-in",tl:"Dumaan lang"}, OTHER:{ko:"기타·지인",en:"Other / friend",tl:"Iba pa"} };
+const srcLabel = (k) => state.lang==="ko" ? SOURCES[k].ko : SOURCES[k].en;
 async function loadClosing(date){
-  Object.assign(cl, { qty:{}, promo:{}, free:{}, cash:"", gcash:"", card:"", note:"", exists:false, by:null, at:null });
-  const { data, error } = await sb.from("closings").select("items,cash,gcash,card,note,closed_by,updated_at").eq("date", date).maybeSingle();
+  Object.assign(cl, { qty:{}, promo:{}, free:{}, src:{}, cash:"", gcash:"", card:"", note:"", exists:false, by:null, at:null });
+  const { data, error } = await sb.from("closings").select("*").eq("date", date).maybeSingle();
   if (error) throw error;
   if (data) {
-    Object.assign(cl, { exists:true, cash:data.cash ?? "", gcash:data.gcash ?? "", card:data.card || "", note:data.note || "", by:data.closed_by, at:data.updated_at });
+    Object.assign(cl, { exists:true, cash:data.cash ?? "", gcash:data.gcash ?? "", card:data.card || "", note:data.note || "", by:data.closed_by, at:data.updated_at, src:{ ...(data.sources||{}) } });
     Object.entries(data.items||{}).forEach(([id, v]) => {
       if (id === "_free") { cl.free = { ...(v||{}) }; return; }
       if (id.startsWith("_")) return;
@@ -1408,11 +1629,15 @@ async function screenClosing(){
         <input class="date-pill" type="date" aria-label="date" value="${cl.date}" max="${today()}" ${minClosingDate() ? `min="${minClosingDate()}"` : ""} onchange="changeClosingDate(this.value)" style="border:1px solid #D8CDBD;min-height:36px"></div>
       ${state.menus.length ? `<div class="cl-row cl-head"><span>${tt("h_menu")}</span><span>${tt("h_qty")}</span><span>${tt("h_promo")}</span><span>${tt("h_sub")}</span></div>${groups}`
         : `<p class="empty">${ko?"등록된 메뉴가 없습니다. 관리 탭에서 메뉴를 먼저 등록하세요.":"No menu items yet. Add them in Settings first."}</p>`}
-      <div class="section-label">🎁 ${tl("free_label")}</div>
-      <div class="add-form"><select id="freeSel" aria-label="menu">${state.menus.map((m) => `<option value="${esc(m.id)}">${esc(menuName(m))}</option>`).join("")}</select>
+      <div class="section-label">🎟 ${tl("free_label")}</div>
+      <div class="add-form"><select id="freeSel" aria-label="menu">${[...state.menus.filter((m) => DRINK_CATS.includes(menuCat(m))), ...state.menus.filter((m) => !DRINK_CATS.includes(menuCat(m)))].map((m) => `<option value="${esc(m.id)}">${esc(menuName(m))}</option>`).join("")}</select>
         <input id="freeQty" type="number" inputmode="numeric" value="1" min="1" style="max-width:64px;text-align:center" aria-label="qty">
         <button class="btn-mini" onclick="addFree()">${tt("free_add")}</button></div>
       <div class="order-items">${freeIds.map((id) => `<span class="chip">${esc(menuName(menuById(id)) || id)} ×${cl.free[id]} <button class="chip-x" aria-label="remove" onclick="delete cl.free['${esc(id)}'];screenClosing()">✕</button></span>`).join("") || `<span class="hint" style="margin:0">${tt("free_hint")}</span>`}</div>
+      <div class="section-label">📣 ${tl("sources")}</div>
+      ${Object.keys(SOURCES).map((k) => `<div class="src-row"><span>${srcLabel(k)}${ko?"":`<span class="lang-sub">${SOURCES[k].tl}</span>`}</span>
+        <div class="stepper"><button aria-label="minus" onclick="stepSrc('${k}',-1)">−</button><input type="number" inputmode="numeric" id="src_${k}" aria-label="count" value="${cl.src[k]||""}" placeholder="0" oninput="cl.src['${k}']=Math.max(0,Math.floor(Number(this.value)||0))"><button aria-label="plus" onclick="stepSrc('${k}',1)">+</button></div></div>`).join("")}
+      <p class="hint">${ko?"손님에게 물어보거나 짐작해서 팀(테이블) 수로 세어 주세요.":"Count groups/tables by asking or noticing. / Bilangin ang grupo."}</p>
     </div>
     <div class="card sticky">
       <h2>${tl("income_verify")}</h2>
@@ -1446,6 +1671,7 @@ function updSub(id){ const m = menuById(id), q = cl.qty[id]||0; $("sub_"+id).tex
 function setQty(id, v){ cl.qty[id] = Math.max(0, Math.floor(Number(v)||0)); updSub(id); }
 function stepQty(id, d){ cl.qty[id] = Math.max(0, (cl.qty[id]||0) + d); $("q_"+id).value = cl.qty[id] || ""; updSub(id); }
 function setPromo(id, v){ cl.promo[id] = v; updSub(id); }
+function stepSrc(k, d){ cl.src[k] = Math.max(0, (cl.src[k]||0) + d); $("src_"+k).value = cl.src[k] || ""; }
 function addFree(){ const id = $("freeSel")?.value; if (!id) return; cl.free[id] = (cl.free[id]||0) + Math.max(1, Number($("freeQty").value)||1); screenClosing(); }
 function recalcClosing(){
   const menuTotal = state.menus.reduce((s, m) => s + (cl.qty[m.id]||0) * unitPrice(m), 0);
@@ -1467,10 +1693,13 @@ async function saveClosing(){
   const recv = (Number(cl.cash)||0) + (Number(cl.gcash)||0) + (Number(cl.card)||0);
   if (Math.abs(recv - menuTotal) >= 0.005 && !confirm(state.lang==="ko" ? `메뉴 합계(${fmt(menuTotal)})와 실제 수입(${fmt(recv)})이 다릅니다. 그대로 저장할까요?` : `Menu total (${fmt(menuTotal)}) and income (${fmt(recv)}) differ. Save anyway?`)) return;
   const btn = $("saveBtn"); btn.disabled = true; btn.textContent = tt("saving");
-  const { error } = await sb.from("closings").upsert({ date: cl.date, items, cash: Number(cl.cash)||0, gcash: Number(cl.gcash)||0, card: Number(cl.card)||0,
-    note: cl.note.trim() || null, closed_by: state.user.id }, { onConflict:"date" });
+  const src = {}; Object.entries(cl.src).forEach(([k, v]) => { if (Number(v) > 0) src[k] = Number(v); });
+  const row = { date: cl.date, items, cash: Number(cl.cash)||0, gcash: Number(cl.gcash)||0, card: Number(cl.card)||0, note: cl.note.trim() || null, closed_by: state.user.id };
+  let { error } = await sb.from("closings").upsert({ ...row, sources: src }, { onConflict:"date" });
+  if (error && /sources/.test(error.message)) ({ error } = await sb.from("closings").upsert(row, { onConflict:"date" })); // 08 SQL 실행 전
   if (error) { toast(tt("save_fail") + error.message); btn.disabled = false; btn.innerHTML = tl("save_closing"); return; }
-  toast(tt("saved_closing")); cl.loadedFor = null; screenClosing();
+  const n = await syncSalesUsage(cl.date, items);
+  toast(tt("saved_closing") + (n ? (state.lang==="ko" ? ` · 재고 ${n}품목 차감` : ` · ${n} stock item(s) deducted`) : "")); cl.loadedFor = null; screenClosing();
 }
 
 // ── 지출 ──
@@ -1480,7 +1709,7 @@ function expenseFormHTML(prefix, withDate){
     ${withDate ? `<input id="${prefix}Date" type="date" value="${today()}" max="${today()}" aria-label="date" style="flex:none;max-width:150px">` : ""}
     <select id="${prefix}Cat" aria-label="category">${Object.keys(EXP_CATS).map((k) => `<option value="${k}">${expCatLabel(k)}</option>`).join("")}</select>
     <input id="${prefix}Amt" type="number" inputmode="decimal" min="0" placeholder="${PESO}" aria-label="amount" style="max-width:100px">
-    <input id="${prefix}Note" placeholder="${ko?"메모":"Note"}" aria-label="note">
+    <input id="${prefix}Note" placeholder="${ko?"항목 (예: 생크림, 믹서기)":"Item (e.g. cream, mixer)"}" aria-label="note">
     <button class="btn-mini" onclick="addExpense('${prefix}')">${ko?"지출 추가":"Add expense"}</button></div>`;
 }
 async function addExpense(prefix){
@@ -1592,13 +1821,14 @@ async function screenReport(){
   const month = sales.repMonth ||= thisMonth(), months = monthsEnding(month, 6), ko = state.lang === "ko";
   const first = monthRange(months[0]).start, { end, prev } = monthRange(month);
   const [cs, ex] = await Promise.all([
-    sb.from("closings").select("date,cash,gcash,card,items").gte("date", first).lt("date", end),
+    sb.from("closings").select("*").gte("date", first).lt("date", end),
     sb.from("expenses").select("date,category,amount").gte("date", first).lt("date", end),
   ]);
   if (cs.error) throw cs.error;
   const stat = (mo) => {
     const c = (cs.data||[]).filter((x) => x.date.startsWith(mo)), e = (ex.data||[]).filter((x) => x.date.startsWith(mo));
-    const s = { cash:0, gcash:0, card:0, sales:0, exp:0, days:c.length, byCat:{}, wd:[0,0,0,0,0,0,0], wdN:[0,0,0,0,0,0,0], lines:{} };
+    const s = { cash:0, gcash:0, card:0, sales:0, exp:0, days:c.length, byCat:{}, wd:[0,0,0,0,0,0,0], wdN:[0,0,0,0,0,0,0], lines:{}, src:{} };
+    c.forEach((x) => Object.entries(x.sources||{}).forEach(([k, v]) => { s.src[k] = (s.src[k]||0) + Number(v); }));
     c.forEach((x) => { s.cash += Number(x.cash); s.gcash += Number(x.gcash); s.card += Number(x.card||0); const t = closingTotal(x); s.sales += t; const w = new Date(x.date+"T00:00:00").getDay(); s.wd[w] += t; s.wdN[w]++;
       Object.entries(closingLines(x.items)).forEach(([id, o]) => { const a = (s.lines[id] ||= { q:0, rev:0 }); a.q += o.q; a.rev += o.rev; }); });
     e.forEach((x) => { s.exp += Number(x.amount); s.byCat[x.category] = (s.byCat[x.category]||0) + Number(x.amount); });
@@ -1635,9 +1865,12 @@ async function screenReport(){
         ${[1,2,3,4,5,6,0].map((w) => `<div class="ebar-row"><span class="ebar-name">${WEEKDAYS[ko?"ko":"en"][w]}</span><div class="ebar-track"><div class="bar-fill" style="width:${(wdAvg[w]/wdMax*100).toFixed(1)}%"></div></div><span class="ebar-val">${wdAvg[w] ? kfmt(wdAvg[w]) : "—"}</span></div>`).join("")}
       </div>
     </div>
+    ${(() => { const tot = Object.values(cur.src).reduce((a, b) => a + b, 0); if (!tot) return "";
+      return `<div class="card"><h2>📣 ${ko?"유입 경로":"How customers found us"} <span class="muted">${tot}${ko?"팀":" groups"}</span></h2>
+        ${Object.keys(SOURCES).map((k) => `<div class="ebar-row"><span class="ebar-name">${srcLabel(k)}</span><div class="ebar-track"><div class="bar-fill" style="width:${((cur.src[k]||0)/tot*100).toFixed(1)}%"></div></div><span class="ebar-val">${cur.src[k]||0} · ${Math.round((cur.src[k]||0)/tot*100)}%</span></div>`).join("")}</div>`; })()}
     <div class="card"><h2>${ko?"최근 6개월":"Last 6 months"}</h2>
       ${svgTrend(months.map((m) => m.slice(2).replace("-", ".")), [
-        { name: ko?"매출":"Sales", color:"#8B4A25", values: trend.map((t) => t.sales) },
+        { name: ko?"매출":"Sales", color:"#1D6A8E", values: trend.map((t) => t.sales) },
         { name: ko?"지출":"Expenses", color:"#C9842A", values: trend.map((t) => t.exp) },
         { name: ko?"순이익":"Profit", color:"#1F7A43", values: trend.map((t) => t.profit) }])}</div>`;
 }
@@ -1688,8 +1921,9 @@ async function updateMenu(id, field, value){
 // ── 출근 사진 자동 정리: 보관기간 지난 사진만 Storage 에서 삭제 (DB 가 기간을 다시 확인) ──
 let purgeRunning = false;
 async function purgeOldPhotos(manual){
-  if (!isAdmin() || purgeRunning) return;
   const ko = state.lang === "ko";
+  if (!isAdmin()) return;
+  if (purgeRunning) { if (manual) toast(ko ? "사진 정리가 진행 중입니다…" : "Cleanup already running…"); return; }
   if (!manual && state.settings.photo_cleanup_on === today()) return;
   purgeRunning = true;
   const btn = manual ? $("purgeBtn") : null; if (btn) btn.disabled = true;
@@ -1711,11 +1945,284 @@ async function purgeOldPhotos(manual){
       total += cleared;
       if (data.length < 100 || !cleared) break;
     }
+    // 청소 사진도 같은 기간으로 정리 (08 SQL 실행 전이면 건너뜀)
+    for (let round = 0; round < 20; round++) {
+      const { data, error } = await sb.from("clean_photos").select("id,photo_path").not("photo_path", "is", null).lt("created_at", new Date(cutoff + "T00:00:00+08:00").toISOString()).order("id").limit(100);
+      if (error || !data?.length) break;
+      const rm = await sb.storage.from(STORAGE_BUCKET).remove(data.map((r) => r.photo_path));
+      if (rm.error) throw rm.error;
+      const up = await sb.from("clean_photos").update({ photo_path: null }).in("id", data.map((r) => r.id)).select("id,photo_path");
+      if (up.error) throw up.error;
+      const cleared = (up.data||[]).filter((r) => !r.photo_path).length;
+      total += cleared;
+      if (data.length < 100 || !cleared) break;
+    }
     await setSetting("photo_cleanup_on", today());
     if (manual) { toast(ko ? `사진 ${total}장 정리했습니다` : `Removed ${total} photo(s)`); renderScreen(); }
   } catch (e) {
     if (manual) toast((ko ? "정리 실패: " : "Cleanup failed: ") + (e.message || e));
   } finally { purgeRunning = false; if (btn) btn.disabled = false; }
+}
+
+// ── 급여: 출퇴근 기록 → 근무시간표 → 지각/조퇴 차감 자동 계산 (15일·말일 2회 지급) ──
+const PH_MS = 8 * 3600e3;
+const toHM = (t) => String(t || "").slice(0, 5);
+const hmToMin = (t) => { const [h, m] = toHM(t).split(":").map(Number); return (h||0) * 60 + (m||0); };
+const dayStart = (d) => Date.parse(`${d}T00:00:00+08:00`);
+const minOfDay = (ts, d) => Math.round((new Date(ts).getTime() - dayStart(d)) / 60000);
+const fmtH = (min) => { const h = Math.floor(min / 60), m = Math.round(min % 60); return m ? `${h}h ${m}m` : `${h}h`; };
+const round2 = (n) => Math.round(n * 100) / 100;
+const fmt2 = (n) => PESO + (Number(n) || 0).toLocaleString("en-PH", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+const empPay = (e) => ({ rate: Number(e?.daily_rate ?? 508), std: Number(e?.std_hours ?? 8), start: hmToMin(e?.shift_start || "09:00"), end: hmToMin(e?.shift_end || "18:00"), brk: Number(e?.break_min ?? 60) });
+function payPeriod(month, half){ const { days } = monthRange(month); return half === 1 ? { start:`${month}-01`, end:`${month}-15` } : { start:`${month}-16`, end:`${month}-${String(days).padStart(2,"0")}` }; }
+function currentPeriod(){ const d = today(); return { month: d.slice(0, 7), half: Number(d.slice(8)) <= 15 ? 1 : 2 }; }
+// 한 사람의 하루 출퇴근 기록들 → 정규시간·지각·조퇴·연장
+function shiftCalc(e, date, recs){
+  const p = empPay(e); let reg = 0, ot = 0, late = 0, early = 0, open = false;
+  recs.forEach((r, k) => {
+    if (!r.clock_out) { open = true; return; }
+    const inM = minOfDay(r.clock_in, date), outM = minOfDay(r.clock_out, date);
+    const span = Math.max(0, Math.min(outM, p.end) - Math.max(inM, p.start));
+    reg += Math.max(0, span - (span > 300 ? p.brk : 0));
+    if (k === 0) late = Math.max(0, inM - p.start);
+    if (k === recs.length - 1) { early = Math.max(0, p.end - outM); const o = outM - p.end; if (o >= 30) ot += Math.floor(o / 30) * 30; }
+  });
+  reg = Math.min(reg, p.std * 60);
+  return { reg, ot, late, early, open };
+}
+async function computePayroll(period, empIds){
+  const [att, adj] = await Promise.all([
+    sb.from("attendance").select("id,employee_id,date,clock_in,clock_out,manual_edit,verified").gte("date", period.start).lte("date", period.end).order("clock_in"),
+    sb.from("pay_adjustments").select("id,employee_id,date,kind,amount,note").gte("date", period.start).lte("date", period.end).order("date"),
+  ]);
+  if (att.error) throw att.error;
+  const otOn = state.settings.ot_enabled !== "0", mult = Number(state.settings.ot_multiplier || 1);
+  return empIds.map((id) => {
+    const e = empById(id), p = empPay(e), hourly = p.rate / p.std, mine = (att.data||[]).filter((r) => r.employee_id === id), byDate = {};
+    mine.forEach((r) => (byDate[r.date] ||= []).push(r));
+    const days = Object.keys(byDate).sort().map((d) => { const c = shiftCalc(e, d, byDate[d]);
+      return { date:d, recs:byDate[d], ...c, pay: round2(c.reg / 60 * hourly), otPay: otOn ? round2(c.ot / 60 * hourly * mult) : 0 }; });
+    const adjs = (adj.data||[]).filter((a) => a.employee_id === id);
+    const s = (f) => days.reduce((t, d) => t + d[f], 0);
+    const other = adjs.filter((a) => a.kind !== "MINUS").reduce((t, a) => t + Number(a.amount), 0), ded = adjs.filter((a) => a.kind === "MINUS").reduce((t, a) => t + Number(a.amount), 0);
+    const basic = round2(s("pay")), otPay = round2(s("otPay"));
+    return { id, e, p, hourly, days, adjs, worked: days.filter((d) => d.reg > 0).length, reg: s("reg"), ot: s("ot"), late: s("late"), early: s("early"), open: days.filter((d) => d.open).length,
+      basic, otPay, other: round2(other), ded: round2(ded), net: round2(basic + otPay + other - ded) };
+  });
+}
+const pay = { month:null, half:null, open:null };
+async function screenPayroll(){
+  if (!pay.month) Object.assign(pay, currentPeriod());
+  const ko = state.lang === "ko", period = payPeriod(pay.month, pay.half);
+  await loadEmployees(); await loadSettings();
+  const { data: atts } = await sb.from("attendance").select("employee_id").gte("date", period.start).lte("date", period.end);
+  const ids = state.employees.filter((e) => (e.active !== false && e.role === "STAFF") || (atts||[]).some((a) => a.employee_id === e.id)).map((e) => e.id);
+  const [res, runs] = await Promise.all([computePayroll(period, ids), sb.from("payroll_runs").select("id,employee_id,net,paid_at,expense_id").eq("period_start", period.start)]);
+  const paidBy = Object.fromEntries((runs.data||[]).map((r) => [r.employee_id, r]));
+  const payday = period.end, ended = today() >= period.end;
+  const rows = res.map((r) => { const paid = paidBy[r.id];
+    return `<tr class="${pay.open===r.id?"sel":""}" onclick="pay.open=pay.open===${r.id}?null:${r.id};screenPayroll()" style="cursor:pointer">
+      <td><b>${esc(empName(r.e))}</b>${r.open ? ` <span class="tag-due">${ko?"퇴근누락":"no out"} ${r.open}</span>` : ""}</td>
+      <td class="num">${r.worked}</td><td class="num">${fmtH(r.reg)}</td><td class="num ${r.late?"neg":""}">${r.late ? `${r.late}${ko?"분":"m"}` : "—"}</td>
+      <td class="num">${r.ot ? fmtH(r.ot) : "—"}</td><td class="num">${fmt2(r.basic)}</td><td class="num">${r.otPay ? fmt2(r.otPay) : "—"}</td>
+      <td class="num">${r.other ? fmt2(r.other) : "—"}</td><td class="num ${r.ded?"neg":""}">${r.ded ? "−" + fmt2(r.ded) : "—"}</td>
+      <td class="num"><b>${fmt2(r.net)}</b></td>
+      <td>${paid ? `<span class="done-mark">✓ ${ko?"지급":"Paid"}</span>` : ""}</td></tr>`; }).join("");
+  const detail = res.find((r) => r.id === pay.open);
+  $("screen").innerHTML = `<div class="report-title">${tt("tab_payroll")} <span>· ${period.start.slice(5)} ~ ${period.end.slice(5)} · ${ko?"지급일":"pay day"} ${payday.slice(5)}</span></div>
+    <div class="filter-bar"><input type="month" value="${pay.month}" aria-label="month" onchange="pay.month=this.value;pay.open=null;screenPayroll()">
+      <div class="fchips" style="margin:0">${[[1, ko?"1일~15일":"1st–15th"], [2, ko?"16일~말일":"16th–end"]].map(([h, l]) => `<button class="fchip ${pay.half===h?"on":""}" onclick="pay.half=${h};pay.open=null;screenPayroll()">${l}</button>`).join("")}</div></div>
+    <div class="card"><div class="tscroll"><table class="data-table pay-table">
+      <thead><tr><th>${ko?"직원":"Staff"}</th><th class="num">${ko?"근무일":"Days"}</th><th class="num">${ko?"정규":"Reg."}</th><th class="num">${ko?"지각":"Late"}</th><th class="num">OT</th><th class="num">${ko?"기본급":"Basic"}</th><th class="num">${ko?"OT수당":"OT pay"}</th><th class="num">${ko?"기타지급":"Other"}</th><th class="num">${ko?"공제":"Deduct."}</th><th class="num">${ko?"실지급":"Net"}</th><th></th></tr></thead>
+      <tbody>${rows || `<tr><td colspan="11" class="empty">—</td></tr>`}</tbody></table></div>
+      <p class="hint">${ko?"직원 이름을 누르면 근무시간표가 열립니다. 계산: 근무 시간표(관리 탭의 출근·퇴근 시각) 안에서 일한 시간만 인정 → 지각·조퇴는 그만큼 자동 차감, 5시간 넘게 근무하면 휴게시간 제외, 일급 ÷ 기준시간 × 근무시간. 퇴근 시각 30분 이상 지나서 퇴근하면 OT(30분 단위).":"Tap a name for the timesheet. Only time inside the shift counts (late/early is deducted), break is excluded for shifts over 5h, pay = daily rate ÷ standard hours × hours. Staying 30+ min past shift end counts as OT (30-min blocks)."}</p></div>
+    ${detail ? payDetailHTML(detail, period, paidBy[detail.id], ended) : ""}`;
+}
+function payDetailHTML(r, period, paid, ended){
+  const ko = state.lang === "ko";
+  const days = r.days.map((d) => `<tr><td>${d.date.slice(5)} <span class="muted">${weekday(d.date)}</span></td>
+      <td class="num">${d.recs.map((x) => timeHM(x.clock_in)).join("<br>")}</td><td class="num">${d.recs.map((x) => x.clock_out ? timeHM(x.clock_out) : `<span class="tag-due">?</span>`).join("<br>")}</td>
+      <td class="num">${fmtH(d.reg)}</td><td class="num ${d.late?"neg":""}">${d.late ? d.late + (ko?"분":"m") : ""}${d.early ? `<div class="neg">${ko?"조퇴":"early"} ${d.early}${ko?"분":"m"}</div>` : ""}</td>
+      <td class="num">${d.ot ? fmtH(d.ot) : ""}</td><td class="num">${fmt2(d.pay + d.otPay)}</td>
+      <td>${d.recs.some((x) => x.manual_edit) ? `<span class="muted">${ko?"수정됨":"edited"}</span>` : ""}</td></tr>`).join("");
+  const adjs = r.adjs.map((a) => `<div class="prev-row"><span>${a.date.slice(5)} · ${a.kind==="MINUS" ? (ko?"공제":"Deduction") : (ko?"기타 지급":"Other pay")}${a.note ? ` <span class="muted">· ${esc(a.note)}</span>` : ""}</span>
+      <span><b class="${a.kind==="MINUS"?"neg":""}">${a.kind==="MINUS"?"−":"+"}${fmt2(a.amount)}</b> ${paid ? "" : `<button class="link-del" aria-label="delete" onclick="delAdj(${a.id})">✕</button>`}</span></div>`).join("");
+  return `<div class="card" id="payDetail"><div class="card-head"><h2>${esc(empName(r.e))} <span class="muted">${period.start.slice(5)} ~ ${period.end.slice(5)}</span></h2>
+      <button class="btn-mini" onclick="printPayslip(${r.id})">🖨 ${ko?"급여 기록지":"Payroll record"}</button></div>
+    <div class="muted" style="margin-bottom:10px">${ko?"일급":"Daily rate"} ${fmt2(r.p.rate)} · ${ko?"기준":"std"} ${r.p.std}h · ${ko?"근무":"shift"} ${String(Math.floor(r.p.start/60)).padStart(2,"0")}:${String(r.p.start%60).padStart(2,"0")}–${String(Math.floor(r.p.end/60)).padStart(2,"0")}:${String(r.p.end%60).padStart(2,"0")} · ${ko?"시급":"hourly"} ${fmt2(round2(r.hourly))}</div>
+    <div class="tscroll"><table class="data-table"><thead><tr><th>${ko?"날짜":"Date"}</th><th class="num">In</th><th class="num">Out</th><th class="num">${ko?"정규":"Reg."}</th><th class="num">${ko?"지각/조퇴":"Late"}</th><th class="num">OT</th><th class="num">${ko?"금액":"Pay"}</th><th></th></tr></thead>
+      <tbody>${days || `<tr><td colspan="8" class="empty">—</td></tr>`}</tbody></table></div>
+    <div class="section-label">${ko?"기타 지급 / 공제":"Other pay / deductions"}</div>
+    ${adjs || `<p class="muted">—</p>`}
+    ${paid ? "" : `<div class="add-form" style="margin-top:8px"><input id="adjDate" type="date" value="${today() < period.end ? today() : period.end}" min="${period.start}" max="${period.end}" style="flex:none;max-width:150px" aria-label="date">
+      <select id="adjKind"><option value="PLUS">${ko?"기타 지급 (+)":"Other pay (+)"}</option><option value="MINUS">${ko?"공제 (−)":"Deduction (−)"}</option></select>
+      <input id="adjAmt" type="number" min="0" step="any" placeholder="${PESO}" style="max-width:100px" aria-label="amount"><input id="adjNote" placeholder="${ko?"사유":"Reason"}">
+      <button class="btn-mini" onclick="addAdj(${r.id})">${ko?"추가":"Add"}</button></div>`}
+    <div class="report-pl" style="margin-top:14px">
+      <div class="pl-row"><span>${ko?"기본급":"Basic pay"} (${fmtH(r.reg)})</span><b>${fmt2(r.basic)}</b></div>
+      <div class="pl-row"><span>${ko?"OT 수당":"Overtime pay"} (${fmtH(r.ot)})</span><b>${fmt2(r.otPay)}</b></div>
+      <div class="pl-row"><span>${ko?"기타 지급":"Other pay"}</span><b>${fmt2(r.other)}</b></div>
+      <div class="pl-row"><span>${ko?"공제":"Deductions"}</span><b>−${fmt2(r.ded)}</b></div>
+      <div class="pl-row total"><span>${ko?"실지급액":"Net pay"}</span><b>${fmt2(r.net)}</b></div></div>
+    ${r.open ? `<div class="setup-note">⚠️ ${ko?`퇴근 기록이 없는 날이 ${r.open}일 있어요. 근태 탭에서 퇴근 시각을 입력하면 계산에 포함됩니다.`:`${r.open} day(s) have no clock-out. Fix them in Attendance to include them.`}</div>` : ""}
+    ${paid ? `<div class="done-mark" style="margin-top:10px">✓ ${ko?"지급 완료":"Paid"} · ${fmt2(paid.net)} · ${ago(paid.paid_at)} ${ko?"(지출 '직원월급'에 기록됨)":"(recorded as a wage expense)"}</div>
+        <button class="btn-ghost" onclick="undoPay(${paid.id}, ${paid.expense_id || "null"})">${ko?"지급 취소":"Undo payment"}</button>`
+      : `<button class="btn-primary" onclick="markPaid(${r.id})" ${ended ? "" : `title="${ko?"기간이 끝나기 전":"period not ended"}"`}>💸 ${ko?"지급 완료 처리":"Mark as paid"} · ${fmt2(r.net)}</button>
+        <p class="hint">${ko?"지급 완료 처리하면 지출(직원월급)에 자동으로 기록되고 이 기간 금액이 고정됩니다.":"Marking as paid records a wage expense and locks this period."}</p>`}
+  </div>`;
+}
+async function addAdj(empId){
+  const amount = Number($("adjAmt").value);
+  if (!(amount > 0)) { toast(state.lang==="ko" ? "금액을 입력하세요" : "Enter an amount"); return; }
+  const { error } = await sb.from("pay_adjustments").insert({ employee_id: empId, date: $("adjDate").value, kind: $("adjKind").value, amount, note: $("adjNote").value.trim() || null, created_by: state.user.id });
+  if (error) { toast(tt("save_fail") + error.message); return; }
+  toast(tt("saved")); screenPayroll();
+}
+async function delAdj(id){
+  if (!confirm(state.lang==="ko" ? "삭제할까요?" : "Delete?")) return;
+  const { error } = await sb.from("pay_adjustments").delete().eq("id", id);
+  if (error) { toast(error.message); return; }
+  screenPayroll();
+}
+async function markPaid(empId){
+  const ko = state.lang === "ko", period = payPeriod(pay.month, pay.half);
+  const [r] = await computePayroll(period, [empId]);
+  if (r.open && !confirm(ko ? "퇴근 기록이 없는 날은 계산에서 빠졌습니다. 그래도 지급 처리할까요?" : "Days without clock-out are excluded. Continue?")) return;
+  if (!confirm(`${empName(r.e)} · ${period.start} ~ ${period.end}\n${ko?"실지급":"Net"} ${fmt2(r.net)}\n\n${ko?"지급 완료로 처리할까요?":"Mark as paid?"}`)) return;
+  const exp = await sb.from("expenses").insert({ date: today() < period.end ? today() : period.end, category:"LABOR", amount: r.net, note: `${ko?"급여":"Wages"} ${r.e.name} ${period.start.slice(5)}~${period.end.slice(5)}`, created_by: state.user.id }).select("id").single();
+  if (exp.error) { toast(tt("save_fail") + exp.error.message); return; }
+  const run = await sb.from("payroll_runs").insert({ employee_id: empId, period_start: period.start, period_end: period.end, days: r.worked, regular_hours: round2(r.reg/60), ot_hours: round2(r.ot/60), late_min: r.late,
+    basic: r.basic, ot_pay: r.otPay, other_pay: r.other, deductions: r.ded, net: r.net, details: r.days.map((d) => ({ date:d.date, reg:d.reg, ot:d.ot, late:d.late, early:d.early, pay:d.pay, ot_pay:d.otPay })), expense_id: exp.data.id, paid_by: state.user.id });
+  if (run.error) { await sb.from("expenses").delete().eq("id", exp.data.id); toast(tt("save_fail") + run.error.message); return; }
+  toast(ko ? "지급 완료 처리했습니다" : "Marked as paid"); screenPayroll();
+}
+async function undoPay(runId, expenseId){
+  if (!confirm(state.lang==="ko" ? "지급 기록과 지출 기록을 취소할까요?" : "Undo this payment and its expense?")) return;
+  const { error } = await sb.from("payroll_runs").delete().eq("id", runId);
+  if (error) { toast(error.message); return; }
+  if (expenseId) await sb.from("expenses").delete().eq("id", expenseId);
+  screenPayroll();
+}
+async function printPayslip(empId){
+  const period = payPeriod(pay.month, pay.half), [r] = await computePayroll(period, [empId]);
+  const w = window.open("", "_blank"); if (!w) { toast(state.lang==="ko" ? "팝업이 막혀 있어요" : "Pop-up blocked"); return; }
+  const rows = r.days.map((d) => `<tr><td>${d.date.slice(5).replace("-", ".")}</td><td>${WEEKDAYS.en[new Date(d.date+"T00:00:00").getDay()]}</td><td>${d.recs.map((x) => timeHM(x.clock_in)).join(", ")}</td><td>${d.recs.map((x) => x.clock_out ? timeHM(x.clock_out) : "—").join(", ")}</td><td>${round2(d.reg/60)}</td><td>${d.ot ? round2(d.ot/60) : ""}</td><td>${d.late ? d.late + "m" : ""}</td><td>${fmt2(d.pay)}</td><td>${d.otPay ? fmt2(d.otPay) : ""}</td><td></td></tr>`).join("");
+  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Payroll ${esc(r.e.name)} ${period.start}</title><style>
+    body{font-family:-apple-system,Segoe UI,sans-serif;padding:24px;color:#111} h1{text-align:center;margin:0}h2{text-align:center;font-size:14px;margin:4px 0 16px}
+    .meta{display:flex;flex-wrap:wrap;gap:6px 24px;font-size:13px;margin-bottom:12px} table{width:100%;border-collapse:collapse;font-size:12px}
+    th,td{border:1px solid #444;padding:6px;text-align:center} th{background:#ddd} .sum{width:60%;margin:16px auto 0} .sum td:first-child{text-align:left}
+    @media print{button{display:none}}</style></head><body>
+    <h1>BAHAYY CAFE</h1><h2>PAYROLL RECORD / SALARY PAYMENT RECORD</h2>
+    <div class="meta"><span><b>Employee Name:</b> ${esc(r.e.name_en || r.e.name)}</span><span><b>Pay Period:</b> ${period.start} ~ ${period.end}</span><span><b>Payment Date:</b> ${period.end}</span><span><b>Daily Rate:</b> ${fmt2(r.p.rate)} (${r.p.std}h)</span></div>
+    <table><thead><tr><th>Date</th><th>Day</th><th>Time In</th><th>Time Out</th><th>Regular Hrs</th><th>OT Hrs</th><th>Late</th><th>Basic Pay</th><th>OT Pay</th><th>Employee Initial/Signature</th></tr></thead><tbody>${rows}</tbody></table>
+    <table class="sum"><tr><th>PAYROLL SUMMARY</th><th>AMOUNT</th></tr>
+      <tr><td>Basic Pay</td><td>${fmt2(r.basic)}</td></tr><tr><td>Overtime Pay</td><td>${fmt2(r.otPay)}</td></tr>
+      <tr><td>Other Pay / Benefits</td><td>${fmt2(r.other)}</td></tr><tr><td>Deductions</td><td>${r.ded ? "−" + fmt2(r.ded) : fmt2(0)}</td></tr>
+      <tr><td><b>Net Pay</b></td><td><b>${fmt2(r.net)}</b></td></tr></table>
+    <p style="margin-top:28px;font-size:13px">Received by: ______________________ &nbsp;&nbsp; Date: ____________</p>
+    <button onclick="print()">Print</button></body></html>`);
+  w.document.close();
+}
+
+// ── 퇴근 전 청소 사진 (매장·야외·주방·화장실) ──
+const CLEAN_AREAS = { STORE:{ko:"매장",en:"Store",tl:"Tindahan"}, OUTSIDE:{ko:"야외",en:"Outside",tl:"Labas"}, KITCHEN:{ko:"주방",en:"Kitchen",tl:"Kusina"}, RESTROOM:{ko:"화장실",en:"Restroom",tl:"Banyo"} };
+const areaLabel = (a) => { const e = CLEAN_AREAS[a]; return !e ? a : (state.lang==="ko" ? e.ko : e.en); };
+const cleanShots = {}; // area → 방금 찍은 사진 미리보기 URL
+function cameraModal(title, facing){
+  return new Promise(async (resolve) => {
+    const ko = state.lang === "ko", m = document.createElement("div");
+    m.className = "modal cam-modal"; m.setAttribute("role", "dialog");
+    m.innerHTML = `<div class="cam-sheet"><div class="cam-title">${esc(title)}</div><div class="cam-wrap"><video playsinline muted autoplay></video></div>
+      <button class="btn-primary" data-act="shot">📸 ${tl("take_photo")}</button><button class="btn-ghost" data-act="cancel">${tt("cancel")}</button></div>`;
+    document.body.appendChild(m);
+    let stream = null;
+    const done = (b) => { if (stream) stream.getTracks().forEach((t) => t.stop()); m.remove(); resolve(b); };
+    try { stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode: facing, width:{ ideal:1280 }, height:{ ideal:960 } }, audio:false }); }
+    catch (e) { toast(tt("cam_denied")); return done(null); }
+    const v = m.querySelector("video"); v.srcObject = stream; v.style.transform = facing === "user" ? "scaleX(-1)" : "none"; v.play().catch(() => {});
+    m.querySelector('[data-act="cancel"]').onclick = () => done(null);
+    m.querySelector('[data-act="shot"]').onclick = () => {
+      if (!v.videoWidth) return;
+      const s = Math.min(1, 800 / Math.max(v.videoWidth, v.videoHeight)), c = document.createElement("canvas");
+      c.width = Math.round(v.videoWidth * s); c.height = Math.round(v.videoHeight * s);
+      c.getContext("2d").drawImage(v, 0, 0, c.width, c.height);
+      c.toBlob((b) => done(b), "image/jpeg", 0.6);
+    };
+  });
+}
+async function cleanPhotosFor(attId){
+  const { data, error } = await sb.from("clean_photos").select("id,area,photo_path,created_at,photo_purged_at").eq("attendance_id", attId).order("id");
+  if (error) return null; // 08 SQL 실행 전
+  const latest = {}; (data||[]).forEach((p) => { latest[p.area] = p; });
+  return latest;
+}
+function cleanCardHTML(open, latest){
+  if (!latest) return "";
+  const ko = state.lang === "ko", n = Object.keys(CLEAN_AREAS).filter((a) => latest[a]).length;
+  return `<div class="section-label">🧹 ${tl("clean_photos")} (${n}/4)</div>
+    <div class="clean-grid">${Object.keys(CLEAN_AREAS).map((a) => `<button class="clean-tile ${latest[a]?"done":""}" onclick="takeCleanPhoto(${open.id},'${a}')">
+      ${cleanShots[a] ? `<img src="${cleanShots[a]}" alt="">` : `<span class="clean-ico">${latest[a] ? "✓" : "📷"}</span>`}
+      <b>${areaLabel(a)}${ko?"":`<span class="lang-sub">${CLEAN_AREAS[a].tl}</span>`}</b>${latest[a] ? `<small>${timeHM(latest[a].created_at)}</small>` : ""}</button>`).join("")}</div>
+    <p class="hint">${ko?"청소를 마치고 각 구역을 찍어 주세요. 사진 시각은 서버가 기록합니다.":"After cleaning, take a photo of each area. Time is recorded by the server. / Kunan ng litrato ang bawat lugar."}</p>`;
+}
+async function takeCleanPhoto(attId, area){
+  const blob = await cameraModal(`🧹 ${areaLabel(area)}`, "environment"); if (!blob) return;
+  const path = `clean/${today()}/${state.user.id}_${attId}_${area}_${Date.now()}.jpg`;
+  const up = await sb.storage.from(STORAGE_BUCKET).upload(path, blob, { contentType:"image/jpeg", upsert:false });
+  if (up.error) { toast(tt("save_fail") + up.error.message); return; }
+  const { error } = await sb.from("clean_photos").insert({ attendance_id: attId, employee_id: state.user.id, area, photo_path: path });
+  if (error) { toast(tt("save_fail") + error.message); return; }
+  if (cleanShots[area]) URL.revokeObjectURL(cleanShots[area]);
+  cleanShots[area] = URL.createObjectURL(blob);
+  toast(`${areaLabel(area)} ✓`); screenClock();
+}
+async function showCleanPhotos(attId){
+  const latest = await cleanPhotosFor(attId); if (!latest) return;
+  const list = Object.keys(CLEAN_AREAS).map((a) => latest[a]).filter((p) => p && p.photo_path);
+  const signed = list.length ? (await sb.storage.from(STORAGE_BUCKET).createSignedUrls(list.map((p) => p.photo_path), 300)).data || [] : [];
+  const m = document.createElement("div"); m.className = "modal"; m.setAttribute("role", "dialog");
+  m.innerHTML = `<div class="clean-gallery">${Object.keys(CLEAN_AREAS).map((a) => { const p = latest[a], k = list.indexOf(p), u = k >= 0 ? signed[k]?.signedUrl : null;
+    return `<figure>${u ? `<img src="${u}" alt="">` : `<div class="clean-missing">${p?.photo_purged_at ? "📷✕" : "—"}</div>`}<figcaption>${areaLabel(a)}${p ? ` · ${timeHM(p.created_at)}` : ""}</figcaption></figure>`; }).join("")}</div>`;
+  m.onclick = () => m.remove(); document.body.appendChild(m);
+}
+
+// ── 근태 수정 (사장): 출퇴근 시각 수정 · 빠진 근무 추가 ──
+async function editShift(id){
+  const r = attState.rows.find((x) => x.id === id); if (!r) return;
+  const ko = state.lang === "ko";
+  const cur = `${timeHM(r.clock_in)}-${r.clock_out ? timeHM(r.clock_out) : ""}`;
+  const v = prompt(ko ? `${r.date} 출근-퇴근 시각 (필리핀 시간, 예: 09:00-18:00)` : `${r.date} in-out time (PH time, e.g. 09:00-18:00)`, cur);
+  if (v === null) return;
+  const mm = v.trim().match(/^([01]?\d|2[0-3]):([0-5]\d)\s*-\s*(?:([01]?\d|2[0-3]):([0-5]\d))?$/);
+  if (!mm) { toast(ko ? "09:00-18:00 형식으로 입력하세요" : "Use 09:00-18:00"); return; }
+  const inTs = new Date(`${r.date}T${mm[1].padStart(2,"0")}:${mm[2]}:00+08:00`);
+  let outTs = mm[3] ? new Date(`${r.date}T${mm[3].padStart(2,"0")}:${mm[4]}:00+08:00`) : null;
+  if (outTs && outTs < inTs) outTs = new Date(outTs.getTime() + 864e5);
+  const { error } = await sb.from("attendance").update({ clock_in: inTs.toISOString(), clock_out: outTs ? outTs.toISOString() : null, admin_edit: true }).eq("id", id);
+  if (error) { toast(tt("save_fail") + error.message); return; }
+  toast(tt("saved")); screenAttendance();
+}
+async function addShift(){
+  const ko = state.lang === "ko", emp = Number($("asEmp").value), d = $("asDate").value, a = $("asIn").value, b = $("asOut").value;
+  if (!emp || !d || !a) { toast(ko ? "직원·날짜·출근 시각을 입력하세요" : "Choose staff, date and time in"); return; }
+  const inTs = new Date(`${d}T${a}:00+08:00`); let outTs = b ? new Date(`${d}T${b}:00+08:00`) : null;
+  if (outTs && outTs < inTs) outTs = new Date(outTs.getTime() + 864e5);
+  const { error } = await sb.from("attendance").insert({ employee_id: emp, date: d, clock_in: inTs.toISOString(), clock_out: outTs ? outTs.toISOString() : null, admin_edit: true });
+  if (error) { toast(tt("save_fail") + error.message); return; }
+  toast(tt("saved")); screenAttendance();
+}
+
+
+async function myPayHTML(){
+  const me = empById(state.user.id); if (!me || me.daily_rate === undefined) return "";
+  const ko = state.lang === "ko", cp = currentPeriod(), period = payPeriod(cp.month, cp.half);
+  let r; try { [r] = await computePayroll(period, [me.id]); } catch (_) { return ""; }
+  return `<div class="card"><h2>💰 ${tl("my_pay")} <span class="muted">${period.start.slice(5)} ~ ${period.end.slice(5)}</span></h2>
+    <div class="kv"><span>${ko?"근무":"Worked"}</span><b>${r.worked}${ko?"일":"d"} · ${fmtH(r.reg)}</b></div>
+    ${r.late ? `<div class="kv"><span>${ko?"지각":"Late"}</span><b class="neg">${r.late}${ko?"분":"m"}</b></div>` : ""}
+    ${r.ot ? `<div class="kv"><span>OT</span><b>${fmtH(r.ot)}</b></div>` : ""}
+    <div class="kv"><span>${ko?"예상 급여":"Estimated pay"}</span><b>${fmt2(r.net)}</b></div>
+    <p class="hint">${ko?`지급일 ${period.end.slice(5)} · 근무시간표(${toHM(me.shift_start)}–${toHM(me.shift_end)}) 기준, 지각·조퇴는 차감됩니다.`:`Pay day ${period.end.slice(5)} · based on your shift ${toHM(me.shift_start)}–${toHM(me.shift_end)}; late/early time is deducted.`}</p></div>`;
 }
 
 init();

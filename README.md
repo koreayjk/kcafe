@@ -1,4 +1,4 @@
-# ☕ Bahay Cafe
+# ☕ Bahayy Cafe
 
 필리핀 카페 원격 관리 웹앱. K-Food(`koreayjk/kfr`) 구조를 그대로 따른 **단일 `index.html`**(바닐라 JS + Supabase) 앱입니다.
 
@@ -11,14 +11,15 @@
    - [`supabase/05_kfood_link.sql`](supabase/05_kfood_link.sql) — K-Food 공급요청 상태 흐름·입고 처리 잠금
    - [`supabase/06_sales.sql`](supabase/06_sales.sql) — 마감(카드/기타 결제, 마감자·수정시각)·지출 기록자
    - [`supabase/07_photo_cleanup.sql`](supabase/07_photo_cleanup.sql) — 출근 사진 보관기간(기본 90일) 지난 것만 정리 허용
+   - [`supabase/08_field_update.sql`](supabase/08_field_update.sql) — 현장 피드백: 메뉴판·물품 목록·급여·청소 사진·재고 확인·유입 경로
 2. **Integrations → Data API → Settings → Exposed schemas** 에 `cafe` 추가 (`kfr` 도 유지)
 3. 앱 접속 → `사장` / PIN `0000` 로그인 → **관리** 탭에서 PIN 변경, 직원 추가
 4. 매장 안에서 **관리 → 📍 지금 위치를 매장 좌표로 등록** (출근 지오펜스 기준점, 기본 반경 100m)
 5. GitHub → Settings → Pages → Source: **GitHub Actions** (main 푸시 시 자동 배포, HTTPS라 카메라·GPS 사용 가능)
 
 ## 로고 / 색
-- 로고 파일을 저장소에 올리고 `index.html` 의 `const LOGO = ""` 에 경로 입력 (비우면 글자 로고)
-- 색은 `index.html` 상단 `:root` 의 `--accent*` 5개 값만 바꾸면 전체 적용
+- 로고: `logo.png` (하늘색 버섯집). `index.html` 의 `const LOGO` 로 지정
+- 색: 로고 하늘색(#B7E4F7)에서 뽑은 `:root` 의 `--accent*` 값
 
 ## 빌드 진행
 | 단계 | 내용 | 상태 |
@@ -31,5 +32,6 @@
 | 5 | K-Food 연동 (`kfr.supply_requests` + K-Food 앱 ☕카페 UI + 배송완료 → 입고 처리) | ✅ |
 | 6 | 마감/매출 · 일별 매출 · 메뉴 순위 · 월별 보고서 · 메뉴/지출 관리 | ✅ |
 | + | 출근 사진 자동 정리(기본 90일, 관리 탭에서 변경·즉시 정리) | ✅ |
+| 8 | 현장 피드백: 로고·색, 메뉴판 전체(+모조스·감자튀김·바하이 세트), 쿠폰 무료 음료, 유입 경로, 지출 분류, 물품 신청(분류·세부 그룹·직원도 품목 추가), 판매→재고 자동 차감, 퇴근 전 재고 확인, 퇴근 전 청소 사진, 급여 자동 계산(일급·근무시간표·지각/조퇴 차감·15일/말일 지급·급여 기록지 인쇄) | ✅ |
 
 기획 전체는 인수인계 문서(Bahay Cafe 관리 프로그램 — 기획 & 인수인계 MD v2) 참고.
