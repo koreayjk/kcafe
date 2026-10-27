@@ -3,7 +3,7 @@
 필리핀 카페 원격 관리 웹앱. K-Food(`koreayjk/kfr`) 구조를 그대로 따른 **단일 `index.html`**(바닐라 JS + Supabase) 앱입니다.
 
 ## 처음 설정 (1회)
-1. K-Food와 **같은 Supabase 프로젝트** → SQL Editor 에서 순서대로 실행
+1. K-Food와 **같은 Supabase 프로젝트** → SQL Editor 에서 [`supabase/00_ALL_IN_ONE.sql`](supabase/00_ALL_IN_ONE.sql) 하나만 실행하면 아래 01~10 전부가 순서대로 적용됩니다 (여러 번 실행해도 데이터 유지). 개별 파일:
    - [`supabase/cafe_schema.sql`](supabase/cafe_schema.sql) — 기본 스키마(`cafe` 테이블, 공용 `kfr.supply_requests`, RLS, Storage 버킷 `cafe`, 첫 관리자 계정)
    - [`supabase/02_attendance.sql`](supabase/02_attendance.sql) — 출퇴근 서버 인증(시각·거리·✅를 DB가 결정)
    - [`supabase/03_board.sql`](supabase/03_board.sql) — 게시판 안 읽음 표시·마지막 활동 시각
