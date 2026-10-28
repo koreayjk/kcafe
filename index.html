@@ -559,6 +559,7 @@ async function enterStaffMode(){
   const mark = await t.from("app_settings").select("value").eq("key", "test_reset_at").maybeSingle();
   const age = mark.data?.value ? Date.now() - new Date(mark.data.value).getTime() : Infinity;
   if (!chk.count || !(age < 12 * 3600e3)) { const r = await t.rpc("reset_from_live"); if (r.error) { toast(r.error.message); return; } }
+  state.liveStaffClosing = state.settings.staff_closing; // 직원 모드도 실제 설정(직원 마감 허용)을 그대로 따름
   resetCam(); state.staffMode = true; sb = t; sbk = t; state.ownerTab = state.tab;
   await loadEmployees(); await loadSettings();
   state.tab = "clock"; renderApp();
@@ -582,7 +583,7 @@ async function resetTestData(){
 function tabsFor(){
   if (isAdmin()) return ["dashboard","closing","daily","menurank","report","attendance","payroll","inventory","supply","board","manage"].map((k)=>[k,tt("tab_"+k)]);
   const t = ["clock","inventory","board"];
-  if (state.settings.staff_closing === "1" || state.staffMode) t.push("closing");
+  if ((state.staffMode ? state.liveStaffClosing : state.settings.staff_closing) === "1") t.push("closing");
   return t.map((k)=>[k,tt("tab_"+k)]);
 }
 function renderApp() {
